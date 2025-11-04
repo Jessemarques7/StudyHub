@@ -1,22 +1,70 @@
 "use client"; // this registers <Editor> as a Client Component
 import "@blocknote/core/fonts/inter.css";
-import { useCreateBlockNote } from "@blocknote/react";
+import {
+  DefaultReactSuggestionItem,
+  SuggestionMenuController,
+  useCreateBlockNote,
+} from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
-import { Block } from "@blocknote/core";
+import {
+  Block,
+  BlockNoteSchema,
+  defaultInlineContentSpecs,
+  filterSuggestionItems,
+} from "@blocknote/core";
 import "@blocknote/shadcn/style.css";
+
+import { Mention } from "./Mention";
+// Our schema with inline content specs, which contain the configs and
+// implementations for inline content  that we want our editor to use.
+const schema = BlockNoteSchema.create({
+  inlineContentSpecs: {
+    // Adds all default inline content.
+    ...defaultInlineContentSpecs,
+    // Adds the mention tag.
+    mention: Mention,
+  },
+});
+
+const getMentionMenuItems = (
+  editor: typeof schema.BlockNoteEditor,
+  notes: { id: string; title: string }[]
+): DefaultReactSuggestionItem[] => {
+  // const users = ["Steve", "Bob", "Joe", "Mike"];
+
+  return notes.map((note) => ({
+    title: note.title,
+    onItemClick: () => {
+      editor.insertInlineContent([
+        {
+          type: "mention",
+          props: {
+            note,
+          },
+        },
+        " ", // add a space after the mention
+      ]);
+    },
+  }));
+};
 
 export default function Blocknote({
   onUpdateNote,
   currentNote,
+  notes,
 }: {
   onUpdateNote: (blocks: Block[]) => void;
   currentNote: { content: Block[] };
+  notes: { content: Block[] };
 }) {
   function handleUpdateNote(blocks: Block[]) {
     onUpdateNote(blocks);
   }
 
-  const editor = useCreateBlockNote({ initialContent: currentNote.content });
+  const editor = useCreateBlockNote({
+    schema,
+    initialContent: currentNote?.content,
+  });
 
   return (
     <BlockNoteView
@@ -30,6 +78,15 @@ export default function Blocknote({
           "--bn-colors-editor-background": "transparent",
         } as React.CSSProperties // Cast para CSSProperties se o TypeScript reclamar
       }
-    />
+    >
+      {/* Adds a mentions menu which opens with the "@" key */}
+      <SuggestionMenuController
+        triggerCharacter={"@"}
+        getItems={async (query) =>
+          // Gets the mentions menu items
+          filterSuggestionItems(getMentionMenuItems(editor, notes), query)
+        }
+      />
+    </BlockNoteView>
   );
 }

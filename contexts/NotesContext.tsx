@@ -9,10 +9,7 @@ const initialNotes = [
     id: crypto.randomUUID(),
     title: "My First Note",
     content: [
-      {
-        type: "heading",
-        content: "My First Note",
-      },
+      {},
       // {
       //   id: crypto.randomUUID(),
       //   type: "paragraph",

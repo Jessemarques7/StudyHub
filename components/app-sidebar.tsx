@@ -1,10 +1,6 @@
 "use client";
-import {
-  ChevronRight,
-  MoreHorizontal,
-  SquarePen, // <-- 1. Importe o ícone
-} from "lucide-react";
-
+import { useRouter, usePathname } from "next/navigation"; // ⬅️ IMPORTANTE
+import { ChevronRight, MoreHorizontal, SquarePen } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +18,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@radix-ui/react-collapsible"; // <-- Assumi que isso seja de "@/components/ui/collapsible"
+} from "@radix-ui/react-collapsible";
 import { useNotes } from "@/contexts/NotesContext";
 import Link from "next/link";
 import {
@@ -31,30 +27,64 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useState } from "react";
 
 export function AppSidebar() {
+  const router = useRouter(); // ⬅️ para redirecionar
+  const pathname = usePathname(); // ⬅️ para saber qual nota está aberta
   const { notes, setNotes } = useNotes();
 
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [tempTitle, setTempTitle] = useState("");
+
   function handleCreateNewNote() {
-    // Lógica para criar uma nova nota
     const newNote = {
       id: crypto.randomUUID(),
-      title: "Untitled",
+      title: "New Note",
       content: [
         {
-          type: "heading",
-          content: "untitled",
+          // type: "heading",
+          // content: "",
         },
       ],
     };
 
     setNotes([...notes, newNote]);
+
+    router.push(`/notes/${newNote.id}`); // ⬅️ redireciona para a nova nota
   }
 
   function handleDeleteNote(noteId: string) {
-    // Lógica para deletar uma nota
-    console.log("passou delete", noteId, notes);
-    setNotes(notes.filter((note) => note.id !== noteId));
+    const updatedNotes = notes.filter((note) => note.id !== noteId);
+    setNotes(updatedNotes);
+
+    // Verifica se a nota deletada é a que está aberta
+    const currentNoteId = pathname.split("/").pop();
+
+    if (noteId === currentNoteId) {
+      if (updatedNotes.length > 0) {
+        // Redireciona para a primeira nota restante
+        router.push(`/notes/${updatedNotes[0].id}`);
+      } else {
+        // Se não restar nenhuma nota, redireciona para home
+        router.push("/");
+      }
+    }
+  }
+
+  function handleStartEditing(noteId: string, currentTitle: string) {
+    setEditingNoteId(noteId);
+    setTempTitle(currentTitle);
+  }
+
+  function handleSaveRename(noteId: string) {
+    if (tempTitle.trim() === "") return;
+    setNotes(
+      notes.map((note) =>
+        note.id === noteId ? { ...note, title: tempTitle } : note
+      )
+    );
+    setEditingNoteId(null);
   }
 
   return (
@@ -68,15 +98,12 @@ export function AppSidebar() {
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton asChild>
-                      <div className="group">
-                        <ChevronRight className=" h-4 w-4 transition-transform group-data-[state=open]:rotate-90" />
-
-                        <span>Notes</span>
+                      <div className="group flex items-center">
+                        <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]:rotate-90" />
+                        <span className="ml-1">Notes</span>
                         <SquarePen
                           aria-label="Create New Note"
-                          onClick={() => {
-                            handleCreateNewNote();
-                          }}
+                          onClick={handleCreateNewNote}
                           className="cursor-pointer ml-auto h-4 w-4"
                         />
                       </div>
@@ -85,30 +112,54 @@ export function AppSidebar() {
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {notes.map((note) => (
-                        <Link key={note.id} href={`/notes/${note.id}`}>
-                          <SidebarMenuSubItem>
-                            {note.title}
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <SidebarMenuAction>
-                                  <MoreHorizontal />
-                                </SidebarMenuAction>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent side="right" align="start">
-                                <DropdownMenuItem>
-                                  <span>Rename Note</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    handleDeleteNote(note.id);
-                                  }}
-                                >
-                                  <span>Delete Note</span>
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </SidebarMenuSubItem>
-                        </Link>
+                        <SidebarMenuSubItem
+                          key={note.id}
+                          className="flex items-center"
+                        >
+                          {editingNoteId === note.id ? (
+                            <input
+                              value={tempTitle}
+                              onChange={(e) => setTempTitle(e.target.value)}
+                              onBlur={() => handleSaveRename(note.id)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter")
+                                  handleSaveRename(note.id);
+                                if (e.key === "Escape") setEditingNoteId(null);
+                              }}
+                              autoFocus
+                              className="flex-1 bg-transparent border-b border-muted focus:outline-none text-sm"
+                            />
+                          ) : (
+                            <Link
+                              href={`/notes/${note.id}`}
+                              className="flex-1 truncate"
+                            >
+                              {note.title}
+                            </Link>
+                          )}
+
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <SidebarMenuAction>
+                                <MoreHorizontal />
+                              </SidebarMenuAction>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent side="right" align="start">
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStartEditing(note.id, note.title)
+                                }
+                              >
+                                <span>Rename Note</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDeleteNote(note.id)}
+                              >
+                                <span>Delete Note</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </SidebarMenuSubItem>
                       ))}
                     </SidebarMenuSub>
                   </CollapsibleContent>
