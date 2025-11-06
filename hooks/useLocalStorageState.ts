@@ -1,32 +1,3 @@
-// "use client";
-
-// import { useState, useEffect, Dispatch, SetStateAction } from "react";
-
-// export function useLocalStorageState<T>(
-//   initialState: T,
-//   key: string
-// ): [T, Dispatch<SetStateAction<T>>] {
-//   const [value, setValue] = useState<T>(() => {
-//     if (typeof window === "undefined") return initialState;
-//     try {
-//       const storedValue = localStorage.getItem(key);
-//       return storedValue ? (JSON.parse(storedValue) as T) : initialState;
-//     } catch {
-//       return initialState;
-//     }
-//   });
-
-//   useEffect(() => {
-//     try {
-//       localStorage.setItem(key, JSON.stringify(value));
-//     } catch {
-//       // Evita erro se localStorage estiver desabilitado
-//     }
-//   }, [value, key]);
-
-//   return [value, setValue];
-// }
-
 "use client";
 
 import {
@@ -78,49 +49,4 @@ export function useLocalStorageState<T>(
   }, [value, key, isClient]);
 
   return [value, setValue];
-}
-
-// Hook alternativo com callback para melhor performance
-export function useLocalStorageStateWithCallback<T>(
-  initialState: T,
-  key: string
-): [T, (value: T | ((prev: T) => T)) => void] {
-  const [storedValue, setStoredValue] = useState<T>(initialState);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient) return;
-
-    try {
-      const item = localStorage.getItem(key);
-      if (item) {
-        setStoredValue(JSON.parse(item));
-      }
-    } catch (error) {
-      console.error(`Error reading localStorage key "${key}":`, error);
-    }
-  }, [key, isClient]);
-
-  const setValue = useCallback(
-    (value: T | ((prev: T) => T)) => {
-      try {
-        const valueToStore =
-          value instanceof Function ? value(storedValue) : value;
-        setStoredValue(valueToStore);
-
-        if (isClient) {
-          localStorage.setItem(key, JSON.stringify(valueToStore));
-        }
-      } catch (error) {
-        console.error(`Error setting localStorage key "${key}":`, error);
-      }
-    },
-    [key, storedValue, isClient]
-  );
-
-  return [storedValue, setValue];
 }
