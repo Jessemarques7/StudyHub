@@ -41,17 +41,18 @@ export const Mention = createReactInlineContentSpec(
         <Link
           href={`/notes/${noteData.id}`}
           style={{
-            backgroundColor: "#8400ff33",
+            backgroundColor: "#9124ff",
             textDecoration: "none",
             padding: "2px 4px",
             borderRadius: "4px",
-            color: "#cfcfcf",
+            color: "#131313",
             transition: "all 0.2s ease",
+            fontWeight: "bold",
           }}
-          className="mention-link hover:bg-[#8400ff55]"
+          className="mention-link "
           title={`Go to: ${noteData.title}`}
         >
-          @{noteData.title || "Untitled"}
+          @ {noteData.title || "Untitled"}
         </Link>
       );
     },

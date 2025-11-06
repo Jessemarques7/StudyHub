@@ -213,7 +213,7 @@ export function AppSidebarAceternity() {
                         "flex items-center gap-2 px-2 py-1.5 rounded-md transition-all group/note",
                         currentNoteId === note.id
                           ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
-                          : "hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200"
+                          : "hover:bg-neutral-200 dark:hover:bg-blue-900/30 text-neutral-700 dark:text-neutral-200"
                       )}
                     >
                       <IconNotes className="h-4 w-4 text-neutral-700 dark:text-neutral-200 flex-shrink-0" />
@@ -268,7 +268,7 @@ export function SidebarDemo({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div className="flex h-screen w-full overflow-hidden ">
       <Sidebar open={open} setOpen={setOpen} animate={true}>
         <SidebarBody className="justify-between gap-10">
           <AppSidebarAceternity />

@@ -102,7 +102,7 @@ export default function Graph() {
   }
 
   return (
-    <div className="relative bg-neutral-900 ">
+    <div className="relative bg-slate-950 ">
       <ForceGraphComponent data={graphData} />
     </div>
   );

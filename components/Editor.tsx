@@ -81,12 +81,12 @@ export default function Editor() {
 
   return (
     <div className="flex flex-1">
-      <div className="flex h-full w-full flex-col rounded-tl-2xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900 overflow-hidden">
+      <div className="flex h-full w-full flex-col rounded-tl-2xl border border-neutral-200  bg-white dark:border-neutral-700  overflow-hidden">
         {/* Header com gradiente */}
         <div className="h-[25vh] bg-gradient-to-r from-green-300 via-blue-500 to-purple-600" />
 
         {/* Conteúdo do editor */}
-        <div className="flex-1 overflow-auto p-2 md:px-10 md:py-6 flex items-start justify-center dark:bg-neutral-900">
+        <div className="flex-1 overflow-auto p-2 md:px-10 md:py-6 flex items-start justify-center dark:bg-slate-950">
           <div className="w-full max-w-[770px]">
             {/* Input do título */}
             <input
