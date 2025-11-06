@@ -5,6 +5,8 @@ export interface Note {
   id: string;
   title: string;
   content: Block[];
+  icon?: string | null; // Adicionado
+  coverImage?: string | null; // Adicionado
   createdAt?: Date;
   updatedAt?: Date;
 }
