@@ -216,7 +216,9 @@ export function AppSidebarAceternity() {
                           : "hover:bg-neutral-200 dark:hover:bg-blue-900/30 text-neutral-700 dark:text-neutral-200"
                       )}
                     >
-                      <IconNotes className="h-4 w-4 text-neutral-700 dark:text-neutral-200 flex-shrink-0" />
+                      <span className="h-4 w-4 text-neutral-700 dark:text-neutral-200 flex-shrink-0">
+                        {note.icon}
+                      </span>
                       <motion.span
                         animate={{
                           opacity: open ? 1 : 0,

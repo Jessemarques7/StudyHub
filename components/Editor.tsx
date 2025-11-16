@@ -5,6 +5,7 @@ import Blocknote from "./Blocknote";
 import { useParams } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { Block } from "@blocknote/core";
+import EmojiPicker from "emoji-picker-react";
 
 export default function Editor() {
   const params = useParams<{ noteid: string }>();
@@ -17,6 +18,9 @@ export default function Editor() {
 
   const [title, setTitle] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+
+  const [chosenEmoji, setChosenEmoji] = useState("🗒️");
+  const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
 
   // Sincroniza o título quando a nota muda
   useEffect(() => {
@@ -81,14 +85,41 @@ export default function Editor() {
 
   return (
     <div className="flex flex-1">
-      <div className="flex h-full w-full flex-col rounded-tl-2xl border border-neutral-200  bg-white dark:border-neutral-700  overflow-hidden">
+      <div className="flex h-full w-full relative flex-col rounded-tl-2xl border border-neutral-200  bg-white dark:border-neutral-700  overflow-hidden">
         {/* Header com gradiente */}
         <div className="h-[25vh] bg-gradient-to-r from-green-300 via-blue-500 to-purple-600" />
 
         {/* Conteúdo do editor */}
-        <div className="flex-1 overflow-auto p-2 md:px-10 md:py-6 flex items-start justify-center dark:bg-slate-950">
+        <div className="flex-1 overflow-auto p-2 md:px-10 md:py-6 flex items-start justify-center  dark:bg-slate-950">
           <div className="w-full max-w-[770px]">
             {/* Input do título */}
+
+            {/* <EmojiPicker theme="dark" /> */}
+            <div className="text-white cursor-pointer -mt-16 z-50 absolute ml-5">
+              {chosenEmoji ? (
+                <span
+                  onClick={() => setEmojiPickerVisible(!emojiPickerVisible)}
+                  className="text-6xl"
+                >
+                  {chosenEmoji}
+                </span>
+              ) : (
+                <span
+                  onClick={() => setEmojiPickerVisible(!emojiPickerVisible)}
+                >
+                  Chose icon
+                </span>
+              )}
+              <EmojiPicker
+                theme="dark"
+                open={emojiPickerVisible}
+                onEmojiClick={(emojiData) => {
+                  setChosenEmoji(emojiData.emoji);
+                  setEmojiPickerVisible(!emojiPickerVisible);
+                }}
+              />
+            </div>
+
             <input
               type="text"
               value={title}

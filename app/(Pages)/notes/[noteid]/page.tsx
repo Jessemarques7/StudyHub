@@ -7,7 +7,7 @@ export default function NotePage() {
     <SidebarDemo>
       {/* Main content area */}
       <div className="h-6 bg-slate-950 rounded-tl-2xl "></div>
-      <div className="flex h-screen flex-row  overflow-hidden">
+      <div className="flex  flex-row  overflow-hidden">
         <Editor />
         <Graph />
       </div>

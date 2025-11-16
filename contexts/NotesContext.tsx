@@ -29,6 +29,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       const newNote: Note = {
         id: crypto.randomUUID(),
         title: noteData?.title || "Untitled",
+        icon: noteData?.icon || "🗒️",
         content: noteData?.content || [],
         createdAt: new Date(),
         updatedAt: new Date(),
