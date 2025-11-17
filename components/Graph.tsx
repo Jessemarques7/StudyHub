@@ -1,73 +1,76 @@
-"use client";
-
 import { useMemo } from "react";
 import { useNotes } from "@/contexts/NotesContext";
 import ForceGraphComponent from "./ForceGraph";
 import { GraphData, GraphLink } from "@/types/notes";
 import { Block } from "@blocknote/core";
 
-interface ContentItem {
+interface MentionContent {
   type: string;
   props?: {
     note?: {
       id: string;
-      title: string;
     };
   };
 }
 
 interface ParagraphBlock extends Block {
   type: "paragraph";
-  content: ContentItem[];
+  content?: MentionContent[];
+}
+
+function isParagraphBlock(block: Block): block is ParagraphBlock {
+  return (
+    block.type === "paragraph" &&
+    Array.isArray((block as ParagraphBlock).content)
+  );
+}
+
+function extractMentionId(contentItem: MentionContent): string | null {
+  return contentItem.type === "mention" && contentItem.props?.note?.id
+    ? contentItem.props.note.id
+    : null;
 }
 
 export default function Graph() {
   const { notes } = useNotes();
 
-  // Extrai os links entre as notas
+  // Extrai os links das menções nas notas
   const links = useMemo((): GraphLink[] => {
     const extractedLinks: GraphLink[] = [];
+    const validNoteIds = new Set(notes.map((n) => n.id));
 
     notes.forEach((note) => {
-      if (!note.content || !Array.isArray(note.content)) return;
+      if (!Array.isArray(note.content)) return;
 
       note.content.forEach((block) => {
-        // Verifica se é um parágrafo com conteúdo
-        if (block.type === "paragraph" && Array.isArray(block.content)) {
-          const paragraphBlock = block as ParagraphBlock;
+        if (!isParagraphBlock(block)) return;
 
-          paragraphBlock.content.forEach((contentItem) => {
-            // Verifica se é uma menção válida
-            if (contentItem.type === "mention" && contentItem.props?.note?.id) {
-              const targetId = contentItem.props.note.id;
+        block.content?.forEach((contentItem) => {
+          const targetId = extractMentionId(contentItem);
 
-              // Verifica se a nota alvo existe
-              const targetExists = notes.some((n) => n.id === targetId);
-
-              if (targetExists) {
-                extractedLinks.push({
-                  source: note.id,
-                  target: targetId,
-                });
-              }
-            }
-          });
-        }
+          if (targetId && validNoteIds.has(targetId)) {
+            extractedLinks.push({
+              source: note.id,
+              target: targetId,
+            });
+          }
+        });
       });
     });
 
     return extractedLinks;
   }, [notes]);
 
-  // Prepara os dados do grafo
+  // Calcula o tamanho dos nós baseado nas conexões
   const graphData: GraphData = useMemo(() => {
-    // Calcula quantas conexões cada nota tem
     const connectionCount = new Map<string, number>();
 
+    // Inicializa contador
     notes.forEach((note) => {
       connectionCount.set(note.id, 0);
     });
 
+    // Conta conexões
     links.forEach((link) => {
       connectionCount.set(
         link.source,
@@ -83,14 +86,13 @@ export default function Graph() {
       nodes: notes.map((note) => ({
         id: note.id,
         name: note.title || "Untitled",
-        // Tamanho do nó baseado no número de conexões (mínimo 1, máximo 5)
+        // Tamanho baseado em conexões (1-5 range)
         val: Math.min(Math.max((connectionCount.get(note.id) || 0) + 1, 1), 5),
       })),
       links,
     };
   }, [notes, links]);
 
-  // Não renderiza se não houver notas
   if (notes.length === 0) {
     return (
       <div className="flex items-center justify-center h-full p-8">
@@ -102,7 +104,7 @@ export default function Graph() {
   }
 
   return (
-    <div className="relative bg-slate-950 ">
+    <div className="relative bg-slate-950 h-full">
       <ForceGraphComponent data={graphData} />
     </div>
   );
