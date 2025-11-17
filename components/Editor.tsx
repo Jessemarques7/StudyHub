@@ -3,9 +3,13 @@
 import { useNotes } from "@/contexts/NotesContext";
 import Blocknote from "./Blocknote";
 import { useParams } from "next/navigation";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { Block } from "@blocknote/core";
 import EmojiPicker from "emoji-picker-react";
+import { CoverPicker } from "@/components/NotePickers";
+import { cn } from "@/lib/utils";
+import { Smile, Upload, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Editor() {
   const params = useParams<{ noteid: string }>();
@@ -18,9 +22,8 @@ export default function Editor() {
 
   const [title, setTitle] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-
-  const [chosenEmoji, setChosenEmoji] = useState("🗒️");
   const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
+  const iconUploadRef = useRef<HTMLInputElement>(null);
 
   // Sincroniza o título quando a nota muda
   useEffect(() => {
@@ -68,6 +71,45 @@ export default function Editor() {
     [currentNote]
   );
 
+  // Handlers para Ícone
+  const handleIconRemove = useCallback(() => {
+    if (!params.noteid) return;
+    updateNote(params.noteid, { icon: null });
+  }, [params.noteid, updateNote]);
+
+  const handleIconUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (file.size > 1024 * 1024) {
+        // 1MB limit
+        alert("File is too large (max 1MB).");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateNote(params.noteid, { icon: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+      e.target.value = ""; // Clear input
+    },
+    [params.noteid, updateNote]
+  );
+
+  // Handlers para Capa
+  const handleCoverSelect = useCallback(
+    (cover: string) => {
+      if (!params.noteid) return;
+      updateNote(params.noteid, { coverImage: cover });
+    },
+    [params.noteid, updateNote]
+  );
+
+  const handleCoverRemove = useCallback(() => {
+    if (!params.noteid) return;
+    updateNote(params.noteid, { coverImage: null });
+  }, [params.noteid, updateNote]);
+
   if (!currentNote) {
     return (
       <div className="flex flex-1 items-center justify-center">
@@ -85,41 +127,125 @@ export default function Editor() {
 
   return (
     <div className="flex flex-1">
-      <div className="flex h-full w-full relative flex-col rounded-tl-2xl border border-neutral-200  bg-white dark:border-neutral-700  overflow-hidden">
-        {/* Header com gradiente */}
-        <div className="h-[25vh] bg-gradient-to-r from-green-300 via-blue-500 to-purple-600" />
+      {/* Wrapper principal: 
+        - 'relative' para posicionar o ícone
+        - 'overflow-hidden' REMOVIDO para evitar corte
+      */}
+      <div className="flex h-full w-full relative flex-col rounded-tl-2xl ">
+        {/* Header com capa dinâmica */}
+        <div className="h-[25vh] group relative">
+          {currentNote.coverImage ? (
+            (() => {
+              const cover = currentNote.coverImage;
+              if (cover.startsWith("http") || cover.startsWith("data:")) {
+                return (
+                  <img
+                    src={cover}
+                    alt="Cover"
+                    className="w-full h-full object-cover"
+                  />
+                );
+              } else if (cover.startsWith("bg-") || cover.startsWith("from-")) {
+                return <div className={cn("w-full h-full", cover)} />;
+              } else {
+                return (
+                  <div
+                    className="w-full h-full"
+                    style={{ background: cover }}
+                  />
+                );
+              }
+            })()
+          ) : (
+            <div className="w-full h-full bg-slate-800" /> // Capa padrão
+          )}
+          <div className="absolute bottom-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+            <CoverPicker
+              currentCover={currentNote.coverImage}
+              onSelect={handleCoverSelect}
+              onRemove={handleCoverRemove}
+            />
+          </div>
+        </div>
 
-        {/* Conteúdo do editor */}
+        {/* Seletor de Ícone:
+          - Movido para fora do container de scroll
+          - Posicionado 'absolute' em relação ao wrapper principal
+          - 'top' é calculado para ficar metade sobre a capa
+          - 'z-50' para ficar acima do conteúdo
+        */}
+        <div
+          className="text-white cursor-pointer z-50 absolute ml-12 group"
+          style={{ top: "calc(25vh - 40px)" }} // 48px é metade da altura do ícone (aprox 6rem/2)
+        >
+          <div className="relative flex items-end gap-2">
+            <button
+              onClick={() => setEmojiPickerVisible((prev) => !prev)}
+              className="text-6xl cursor-pointer rounded-lg p-1 transition-colors"
+              aria-label="Pick emoji icon"
+            >
+              {currentNote.icon && !currentNote.icon.startsWith("data:") ? (
+                <span>{currentNote.icon}</span>
+              ) : currentNote.icon && currentNote.icon.startsWith("data:") ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={currentNote.icon}
+                  alt="icon"
+                  className="w-16 h-16 object-cover rounded"
+                />
+              ) : (
+                <Smile className="w-16 h-16 text-slate-600 p-2" />
+              )}
+            </button>
+            <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Button
+                size="icon-sm"
+                variant="outline"
+                className="bg-black/50 hover:bg-black/70 border-slate-700"
+                onClick={() => iconUploadRef.current?.click()}
+                aria-label="Upload icon"
+              >
+                <Upload className="w-4 h-4" />
+              </Button>
+              {currentNote.icon && (
+                <Button
+                  size="icon-sm"
+                  variant="outline"
+                  className="bg-black/50 hover:bg-black/70 border-slate-700 text-red-400 hover:text-red-400"
+                  onClick={handleIconRemove}
+                  aria-label="Remove icon"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+            <input
+              type="file"
+              ref={iconUploadRef}
+              accept="image/*,.svg"
+              onChange={handleIconUpload}
+              className="hidden"
+            />
+            {emojiPickerVisible && (
+              <div className="absolute top-full mt-2 z-50">
+                <EmojiPicker
+                  theme="dark"
+                  onEmojiClick={(emojiData) => {
+                    updateNote(params.noteid, { icon: emojiData.emoji });
+                    setEmojiPickerVisible(false);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Conteúdo do editor (com scroll) */}
         <div className="flex-1 overflow-auto p-2 md:px-10 md:py-6 flex items-start justify-center  dark:bg-slate-950">
           <div className="w-full max-w-[770px]">
-            {/* Input do título */}
-
-            {/* <EmojiPicker theme="dark" /> */}
-            <div className="text-white cursor-pointer -mt-16 z-50 absolute ml-5">
-              {chosenEmoji ? (
-                <span
-                  onClick={() => setEmojiPickerVisible(!emojiPickerVisible)}
-                  className="text-6xl"
-                >
-                  {chosenEmoji}
-                </span>
-              ) : (
-                <span
-                  onClick={() => setEmojiPickerVisible(!emojiPickerVisible)}
-                >
-                  Chose icon
-                </span>
-              )}
-              <EmojiPicker
-                theme="dark"
-                open={emojiPickerVisible}
-                onEmojiClick={(emojiData) => {
-                  setChosenEmoji(emojiData.emoji);
-                  setEmojiPickerVisible(!emojiPickerVisible);
-                }}
-              />
-            </div>
-
+            {/* Input do título:
+              - Adicionado 'mt-12' (margin-top) para dar espaço ao ícone
+            */}
             <input
               type="text"
               value={title}
@@ -129,7 +255,7 @@ export default function Editor() {
               onFocus={() => setIsEditing(true)}
               placeholder="Untitled"
               aria-label="Note title"
-              className="w-full px-[54px] mb-4 text-gray-50 text-5xl font-bold bg-transparent border-none outline-none placeholder:text-gray-400 focus:placeholder:text-gray-500 transition-colors"
+              className="w-full px-[54px] mt-12 mb-4 text-gray-50 text-5xl font-bold bg-transparent border-none outline-none placeholder:text-gray-400 focus:placeholder:text-gray-500 transition-colors"
             />
 
             {/* Editor de conteúdo */}

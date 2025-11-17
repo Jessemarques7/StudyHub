@@ -88,9 +88,10 @@ export default function Blocknote({
   return (
     <BlockNoteView
       onChange={handleChange}
-      theme="dark"
+      // theme="dark" <-- ESSA LINHA FOI REMOVIDA
       editor={editor}
       shadCNComponents={{}}
+      // Adicionamos este estilo de volta para o editor ficar transparente
       style={
         {
           "--bn-colors-editor-background": "transparent",
