@@ -19,6 +19,7 @@ import {
   SidebarBody,
   useSidebar,
 } from "@/components/ui/aceternity-sidebar";
+import Image from "next/image";
 
 export function AppSidebarAceternity() {
   const router = useRouter();
@@ -124,6 +125,7 @@ export function AppSidebarAceternity() {
           </motion.span>
         </div>
       </div> */}
+      {open ? <Logo /> : <LogoIcon />}
 
       {/* Notes Section */}
       <div className="flex-1 overflow-y-auto px-4.5 py-4">
@@ -280,3 +282,36 @@ export function SidebarDemo({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+export const Logo = () => {
+  return (
+    <Link
+      href="/"
+      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
+    >
+      <div className="h-8 w-8 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm ">
+        <Image alt="logo" width={50} height={50} src={"/logo.png"} />
+      </div>
+
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="font-medium whitespace-pre text-black dark:text-white"
+      >
+        StudyHub
+      </motion.span>
+    </Link>
+  );
+};
+export const LogoIcon = () => {
+  return (
+    <Link
+      href="#"
+      className="relative z-20 flex items-center space-x-2 py-1  text-sm font-normal text-black"
+    >
+      <div className="h-8 w-8 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm ">
+        <Image alt="logo" width={50} height={50} src={"/logo.png"} />
+      </div>
+    </Link>
+  );
+};
