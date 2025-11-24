@@ -20,6 +20,7 @@ import {
   useSidebar,
 } from "@/components/ui/aceternity-sidebar";
 import Image from "next/image";
+import { IconCards } from "@tabler/icons-react"; // Exemplo de ícone
 
 export function AppSidebarAceternity() {
   const router = useRouter();
@@ -131,7 +132,7 @@ export function AppSidebarAceternity() {
       <div className="flex-1 overflow-y-auto px-4.5 py-4">
         {/* Notes Header with Collapsible */}
         <div className="mb-2">
-          <div className="flex items-center justify-between w-full text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md px-2 py-2 transition-colors">
+          <div className="flex items-center justify-between w-full text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-blue-900/30 rounded-md px-2 py-2 transition-colors">
             <button
               onClick={() => setNotesOpen(!notesOpen)}
               className="flex items-center gap-2 flex-1 min-w-0"

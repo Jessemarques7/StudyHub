@@ -3,7 +3,7 @@
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/shadcn/style.css";
 
-import { useCallback, useMemo, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import {
   DefaultReactSuggestionItem,
   SuggestionMenuController,
@@ -88,10 +88,10 @@ export default function Blocknote({
   return (
     <BlockNoteView
       onChange={handleChange}
-      // theme="dark" <-- ESSA LINHA FOI REMOVIDA
+      // theme="dark"
       editor={editor}
       shadCNComponents={{}}
-      // Adicionamos este estilo de volta para o editor ficar transparente
+      // Adicionamos as variáveis de cor aqui
       style={
         {
           "--bn-colors-editor-background": "transparent",

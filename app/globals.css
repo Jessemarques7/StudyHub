@@ -156,3 +156,182 @@
     --sidebar-ring: oklch(0.439 0 0);
   }
 }
+
+/* BlockNote Menu Customization */
+
+/* Menus principais (toolbar, suggestion menu, etc) */
+.bn-container .bn-suggestion-menu,
+.bn-container .bn-formatting-toolbar,
+.bn-container .bn-table-handles,
+.bn-container [data-radix-popper-content-wrapper] {
+  background-color: var(--color-slate-900) !important; /* slate-800 */
+  color: #e2e8f0 !important; /* slate-200 */
+}
+
+/* Itens do menu */
+.bn-container .bn-suggestion-menu-item,
+.bn-container .bn-formatting-toolbar-button,
+.bn-container .bn-side-menu-button {
+  background-color: transparent !important;
+  color: #e2e8f0 !important; /* slate-200 */
+  transition: all 0.2s ease;
+}
+
+/* Hover nos itens */
+.bn-container .bn-suggestion-menu-item:hover,
+.bn-container .bn-suggestion-menu-item[data-active="true"],
+.bn-container .bn-formatting-toolbar-button:hover,
+.bn-container .bn-side-menu-button:hover {
+  background-color: #334155 !important; /* slate-700 */
+  color: #ffffff !important;
+}
+
+/* Item selecionado */
+.bn-container .bn-suggestion-menu-item[data-selected="true"] {
+  background-color: #9124ff !important; /* cor roxa do app */
+  color: #ffffff !important;
+}
+
+/* Separadores */
+.bn-container .bn-formatting-toolbar-separator {
+  background-color: #475569 !important; /* slate-600 */
+}
+
+/* Dropdown menus */
+.bn-container [role="menu"],
+.bn-container [role="listbox"] {
+  background-color: #1e293b !important; /* slate-800 */
+  border: 1px solid #334155 !important; /* slate-700 */
+  border-radius: 0.375rem;
+}
+
+/* Itens do dropdown */
+.bn-container [role="menuitem"],
+.bn-container [role="option"] {
+  color: #e2e8f0 !important; /* slate-200 */
+}
+
+.bn-container [role="menuitem"]:hover,
+.bn-container [role="option"]:hover {
+  background-color: #334155 !important; /* slate-700 */
+  color: #ffffff !important;
+}
+
+/* Input fields nos menus */
+.bn-container input[type="text"],
+.bn-container input[type="url"] {
+  background-color: #0f172a !important; /* slate-900 */
+  border: 1px solid #334155 !important; /* slate-700 */
+  color: #e2e8f0 !important; /* slate-200 */
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+}
+
+.bn-container input[type="text"]:focus,
+.bn-container input[type="url"]:focus {
+  border-color: #9124ff !important; /* cor roxa do app */
+  outline: none;
+}
+
+/* Placeholder text */
+.bn-container input::placeholder {
+  color: #64748b !important; /* slate-500 */
+}
+
+/* Panel de cores */
+.bn-container .bn-color-picker,
+.bn-container [data-color-scheme] {
+  background-color: #1e293b !important; /* slate-800 */
+  border: 1px solid #334155 !important; /* slate-700 */
+}
+
+/* Botões de ação */
+.bn-container button[data-test*="create"],
+.bn-container button[type="submit"] {
+  background-color: #9124ff !important; /* cor roxa do app */
+  color: #ffffff !important;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.bn-container button[data-test*="create"]:hover,
+.bn-container button[type="submit"]:hover {
+  background-color: #7c1fd9 !important;
+}
+
+/* Tooltip */
+.bn-container [role="tooltip"] {
+  background-color: #1e293b !important; /* slate-800 */
+  border: 1px solid #334155 !important; /* slate-700 */
+  color: #e2e8f0 !important; /* slate-200 */
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Scrollbar nos menus */
+.bn-container .bn-suggestion-menu::-webkit-scrollbar,
+.bn-container [role="menu"]::-webkit-scrollbar {
+  width: 8px;
+}
+
+.bn-container .bn-suggestion-menu::-webkit-scrollbar-track,
+.bn-container [role="menu"]::-webkit-scrollbar-track {
+  background: #0f172a; /* slate-900 */
+}
+
+.bn-container .bn-suggestion-menu::-webkit-scrollbar-thumb,
+.bn-container [role="menu"]::-webkit-scrollbar-thumb {
+  background: #475569; /* slate-600 */
+  border-radius: 999px;
+}
+
+.bn-container .bn-suggestion-menu::-webkit-scrollbar-thumb:hover,
+.bn-container [role="menu"]::-webkit-scrollbar-thumb:hover {
+  background: #64748b; /* slate-500 */
+}
+
+/* Drag handle */
+.bn-container .bn-drag-handle {
+  color: #64748b !important; /* slate-500 */
+}
+.bn-container .bn-drag-handle:hover {
+  color: #9124ff !important; /* cor roxa do app */
+  background-color: #334155 !important; /* slate-700 */
+} /* File block backgrounds */
+.bn-container [data-node-type="file"] {
+  background-color: #1e293b !important; /* slate-800 */
+  border: 1px solid #334155 !important; /* slate-700 */
+}
+/* Link preview */
+.bn-container .bn-link-toolbar {
+  background-color: #1e293b !important; /* slate-800 */
+  border: 1px solid #334155 !important; /* slate-700 */
+  color: #e2e8f0 !important; /* slate-200 */
+}
+
+/* Flashcards Theme Colors */
+:root {
+  --primary-glow: 258 90% 66%;
+  --success: 142 76% 36%;
+  --warning: 38 92% 50%;
+}
+
+/* Utilitários personalizados do Indigo Flash */
+.glass {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
+}
+
+.text-gradient {
+  @apply bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent;
+}
+
+/* Ajuste para o editor rico */
+.prose-invert {
+  @apply text-gray-200;
+}
+.prose-invert strong {
+  @apply text-white font-bold;
+}
