@@ -1,7 +1,5 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/flashcards/ui/button";
 import { Input } from "@/components/flashcards/ui/input";
 import { Label } from "@/components/flashcards/ui/label";
@@ -26,9 +24,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/flashcards/ui/alert-dialog";
-import { SidebarDemo } from "@/components/app-sidebar-aceternity";
+import { useRouter } from "next/navigation";
 
-export default function FlashcardsIndex() {
+export default function Index() {
   const router = useRouter();
   const [decks, setDecks] = useState<Deck[]>([]);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -37,9 +35,12 @@ export default function FlashcardsIndex() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deckToDelete, setDeckToDelete] = useState<string | null>(null);
 
-  // Carregar decks apenas no cliente
-  useEffect(() => {
+  const loadDecks = () => {
     setDecks(getAllDecks());
+  };
+
+  useEffect(() => {
+    loadDecks();
   }, []);
 
   const handleCreateDeck = () => {
@@ -58,11 +59,12 @@ export default function FlashcardsIndex() {
 
     saveDeck(newDeck);
     toast.success("Deck created!");
-    setDecks(getAllDecks());
+    loadDecks();
     setCreateDialogOpen(false);
     setDeckName("");
     setDeckDescription("");
 
+    // Navigate to the new deck
     router.push(`/flashcards/deck/${newDeck.id}`);
   };
 
@@ -75,18 +77,22 @@ export default function FlashcardsIndex() {
     if (deckToDelete) {
       deleteDeck(deckToDelete);
       toast.success("Deck deleted");
-      setDecks(getAllDecks());
+      loadDecks();
     }
     setDeleteDialogOpen(false);
     setDeckToDelete(null);
   };
 
+  const handleStudy = (deckId: string) => {
+    router.push(`/flashcards/study/${deckId}`);
+  };
+
   return (
-    <SidebarDemo>
-      <div className="min-h-screen bg-slate-950 text-white p-6 md:p-8 rounded-tl-2xl">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto p-6 md:p-8">
         <header className="mb-12 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-4 text-gradient">
-            FlashMind
+            Flashcards
           </h1>
           <p className="text-lg text-muted-foreground">
             Master anything with spaced repetition
@@ -97,7 +103,7 @@ export default function FlashcardsIndex() {
           <h2 className="text-2xl font-semibold">My Decks</h2>
           <Button
             onClick={() => setCreateDialogOpen(true)}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 text-white"
+            className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90"
           >
             <Plus className="mr-2 h-4 w-4" />
             New Deck
@@ -105,7 +111,7 @@ export default function FlashcardsIndex() {
         </div>
 
         {decks.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
             {decks.map((deck) => (
               <div
                 key={deck.id}
@@ -114,7 +120,7 @@ export default function FlashcardsIndex() {
               >
                 <DeckCard
                   deck={deck}
-                  onStudy={(id) => router.push(`/flashcards/study/${id}`)}
+                  onStudy={handleStudy}
                   onDelete={handleDeleteDeck}
                 />
               </div>
@@ -129,75 +135,71 @@ export default function FlashcardsIndex() {
             </p>
             <Button
               onClick={() => setCreateDialogOpen(true)}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+              className="bg-gradient-to-r from-primary to-primary-glow"
             >
               <Plus className="mr-2 h-4 w-4" />
               Create Your First Deck
             </Button>
           </div>
         )}
-
-        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogContent className="bg-slate-900 border-slate-800 text-white">
-            <DialogHeader>
-              <DialogTitle>Create New Deck</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div>
-                <Label htmlFor="name">Deck Name *</Label>
-                <Input
-                  id="name"
-                  value={deckName}
-                  onChange={(e) => setDeckName(e.target.value)}
-                  className="mt-2 bg-slate-950 border-slate-800"
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Input
-                  id="description"
-                  value={deckDescription}
-                  onChange={(e) => setDeckDescription(e.target.value)}
-                  className="mt-2 bg-slate-950 border-slate-800"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setCreateDialogOpen(false)}
-                className="text-black dark:text-white"
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleCreateDeck}>Create Deck</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent className="bg-slate-900 border-slate-800 text-white">
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete Deck?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                deck and all its cards.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="text-black dark:text-white">
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={confirmDelete}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
-    </SidebarDemo>
+
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Deck</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="name">Deck Name *</Label>
+              <Input
+                id="name"
+                value={deckName}
+                onChange={(e) => setDeckName(e.target.value)}
+                placeholder="e.g., Spanish Vocabulary"
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                value={deckDescription}
+                onChange={(e) => setDeckDescription(e.target.value)}
+                placeholder="Optional description..."
+                className="mt-2"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setCreateDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleCreateDeck}>Create Deck</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Deck?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              deck and all its cards.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 }

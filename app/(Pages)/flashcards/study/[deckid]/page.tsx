@@ -1,6 +1,7 @@
+"use client";
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useRouter, useParams } from "next/navigation";
+import { Button } from "@/components/flashcards/ui/button";
 import { Card, CardContent } from "@/components/flashcards/ui/card";
 import { Flashcard, ReviewQuality } from "@/types/flashcard";
 import { getCardsByDeck } from "@/lib/storage";
@@ -9,10 +10,12 @@ import { saveCard } from "@/lib/storage";
 import { ArrowLeft, Volume2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { navigate } from "next/dist/client/components/segment-cache";
 
 export default function Study() {
-  const { deckId } = useParams<{ deckId: string }>();
-  const navigate = useNavigate();
+  const params = useParams<{ deckid: string }>();
+  const deckId = params.deckid;
+  const router = useRouter();
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -98,7 +101,7 @@ export default function Study() {
       toast.success(
         `Study session complete! Reviewed ${studiedCount + 1} cards.`
       );
-      navigate("/");
+      router.push("/flashcards");
     }
   };
 
@@ -118,7 +121,9 @@ export default function Study() {
             <p className="text-muted-foreground mb-6">
               All cards are up to date. Come back later!
             </p>
-            <Button onClick={() => navigate("/")}>Back to Decks</Button>
+            <Button onClick={() => router.push("/flashcards")}>
+              Back to Decks
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -129,7 +134,7 @@ export default function Study() {
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <Button variant="ghost" onClick={() => navigate("/")}>
+          <Button variant="ghost" onClick={() => router.push("/flashcards")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>

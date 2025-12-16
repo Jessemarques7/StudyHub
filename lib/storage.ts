@@ -26,7 +26,7 @@ export function saveDeck(deck: Deck): void {
 export function deleteDeck(deckId: string): void {
   const decks = getAllDecks().filter((d) => d.id !== deckId);
   localStorage.setItem(STORAGE_KEYS.DECKS, JSON.stringify(decks));
-  
+
   // Also delete all cards in this deck
   const cards = getAllCards().filter((c) => c.deckId !== deckId);
   localStorage.setItem(STORAGE_KEYS.CARDS, JSON.stringify(cards));
@@ -36,7 +36,7 @@ export function deleteDeck(deckId: string): void {
 export function getAllCards(): Flashcard[] {
   const data = localStorage.getItem(STORAGE_KEYS.CARDS);
   if (!data) return [];
-  
+
   const cards = JSON.parse(data);
   return cards.map((card: any) => ({
     ...card,
@@ -71,7 +71,7 @@ export function deleteCard(cardId: string): void {
 export function getStats(deckId: string): StudyStats | null {
   const data = localStorage.getItem(STORAGE_KEYS.STATS);
   if (!data) return null;
-  
+
   const allStats = JSON.parse(data);
   return allStats[deckId] || null;
 }

@@ -1,17 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { SidebarDemo } from "@/components/app-sidebar-aceternity";
-import Editor from "@/components/Editor";
-import Graph from "@/components/Graph";
-import { Button } from "@/components/ui/button";
+
+import Editor from "@/components/notes/Editor";
+import Graph from "@/components/notes/Graph";
+import { Button } from "@/components/notes/ui/button";
 import { PanelRightOpen, PanelRightClose } from "lucide-react";
 
 export default function NotePage() {
   const [isGraphVisible, setIsGraphVisible] = useState(true);
 
   return (
-    <SidebarDemo>
+    <>
       {/* Main content area */}
       <div className="h-6 bg-slate-950 rounded-tl-2xl "></div>
       <div className="flex flex-row overflow-hidden relative">
@@ -38,6 +38,6 @@ export default function NotePage() {
           </div>
         )}
       </div>
-    </SidebarDemo>
+    </>
   );
 }

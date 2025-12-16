@@ -8,6 +8,12 @@ export default function Home() {
           <li>
             <Link href={"/notes"}>Notes</Link>
           </li>
+          <li>
+            <Link href={"/flashcards"}>Flashcards</Link>
+          </li>
+          <li>
+            <Link href={"/diagram"}>Diagram</Link>
+          </li>
         </ul>
         <div></div>
       </main>

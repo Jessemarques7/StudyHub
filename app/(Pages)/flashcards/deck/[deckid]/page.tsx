@@ -1,21 +1,16 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/flashcards/ui/button";
 import { Card, CardContent } from "@/components/flashcards/ui/card";
 import { Badge } from "@/components/flashcards/ui/badge";
 import { Flashcard, Deck } from "@/types/flashcard";
-import {
-  getCardsByDeck,
-  getAllDecks,
-  deleteCard,
-  saveCard,
-} from "@/lib/storage";
+import { getCardsByDeck, getAllDecks, deleteCard } from "@/lib/storage";
 import { CardEditorDialog } from "@/components/flashcards/CardEditorDialog";
+import { saveCard } from "@/lib/storage";
 import { ArrowLeft, Plus, Trash2, Edit } from "lucide-react";
 import { toast } from "sonner";
-import { SidebarDemo } from "@/components/app-sidebar-aceternity";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,15 +22,10 @@ import {
   AlertDialogTitle,
 } from "@/components/flashcards/ui/alert-dialog";
 
-export default function DeckView({
-  params,
-}: {
-  params: Promise<{ deckId: string }>;
-}) {
-  // Unwrap params no Next.js 15
-  const { deckId } = use(params);
+export default function DeckView() {
+  const params = useParams<{ deckid: string }>();
+  const deckId = params.deckid;
   const router = useRouter();
-
   const [deck, setDeck] = useState<Deck | null>(null);
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [editorOpen, setEditorOpen] = useState(false);
@@ -58,7 +48,7 @@ export default function DeckView({
   const handleSaveCard = (cardData: Partial<Flashcard>) => {
     const card: Flashcard = {
       id: editingCard?.id || crypto.randomUUID(),
-      deckId: deckId,
+      deckId: deckId!,
       type: cardData.type || "regular",
       front: cardData.front!,
       back: cardData.back!,
@@ -102,16 +92,13 @@ export default function DeckView({
     setCardToDelete(null);
   };
 
-  if (!deck)
-    return (
-      <SidebarDemo>
-        <div className="p-8 text-white">Loading...</div>
-      </SidebarDemo>
-    );
+  if (!deck) {
+    return <div>Deck not found</div>;
+  }
 
   return (
-    <SidebarDemo>
-      <div className="min-h-screen bg-slate-950 text-white p-6 md:p-8 rounded-tl-2xl">
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => router.push("/flashcards")}>
@@ -130,7 +117,6 @@ export default function DeckView({
               setEditingCard(undefined);
               setEditorOpen(true);
             }}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             <Plus className="mr-2 h-4 w-4" />
             Add Card
@@ -141,15 +127,16 @@ export default function DeckView({
           {cards.map((card) => (
             <Card
               key={card.id}
-              className="bg-slate-900 border-slate-800 text-white hover:border-slate-700 transition-all"
+              className="glass hover:shadow-[var(--shadow-glow)] transition-all"
             >
               <CardContent className="p-6">
                 <div className="flex justify-between items-start gap-4 mb-3">
-                  <Badge
-                    variant="outline"
-                    className="capitalize text-white border-slate-600"
-                  >
-                    {card.type}
+                  <Badge variant="outline" className="capitalize">
+                    {card.type === "one-sided"
+                      ? "One-Sided"
+                      : card.type === "multiple-choice"
+                      ? "Multiple Choice"
+                      : "Regular"}
                   </Badge>
                   <div className="flex gap-2">
                     <Button
@@ -164,7 +151,7 @@ export default function DeckView({
                       size="icon"
                       onClick={() => handleDeleteCard(card.id)}
                     >
-                      <Trash2 className="h-4 w-4 text-red-500" />
+                      <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
                 </div>
@@ -191,36 +178,89 @@ export default function DeckView({
                       />
                     </div>
                   )}
+
+                  {card.type === "multiple-choice" &&
+                    card.multipleChoiceOptions && (
+                      <div>
+                        <h4 className="text-sm text-muted-foreground mb-2">
+                          Options
+                        </h4>
+                        <div className="space-y-2">
+                          {card.multipleChoiceOptions.map((option) => (
+                            <div
+                              key={option.id}
+                              className="flex items-center gap-2 text-sm"
+                            >
+                              <span
+                                className={
+                                  option.isCorrect
+                                    ? "text-success"
+                                    : "text-muted-foreground"
+                                }
+                              >
+                                {option.isCorrect ? "✓" : "○"}
+                              </span>
+                              <span>{option.text}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                 </div>
+
+                {card.tags.length > 0 && (
+                  <div className="mt-4 flex gap-2">
+                    {card.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
+
+          {cards.length === 0 && (
+            <Card className="glass">
+              <CardContent className="p-12 text-center">
+                <p className="text-muted-foreground">
+                  No cards yet. Click "Add Card" to create your first one!
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
-
-        <CardEditorDialog
-          open={editorOpen}
-          onOpenChange={setEditorOpen}
-          onSave={handleSaveCard}
-          card={editingCard}
-          deckId={deckId}
-        />
-
-        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent className="bg-slate-900 border-slate-800 text-white">
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete Card?</AlertDialogTitle>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="text-black dark:text-white">
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction onClick={confirmDelete} className="bg-red-600">
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
-    </SidebarDemo>
+
+      <CardEditorDialog
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        onSave={handleSaveCard}
+        card={editingCard}
+        deckId={deckId!}
+      />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Card?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              card.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 }

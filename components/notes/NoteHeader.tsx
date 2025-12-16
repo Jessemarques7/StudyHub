@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Note, MAX_ICON_FILE_SIZE } from "@/types/notes";
 import { cn } from "@/lib/utils";
 import { Smile, Upload, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/notes/ui/button";
 import EmojiPicker from "emoji-picker-react";
 import { CoverPicker } from "./NotePickers";
 

@@ -1,3 +1,9 @@
+import { SidebarDemo } from "@/components/SidebarDemo";
+
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <main className="bg-slate-950">{children}</main>;
+  return (
+    <main>
+      <SidebarDemo>{children}</SidebarDemo>
+    </main>
+  );
 }
