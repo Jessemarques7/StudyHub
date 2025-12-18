@@ -1,19 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import Editor from "@/components/notes/Editor";
 import Graph from "@/components/notes/Graph";
 import { Button } from "@/components/notes/ui/button";
 import { PanelRightOpen, PanelRightClose } from "lucide-react";
+import Link from "next/link";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { useParams } from "next/navigation";
+import { useNotes } from "@/contexts/NotesContext";
 
 export default function NotePage() {
   const [isGraphVisible, setIsGraphVisible] = useState(true);
+  const params = useParams<{ noteid: string }>();
+  const { getNote } = useNotes();
+
+  const currentNote = useMemo(
+    () => getNote(params.noteid),
+    [params.noteid, getNote]
+  );
 
   return (
     <>
       {/* Main content area */}
-      <div className="h-6 bg-slate-950 rounded-tl-2xl "></div>
+      <div className=" py-2 px-8 bg-slate-950 rounded-tl-2xl ">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/notes">Notes</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{currentNote?.title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
       <div className="flex flex-row overflow-hidden relative">
         <Editor />
 
