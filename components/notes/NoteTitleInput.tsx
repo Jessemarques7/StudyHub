@@ -59,7 +59,7 @@ export function NoteTitleInput({
       onFocus={handleFocus}
       placeholder="Untitled"
       aria-label="Note title"
-      className="w-full px-[54px] mt-12 mb-4 text-gray-50 text-5xl font-bold bg-transparent border-none outline-none placeholder:text-gray-400 focus:placeholder:text-gray-500 transition-colors"
+      className="w-full px-[54px] mt-10 mb-4 text-gray-50 text-5xl font-bold bg-transparent border-none outline-none placeholder:text-gray-400 focus:placeholder:text-gray-500 transition-colors"
     />
   );
 }

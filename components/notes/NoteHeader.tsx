@@ -58,7 +58,6 @@ export function NoteHeader({
 
     const cover = note.coverImage;
 
-    // URL de imagem
     if (cover.startsWith("http") || cover.startsWith("data:")) {
       return (
         <img
@@ -69,12 +68,10 @@ export function NoteHeader({
       );
     }
 
-    // Classe Tailwind
     if (cover.startsWith("bg-") || cover.startsWith("from-")) {
       return <div className={cn("w-full h-full", cover)} />;
     }
 
-    // CSS customizado
     return <div className="w-full h-full" style={{ background: cover }} />;
   };
 
@@ -83,7 +80,6 @@ export function NoteHeader({
       return <Smile className="w-16 h-16 text-slate-600 p-2" />;
     }
 
-    // Imagem
     if (note.icon.startsWith("data:")) {
       return (
         <img
@@ -94,14 +90,12 @@ export function NoteHeader({
       );
     }
 
-    // Emoji
     return <span className="text-6xl">{note.icon}</span>;
   };
 
   return (
     <>
-      {/* Cover Section */}
-      <div className="h-[25vh] group relative">
+      <div className="h-[25vh] group relative w-full">
         {renderCover()}
         <div className="absolute bottom-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
           <CoverPicker
@@ -112,57 +106,68 @@ export function NoteHeader({
         </div>
       </div>
 
-      {/* Icon Section */}
-      <div
-        className="absolute ml-12 group z-50"
-        style={{ top: "calc(25vh - 40px)" }}
-      >
-        <div className="relative flex items-end gap-2">
-          <button
-            onClick={() => setEmojiPickerVisible((prev) => !prev)}
-            className="cursor-pointer rounded-lg p-1 transition-colors "
-            aria-label="Change icon"
+      {/* Wrapper de Alinhamento do Ícone */}
+      {/* Usa as mesmas margens do Editor (p-2 md:px-10) e centralização */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex justify-center p-2 md:px-10">
+        {/* Container interno igual ao do texto (max-w-[770px]) */}
+        <div className="w-full max-w-[770px] relative h-full">
+          {/* O ícone é posicionado relativo a este container centralizado */}
+          <div
+            className="absolute group z-50 pointer-events-auto"
+            style={{
+              top: "calc(25vh - 40px)",
+              // 54px é o padding do título (NoteTitleInput)
+              left: "54px",
+            }}
           >
-            {renderIcon()}
-          </button>
-
-          <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button
-              size="icon-sm"
-              variant="outline"
-              className="bg-black/50 hover:bg-black/70 border-slate-700"
-              onClick={() => iconUploadRef.current?.click()}
-              aria-label="Upload icon"
-            >
-              <Upload className="w-4 h-4" />
-            </Button>
-
-            {note.icon && (
-              <Button
-                size="icon-sm"
-                variant="outline"
-                className="bg-black/50 hover:bg-black/70 border-slate-700 text-red-400 hover:text-red-400"
-                onClick={handleIconRemove}
-                aria-label="Remove icon"
+            <div className="relative flex -ml-11 items-end gap-2">
+              <button
+                onClick={() => setEmojiPickerVisible((prev) => !prev)}
+                className="cursor-pointer rounded-lg p-1 transition-colors hover:bg-black/20"
+                aria-label="Change icon"
               >
-                <X className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
+                {renderIcon()}
+              </button>
 
-          <input
-            type="file"
-            ref={iconUploadRef}
-            accept="image/*,.svg"
-            onChange={handleIconUpload}
-            className="hidden"
-          />
+              <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  size="icon-sm"
+                  variant="outline"
+                  className="bg-black/50 hover:bg-black/70 border-slate-700"
+                  onClick={() => iconUploadRef.current?.click()}
+                  aria-label="Upload icon"
+                >
+                  <Upload className="w-4 h-4" />
+                </Button>
 
-          {emojiPickerVisible && (
-            <div className="absolute top-full mt-2 z-50">
-              <EmojiPicker theme="dark" onEmojiClick={handleEmojiSelect} />
+                {note.icon && (
+                  <Button
+                    size="icon-sm"
+                    variant="outline"
+                    className="bg-black/50 hover:bg-black/70 border-slate-700 text-red-400 hover:text-red-400"
+                    onClick={handleIconRemove}
+                    aria-label="Remove icon"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+
+              <input
+                type="file"
+                ref={iconUploadRef}
+                accept="image/*,.svg"
+                onChange={handleIconUpload}
+                className="hidden"
+              />
+
+              {emojiPickerVisible && (
+                <div className="absolute top-full mt-2 z-50">
+                  <EmojiPicker theme="dark" onEmojiClick={handleEmojiSelect} />
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </>

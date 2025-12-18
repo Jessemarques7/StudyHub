@@ -75,26 +75,31 @@ export default function Editor() {
   }
 
   return (
-    <div className="flex flex-1 flex-col h-full">
-      <NoteHeader
-        note={currentNote}
-        onIconUpdate={handleIconUpdate}
-        onCoverUpdate={handleCoverUpdate}
-      />
+    <div className="flex flex-1 flex-col h-full bg-slate-950">
+      {/* Container de Scroll Único para Header e Conteúdo */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden relative">
+        {/* Header agora faz parte do fluxo, garantindo largura total correta */}
+        <NoteHeader
+          note={currentNote}
+          onIconUpdate={handleIconUpdate}
+          onCoverUpdate={handleCoverUpdate}
+        />
 
-      <div className="flex-1 overflow-auto p-2 md:px-10 md:py-6 flex items-start justify-center dark:bg-slate-950">
-        <div className="w-full min-h-[70vh] max-w-[770px] ">
-          <NoteTitleInput
-            value={title}
-            onChange={handleTitleChange}
-            onSave={handleTitleSave}
-          />
+        {/* Wrapper do Conteúdo: Aqui aplicamos o padding e centralização */}
+        <div className="w-full flex justify-center p-2 md:px-10 md:py-6">
+          <div className="w-full min-h-[70vh] max-w-[770px]">
+            <NoteTitleInput
+              value={title}
+              onChange={handleTitleChange}
+              onSave={handleTitleSave}
+            />
 
-          <Blocknote
-            onUpdateNote={handleUpdateContent}
-            currentNote={currentNote}
-            notes={notes}
-          />
+            <Blocknote
+              onUpdateNote={handleUpdateContent}
+              currentNote={currentNote}
+              notes={notes}
+            />
+          </div>
         </div>
       </div>
     </div>
