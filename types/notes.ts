@@ -39,7 +39,8 @@ export interface UpdateNoteInput {
 export interface NotesContextValue {
   notes: Note[];
   folders: Folder[]; // Novo estado exposto
-  addNote: (input?: CreateNoteInput) => Note;
+  // addNote: (input?: CreateNoteInput) => Note;
+  addNote: (input?: CreateNoteInput) => Promise<Note>; // Mudar para Promise
   updateNote: (id: string, updates: UpdateNoteInput) => void;
   deleteNote: (id: string) => void;
   getNote: (id: string) => Note | undefined;
