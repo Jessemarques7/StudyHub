@@ -2,6 +2,8 @@
 
 import CustomEdge from "@/components/diagram/CustomEdge";
 import TextUpdaterNode from "@/components/diagram/TextUpdaterNode";
+// 1. Importe o ImageNode
+import ImageNode from "@/components/diagram/ImageNode";
 import { IconNote, IconNotes, IconPhoto } from "@tabler/icons-react";
 import {
   Background,
@@ -14,7 +16,7 @@ import {
   useReactFlow,
   ReactFlowProvider,
   reconnectEdge,
-  Panel, // Import reconnectEdge utility
+  Panel,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
@@ -45,7 +47,11 @@ const defaultEdgeOptions = {
   type: "default",
 };
 
-const nodeTypes = { textUpdater: TextUpdaterNode };
+// 2. Registre o imageNode em nodeTypes
+const nodeTypes = {
+  textUpdater: TextUpdaterNode,
+  imageNode: ImageNode,
+};
 
 const edgeTypes = {
   customEdge: CustomEdge,
@@ -56,7 +62,7 @@ const getId = () => `n${id++}`;
 
 function Flow() {
   const reactFlowWrapper = useRef(null);
-  const edgeReconnectSuccessful = useRef(true); // Ref to track reconnection status
+  const edgeReconnectSuccessful = useRef(true);
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
 
@@ -77,31 +83,23 @@ function Flow() {
   const onConnect = useCallback(
     (params) =>
       setEdges((edgesSnapshot) =>
-        // ADICIONE { ...params, type: "customEdge" } AQUI
         addEdge({ ...params, type: "customEdge" }, edgesSnapshot)
       ),
     []
   );
 
-  // 1. Handle the start of a reconnection
   const onReconnectStart = useCallback(() => {
     edgeReconnectSuccessful.current = false;
   }, []);
 
-  // 2. Handle a successful reconnection
   const onReconnect = useCallback((oldEdge, newConnection) => {
     edgeReconnectSuccessful.current = true;
     setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
   }, []);
 
-  // 3. Handle the end of a reconnection attempt
   const onReconnectEnd = useCallback((_, edge) => {
     if (!edgeReconnectSuccessful.current) {
-      // If needed, you could add logic here for failed reconnections
-      // (e.g., deleting the edge if dropped in empty space, or reverting)
-      // For now, we'll just leave it or you can implement deletion here if desired.
-      // To implement deletion on drop, uncomment the following:
-      // setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+      // Lógica de falha na reconexão (opcional)
     }
     edgeReconnectSuccessful.current = true;
   }, []);
@@ -126,8 +124,8 @@ function Flow() {
 
         const newEdge = {
           id,
-          ...defaultEdgeOptions, // 1. Espalhe as opções padrão PRIMEIRO
-          type: "customEdge", // 2. Defina o tipo DEPOIS para garantir que seja customEdge
+          ...defaultEdgeOptions,
+          type: "customEdge",
           source: connectionState.fromNode.id,
           sourceHandle: connectionState.fromHandle.id,
           target: id,
@@ -138,6 +136,17 @@ function Flow() {
     },
     [screenToFlowPosition]
   );
+
+  // 3. Função auxiliar para adicionar Image Node
+  const addImageNode = () => {
+    const newNode = {
+      id: getId(),
+      type: "imageNode",
+      position: { x: 100, y: 100 }, // Posição inicial arbitrária ou centralizada
+      data: { label: `Image ${id}` }, // Sem imagem inicial, mostrará o upload
+    };
+    setNodes((nds) => nds.concat(newNode));
+  };
 
   return (
     <div className="w-full h-full" ref={reactFlowWrapper}>
@@ -151,9 +160,9 @@ function Flow() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onConnectEnd={onConnectEnd}
-        onReconnect={onReconnect} // Added handler
-        onReconnectStart={onReconnectStart} // Added handler
-        onReconnectEnd={onReconnectEnd} // Added handler
+        onReconnect={onReconnect}
+        onReconnectStart={onReconnectStart}
+        onReconnectEnd={onReconnectEnd}
         connectionMode="loose"
         fitView
         defaultEdgeOptions={defaultEdgeOptions}
@@ -170,7 +179,7 @@ function Flow() {
           }}
         />
         <Panel position="bottom-center">
-          <div className="bg-slate-900 px-8 py-3 mb-2 border border-neutral-700  rounded-[16px] flex items-center justify-center gap-6">
+          <div className="bg-slate-900 px-8 py-3 mb-2 border border-neutral-700 rounded-[16px] flex items-center justify-center gap-6">
             <button
               onClick={() => {
                 setNodes((nds) =>
@@ -182,14 +191,19 @@ function Flow() {
                   })
                 );
               }}
-              className="cursor-pointer"
+              className="cursor-pointer hover:text-slate-300 transition-colors"
             >
               <IconNote className="h-12 w-12" />
             </button>
-            <button className="cursor-pointer">
+            {/* <button className="cursor-pointer hover:text-slate-300 transition-colors">
               <IconNotes className="h-12 w-12" />
-            </button>
-            <button className="cursor-pointer">
+            </button> */}
+            <div className="w-px h-8 bg-slate-700" /> {/* Separador */}
+            {/* 4. Botão de Adicionar Imagem Configurado */}
+            <button
+              onClick={addImageNode}
+              className="cursor-pointer hover:text-slate-300 transition-colors"
+            >
               <IconPhoto className="h-12 w-12" />
             </button>
           </div>

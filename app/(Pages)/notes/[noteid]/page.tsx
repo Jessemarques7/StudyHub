@@ -17,9 +17,10 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useParams } from "next/navigation";
 import { useNotes } from "@/contexts/NotesContext";
+import { IconChartDots3, IconChartDots3Filled } from "@tabler/icons-react";
 
 export default function NotePage() {
-  const [isGraphVisible, setIsGraphVisible] = useState(true);
+  const [isGraphVisible, setIsGraphVisible] = useState(false);
   const params = useParams<{ noteid: string }>();
   const { getNote } = useNotes();
 
@@ -62,11 +63,12 @@ export default function NotePage() {
           size="icon"
           className="absolute top-2 right-4 z-10 text-white hover:bg-slate-700 hover:text-white"
         >
-          {isGraphVisible ? (
+          {/* {isGraphVisible ? (
             <PanelRightClose className="h-5 w-5" />
           ) : (
             <PanelRightOpen className="h-5 w-5" />
-          )}
+          )} */}
+          <IconChartDots3 className="h-5 w-5" />
         </Button>
 
         {/* Container do Grafo com renderização condicional */}
