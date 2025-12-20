@@ -1,119 +1,30 @@
-// import { Flashcard, Deck, StudyStats } from "@/types/flashcard";
-
-// const STORAGE_KEYS = {
-//   DECKS: "flashcards_decks",
-//   CARDS: "flashcards_cards",
-//   STATS: "flashcards_stats",
-// };
-
-// // Deck operations
-// export function getAllDecks(): Deck[] {
-//   const data = localStorage.getItem(STORAGE_KEYS.DECKS);
-//   return data ? JSON.parse(data) : [];
-// }
-
-// export function saveDeck(deck: Deck): void {
-//   const decks = getAllDecks();
-//   const index = decks.findIndex((d) => d.id === deck.id);
-//   if (index >= 0) {
-//     decks[index] = deck;
-//   } else {
-//     decks.push(deck);
-//   }
-//   localStorage.setItem(STORAGE_KEYS.DECKS, JSON.stringify(decks));
-// }
-
-// export function deleteDeck(deckId: string): void {
-//   const decks = getAllDecks().filter((d) => d.id !== deckId);
-//   localStorage.setItem(STORAGE_KEYS.DECKS, JSON.stringify(decks));
-
-//   // Also delete all cards in this deck
-//   const cards = getAllCards().filter((c) => c.deckId !== deckId);
-//   localStorage.setItem(STORAGE_KEYS.CARDS, JSON.stringify(cards));
-// }
-
-// // Card operations
-// export function getAllCards(): Flashcard[] {
-//   const data = localStorage.getItem(STORAGE_KEYS.CARDS);
-//   if (!data) return [];
-
-//   const cards = JSON.parse(data);
-//   return cards.map((card: any) => ({
-//     ...card,
-//     type: card.type || "regular", // Default to regular for existing cards
-//     nextReview: new Date(card.nextReview),
-//     createdAt: new Date(card.createdAt),
-//     updatedAt: new Date(card.updatedAt),
-//   }));
-// }
-
-// export function getCardsByDeck(deckId: string): Flashcard[] {
-//   return getAllCards().filter((card) => card.deckId === deckId);
-// }
-
-// export function saveCard(card: Flashcard): void {
-//   const cards = getAllCards();
-//   const index = cards.findIndex((c) => c.id === card.id);
-//   if (index >= 0) {
-//     cards[index] = card;
-//   } else {
-//     cards.push(card);
-//   }
-//   localStorage.setItem(STORAGE_KEYS.CARDS, JSON.stringify(cards));
-// }
-
-// export function deleteCard(cardId: string): void {
-//   const cards = getAllCards().filter((c) => c.id !== cardId);
-//   localStorage.setItem(STORAGE_KEYS.CARDS, JSON.stringify(cards));
-// }
-
-// // Stats operations
-// export function getStats(deckId: string): StudyStats | null {
-//   const data = localStorage.getItem(STORAGE_KEYS.STATS);
-//   if (!data) return null;
-
-//   const allStats = JSON.parse(data);
-//   return allStats[deckId] || null;
-// }
-
-// export function saveStats(stats: StudyStats): void {
-//   const data = localStorage.getItem(STORAGE_KEYS.STATS);
-//   const allStats = data ? JSON.parse(data) : {};
-//   allStats[stats.deckId] = stats;
-//   localStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(allStats));
-// }
-
 import { supabase } from "@/lib/supabase";
 import { Deck, Flashcard, StudyStats } from "@/types/flashcard";
 
-// --- Helpers para tratar nomes de campo (camelCase vs snake_case) ---
-// O Supabase retorna snake_case, mas seu front usa camelCase.
-// Ajuste conforme necessário ou use alias na query.
-
-export async function uploadMedia(file: File): Promise<string | null> {
+// Agora aceita um bucket opcional, padrão 'flashcard-media' para não quebrar o código anterior
+export async function uploadMedia(
+  file: File,
+  bucket: string = "flashcard-media"
+): Promise<string | null> {
   const fileExt = file.name.split(".").pop();
   const fileName = `${crypto.randomUUID()}.${fileExt}`;
   const filePath = `${fileName}`;
 
-  const { error } = await supabase.storage
-    .from("flashcard-media")
-    .upload(filePath, file);
+  const { error } = await supabase.storage.from(bucket).upload(filePath, file);
 
   if (error) {
-    console.error("Error uploading media:", error);
+    console.error(`Error uploading media to ${bucket}:`, error);
     return null;
   }
 
-  const { data } = supabase.storage
-    .from("flashcard-media")
-    .getPublicUrl(filePath);
+  const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
 
   return data.publicUrl;
 }
 
-// --- Decks ---
-
+// ... (mantenha o restante das funções de Decks e Cards como estão)
 export async function getAllDecks(): Promise<Deck[]> {
+  // ... código existente ...
   const { data, error } = await supabase
     .from("decks")
     .select("*")
@@ -121,7 +32,6 @@ export async function getAllDecks(): Promise<Deck[]> {
 
   if (error) throw error;
 
-  // Mapeamento snake_case -> camelCase
   return data.map((d: any) => ({
     id: d.id,
     name: d.name,

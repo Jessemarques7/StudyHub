@@ -94,7 +94,9 @@ export default function Editor() {
               onSave={handleTitleSave}
             />
 
+            {/* CORREÇÃO CRÍTICA: key={currentNote.id} força o editor a reiniciar ao trocar de nota */}
             <Blocknote
+              key={currentNote.id}
               onUpdateNote={handleUpdateContent}
               currentNote={currentNote}
               notes={notes}

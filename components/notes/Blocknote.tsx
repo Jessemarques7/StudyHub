@@ -3,7 +3,7 @@
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/shadcn/style.css";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import {
   DefaultReactSuggestionItem,
   SuggestionMenuController,
@@ -19,7 +19,9 @@ import {
 
 import { Mention } from "./Mention";
 import { Note } from "@/types/notes";
-import { debounce } from "lodash"; // Recomenda-se instalar: npm install lodash
+import { debounce } from "lodash";
+import { uploadMedia } from "@/lib/storage";
+import { toast } from "sonner";
 
 const schema = BlockNoteSchema.create({
   inlineContentSpecs: {
@@ -39,13 +41,20 @@ export default function Blocknote({
   currentNote,
   notes,
 }: BlocknoteProps) {
-  // OTIMIZAÇÃO 1: Upload eficiente
+  // Configuração do Upload para Supabase
   const uploadFile = async (file: File): Promise<string> => {
-    // Para evitar travamentos, não usamos FileReader/Base64 para arquivos grandes.
-    // Criamos uma URL temporária que aponta para a memória do navegador.
-    return URL.createObjectURL(file);
-
-    // NOTA: Em produção, você deve enviar para o S3/Cloudinary e retornar a URL real.
+    try {
+      const publicUrl = await uploadMedia(file, "notes-media");
+      if (!publicUrl) {
+        toast.error("Failed to upload media");
+        return ""; // Retorna vazio para cancelar a inserção se falhar
+      }
+      return publicUrl;
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Error uploading file");
+      return "";
+    }
   };
 
   const getMentionMenuItems = useCallback(
@@ -74,8 +83,7 @@ export default function Blocknote({
     [notes, currentNote.id]
   );
 
-  // OTIMIZAÇÃO 2: Debounce no salvamento
-  // Impede que o componente 'Editor.tsx' tente salvar 60 vezes por segundo enquanto o vídeo carrega
+  // Debounce para evitar salvar a cada caractere digitado (500ms)
   const debouncedUpdate = useMemo(
     () => debounce((blocks: Block[]) => onUpdateNote(blocks), 500),
     [onUpdateNote]
@@ -84,26 +92,15 @@ export default function Blocknote({
   const editor = useCreateBlockNote({
     schema,
     initialContent:
-      currentNote.content.length > 0 ? currentNote.content : undefined,
+      currentNote.content && currentNote.content.length > 0
+        ? currentNote.content
+        : undefined, // undefined faz o BlockNote criar um parágrafo vazio padrão
     uploadFile,
   });
 
   const handleChange = useCallback(() => {
-    // Usamos a versão com debounce em vez da chamada direta
     debouncedUpdate(editor.document);
   }, [editor, debouncedUpdate]);
-
-  // OTIMIZAÇÃO 3: Correção do Loop de Efeito
-  // Remova ou ajuste o useEffect que faz replaceBlocks se ele estiver causando re-renderizações infinitas.
-  useEffect(() => {
-    if (
-      currentNote.content.length > 0 &&
-      editor.document !== currentNote.content
-    ) {
-      // Apenas substitua se o ID mudou (navegação entre notas)
-      // Se substituir sempre, o vídeo reiniciará o tempo todo.
-    }
-  }, [currentNote.id]);
 
   return (
     <BlockNoteView
