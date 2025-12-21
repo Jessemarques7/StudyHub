@@ -1,181 +1,3 @@
-// // contexts/NotesContext.tsx
-// "use client";
-
-// import {
-//   createContext,
-//   useContext,
-//   ReactNode,
-//   useCallback,
-//   useMemo,
-// } from "react";
-// import { useLocalStorage } from "@/hooks/useLocalStorageState";
-// import {
-//   Note,
-//   Folder,
-//   NotesContextValue,
-//   CreateNoteInput,
-//   UpdateNoteInput,
-//   DEFAULT_NOTE_ICON,
-//   DEFAULT_NOTE_TITLE,
-// } from "@/types/notes";
-
-// const NOTES_STORAGE_KEY = "notes-v1";
-// const FOLDERS_STORAGE_KEY = "folders-v1";
-
-// const NotesContext = createContext<NotesContextValue | null>(null);
-
-// // Função helper para criar nova nota (usada apenas em interações do utilizador)
-// function createNote(input: CreateNoteInput = {}): Note {
-//   return {
-//     id: crypto.randomUUID(),
-//     title: input.title || DEFAULT_NOTE_TITLE,
-//     icon: input.icon || DEFAULT_NOTE_ICON,
-//     coverImage:
-//       input.coverImage ||
-//       "bg-gradient-to-r from-blue-700 via-blue-800 to-gray-900",
-//     content: input.content || [],
-//     folderId: input.folderId || null,
-//     createdAt: new Date(),
-//     updatedAt: new Date(),
-//   };
-// }
-
-// // FIX: Nota inicial com ID e DATA estáticos para evitar Hydration Mismatch
-// const INITIAL_NOTES: Note[] = [
-//   {
-//     id: "welcome-note-static-id", // ID fixo
-//     title: "Welcome to Notes",
-//     icon: "👋",
-//     coverImage: "bg-gradient-to-r from-blue-700 via-blue-800 to-gray-900",
-//     content: [],
-//     folderId: null,
-//     createdAt: new Date("2024-01-01T00:00:00.000Z"), // Data fixa
-//     updatedAt: new Date("2024-01-01T00:00:00.000Z"), // Data fixa
-//   },
-// ];
-
-// export function NotesProvider({ children }: { children: ReactNode }) {
-//   // Inicializa com INITIAL_NOTES (estático) e depois hidrata com localStorage
-//   const [notes, setNotes] = useLocalStorage<Note[]>(
-//     NOTES_STORAGE_KEY,
-//     INITIAL_NOTES
-//   );
-//   const [folders, setFolders] = useLocalStorage<Folder[]>(
-//     FOLDERS_STORAGE_KEY,
-//     []
-//   );
-
-//   // --- Funções de Pasta ---
-//   const addFolder = useCallback(
-//     (name: string) => {
-//       const newFolder: Folder = {
-//         id: crypto.randomUUID(),
-//         name,
-//         createdAt: new Date(),
-//       };
-//       setFolders((prev) => [...prev, newFolder]);
-//     },
-//     [setFolders]
-//   );
-
-//   const deleteFolder = useCallback(
-//     (id: string) => {
-//       setNotes((prevNotes) =>
-//         prevNotes.map((note) =>
-//           note.folderId === id ? { ...note, folderId: null } : note
-//         )
-//       );
-//       setFolders((prev) => prev.filter((f) => f.id !== id));
-//     },
-//     [setFolders, setNotes]
-//   );
-
-//   const updateFolder = useCallback(
-//     (id: string, name: string) => {
-//       setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name } : f)));
-//     },
-//     [setFolders]
-//   );
-
-//   // --- Funções de Notas ---
-//   const addNote = useCallback(
-//     (input?: CreateNoteInput): Note => {
-//       const newNote = createNote(input);
-//       setNotes((prev) => [...prev, newNote]);
-//       return newNote;
-//     },
-//     [setNotes]
-//   );
-
-//   const updateNote = useCallback(
-//     (id: string, updates: UpdateNoteInput) => {
-//       setNotes((prev) =>
-//         prev.map((note) =>
-//           note.id === id
-//             ? {
-//                 ...note,
-//                 ...updates,
-//                 updatedAt: new Date(),
-//               }
-//             : note
-//         )
-//       );
-//     },
-//     [setNotes]
-//   );
-
-//   const deleteNote = useCallback(
-//     (id: string) => {
-//       setNotes((prev) => prev.filter((note) => note.id !== id));
-//     },
-//     [setNotes]
-//   );
-
-//   const getNote = useCallback(
-//     (id: string): Note | undefined => {
-//       return notes.find((note) => note.id === id);
-//     },
-//     [notes]
-//   );
-
-//   const value = useMemo<NotesContextValue>(
-//     () => ({
-//       notes,
-//       folders,
-//       addNote,
-//       updateNote,
-//       deleteNote,
-//       getNote,
-//       addFolder,
-//       deleteFolder,
-//       updateFolder,
-//     }),
-//     [
-//       notes,
-//       folders,
-//       addNote,
-//       updateNote,
-//       deleteNote,
-//       getNote,
-//       addFolder,
-//       deleteFolder,
-//       updateFolder,
-//     ]
-//   );
-
-//   return (
-//     <NotesContext.Provider value={value}>{children}</NotesContext.Provider>
-//   );
-// }
-
-// export function useNotes(): NotesContextValue {
-//   const context = useContext(NotesContext);
-//   if (!context) {
-//     throw new Error("useNotes must be used within a NotesProvider");
-//   }
-//   return context;
-// }
-
 // contexts/NotesContext.tsx
 "use client";
 
@@ -198,12 +20,12 @@ import {
   DEFAULT_NOTE_ICON,
   DEFAULT_NOTE_TITLE,
 } from "@/types/notes";
+import { toast } from "sonner";
 
 const NotesContext = createContext<NotesContextValue | null>(null);
 
-// --- Funções Auxiliares de Mapeamento ---
-// Converte os dados vindos do Supabase (snake_case) para o tipo da aplicação (camelCase)
-const mapNoteFromSupabase = (data: any): Note => ({
+// Mappers
+const mapNote = (data: any): Note => ({
   id: data.id,
   title: data.title,
   icon: data.icon,
@@ -214,214 +36,233 @@ const mapNoteFromSupabase = (data: any): Note => ({
   updatedAt: new Date(data.updated_at),
 });
 
-const mapFolderFromSupabase = (data: any): Folder => ({
-  id: data.id,
-  name: data.name,
-  createdAt: new Date(data.created_at),
-});
-
 export function NotesProvider({ children }: { children: ReactNode }) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // --- Carregar dados iniciais do Supabase ---
+  // Carregamento inicial
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setIsLoading(true);
-
-        // Buscar Pastas
-        const { data: foldersData, error: foldersError } = await supabase
-          .from("folders")
-          .select("*")
-          .order("created_at", { ascending: true });
-
-        if (foldersError) throw foldersError;
-
-        // Buscar Notas
-        const { data: notesData, error: notesError } = await supabase
+    async function loadData() {
+      const [foldersRes, notesRes] = await Promise.all([
+        supabase.from("folders").select("*").order("created_at"),
+        supabase
           .from("notes")
           .select("*")
-          .order("updated_at", { ascending: false });
+          .order("updated_at", { ascending: false }),
+      ]);
 
-        if (notesError) throw notesError;
-
-        if (foldersData) setFolders(foldersData.map(mapFolderFromSupabase));
-        if (notesData) setNotes(notesData.map(mapNoteFromSupabase));
-      } catch (error: any) {
-        console.error("Erro detalhado:", JSON.stringify(error, null, 2));
-        console.error("Mensagem de erro:", error.message || error);
-      } finally {
-        setIsLoading(false);
+      if (foldersRes.data) {
+        setFolders(
+          foldersRes.data.map((f) => ({
+            id: f.id,
+            name: f.name,
+            createdAt: new Date(f.created_at),
+          }))
+        );
+      }
+      if (notesRes.data) {
+        setNotes(notesRes.data.map(mapNote));
       }
     }
-
-    fetchData();
+    loadData();
   }, []);
 
-  // --- Funções de Pasta ---
-  const addFolder = useCallback(async (name: string) => {
-    try {
-      // 1. Inserir no Supabase
-      const { data, error } = await supabase
-        .from("folders")
-        .insert({ name })
-        .select()
-        .single();
+  // --- UPDATE NOTE ---
+  const updateNote = useCallback(
+    async (id: string, updates: UpdateNoteInput) => {
+      const previousNotes = [...notes];
 
-      if (error) throw error;
-
-      // 2. Atualizar estado local
-      const newFolder = mapFolderFromSupabase(data);
-      setFolders((prev) => [...prev, newFolder]);
-    } catch (error) {
-      console.error("Erro ao criar pasta:", error);
-    }
-  }, []);
-
-  const deleteFolder = useCallback(async (id: string) => {
-    try {
-      // 1. Deletar do Supabase
-      const { error } = await supabase.from("folders").delete().eq("id", id);
-      if (error) throw error;
-
-      // 2. Atualizar estado local
-      setNotes((prevNotes) =>
-        prevNotes.map((note) =>
-          note.folderId === id ? { ...note, folderId: null } : note
+      // Optimistic UI
+      setNotes((prev) =>
+        prev.map((note) =>
+          note.id === id ? { ...note, ...updates, updatedAt: new Date() } : note
         )
       );
-      setFolders((prev) => prev.filter((f) => f.id !== id));
-    } catch (error) {
-      console.error("Erro ao deletar pasta:", error);
-    }
-  }, []);
 
-  const updateFolder = useCallback(async (id: string, name: string) => {
-    try {
-      const { error } = await supabase
-        .from("folders")
-        .update({ name })
-        .eq("id", id);
+      const dbUpdates: any = { updated_at: new Date().toISOString() };
+      if (updates.title !== undefined) dbUpdates.title = updates.title;
+      if (updates.icon !== undefined) dbUpdates.icon = updates.icon;
+      if (updates.content !== undefined) dbUpdates.content = updates.content;
+      if (updates.coverImage !== undefined)
+        dbUpdates.cover_image = updates.coverImage;
+      if (updates.folderId !== undefined)
+        dbUpdates.folder_id = updates.folderId;
 
-      if (error) throw error;
+      try {
+        const { error } = await supabase
+          .from("notes")
+          .update(dbUpdates)
+          .eq("id", id);
+        if (error) throw error;
+      } catch (error) {
+        console.error("Erro ao atualizar nota:", error);
+        setNotes(previousNotes);
+        toast.error("Falha ao salvar alterações");
+      }
+    },
+    [notes]
+  );
 
-      setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name } : f)));
-    } catch (error) {
-      console.error("Erro ao atualizar pasta:", error);
-    }
-  }, []);
-
-  // --- Funções de Notas ---
+  // --- CREATE NOTE ---
   const addNote = useCallback(
     async (input: CreateNoteInput = {}): Promise<Note> => {
-      // Preparar objeto para inserção
-      const dbPayload = {
+      const tempId = crypto.randomUUID();
+      const newNoteOptimistic: Note = {
+        id: tempId,
         title: input.title || DEFAULT_NOTE_TITLE,
         icon: input.icon || DEFAULT_NOTE_ICON,
-        cover_image:
+        coverImage:
           input.coverImage ||
           "bg-gradient-to-r from-blue-700 via-blue-800 to-gray-900",
         content: input.content || [],
-        folder_id: input.folderId || null,
-        // created_at e updated_at são gerados automaticamente pelo banco,
-        // mas se quiser forçar a data atual do cliente, pode enviar.
+        folderId: input.folderId || null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
+
+      setNotes((prev) => [newNoteOptimistic, ...prev]);
 
       try {
         const { data, error } = await supabase
           .from("notes")
-          .insert(dbPayload)
+          .insert({
+            title: newNoteOptimistic.title,
+            icon: newNoteOptimistic.icon,
+            cover_image: newNoteOptimistic.coverImage,
+            content: newNoteOptimistic.content,
+            folder_id: newNoteOptimistic.folderId,
+          })
           .select()
           .single();
 
         if (error) throw error;
 
-        const newNote = mapNoteFromSupabase(data);
-        setNotes((prev) => [newNote, ...prev]); // Adiciona no início
-        return newNote;
+        const confirmedNote = mapNote(data);
+        setNotes((prev) =>
+          prev.map((n) => (n.id === tempId ? confirmedNote : n))
+        );
+        return confirmedNote;
       } catch (error) {
-        console.error("Erro ao criar nota:", error);
-        // Retornar um fallback ou lançar erro, dependendo da sua estratégia de UI
+        setNotes((prev) => prev.filter((n) => n.id !== tempId));
+        toast.error("Erro ao criar nota");
         throw error;
       }
     },
     []
   );
 
-  const updateNote = useCallback(
-    async (id: string, updates: UpdateNoteInput) => {
+  // --- DELETE NOTE ---
+  const deleteNote = useCallback(
+    async (id: string) => {
+      const previousNotes = [...notes];
+
+      // Remove da UI imediatamente
+      setNotes((prev) => prev.filter((n) => n.id !== id));
+      toast.success("Nota movida para lixeira"); // Feedback imediato
+
       try {
-        // Mapear campos camelCase para snake_case
-        const dbUpdates: any = {
-          updated_at: new Date().toISOString(),
-        };
-        if (updates.title !== undefined) dbUpdates.title = updates.title;
-        if (updates.icon !== undefined) dbUpdates.icon = updates.icon;
-        if (updates.content !== undefined) dbUpdates.content = updates.content;
-        if (updates.coverImage !== undefined)
-          dbUpdates.cover_image = updates.coverImage;
-        if (updates.folderId !== undefined)
-          dbUpdates.folder_id = updates.folderId;
-
-        // Otimisticamente atualizar a UI antes (opcional, aqui estamos fazendo depois)
-        // Se quiser UI otimista, atualize o setNotes antes do await
-
-        const { error } = await supabase
-          .from("notes")
-          .update(dbUpdates)
-          .eq("id", id);
-
+        const { error } = await supabase.from("notes").delete().eq("id", id);
         if (error) throw error;
-
-        setNotes((prev) =>
-          prev.map((note) =>
-            note.id === id
-              ? {
-                  ...note,
-                  ...updates,
-                  updatedAt: new Date(),
-                }
-              : note
-          )
-        );
       } catch (error) {
-        console.error("Erro ao atualizar nota:", error);
+        console.error("Erro ao deletar nota:", error);
+        setNotes(previousNotes); // Restaura se falhar
+        toast.error("Erro ao excluir nota. Verifique permissões.");
       }
-    },
-    []
-  );
-
-  const deleteNote = useCallback(async (id: string) => {
-    try {
-      const { error } = await supabase.from("notes").delete().eq("id", id);
-      if (error) throw error;
-
-      setNotes((prev) => prev.filter((note) => note.id !== id));
-    } catch (error) {
-      console.error("Erro ao deletar nota:", error);
-    }
-  }, []);
-
-  const getNote = useCallback(
-    (id: string): Note | undefined => {
-      return notes.find((note) => note.id === id);
     },
     [notes]
   );
 
-  const value = useMemo<NotesContextValue>(
+  // --- ADD FOLDER ---
+  const addFolder = useCallback(async (name: string) => {
+    const tempId = crypto.randomUUID();
+    const newFolder: Folder = { id: tempId, name, createdAt: new Date() };
+
+    setFolders((prev) => [...prev, newFolder]);
+
+    try {
+      const { data, error } = await supabase
+        .from("folders")
+        .insert({ name })
+        .select()
+        .single();
+      if (error) throw error;
+
+      const createdFolder = {
+        id: data.id,
+        name: data.name,
+        createdAt: new Date(data.created_at),
+      };
+
+      setFolders((prev) =>
+        prev.map((f) => (f.id === tempId ? createdFolder : f))
+      );
+    } catch (error) {
+      setFolders((prev) => prev.filter((f) => f.id !== tempId));
+      toast.error("Erro ao criar pasta");
+    }
+  }, []);
+
+  // --- DELETE FOLDER ---
+  const deleteFolder = useCallback(
+    async (id: string) => {
+      const prevFolders = [...folders];
+      const prevNotes = [...notes];
+
+      // Remove pasta e remove notas dessa pasta visualmente
+      setFolders((prev) => prev.filter((f) => f.id !== id));
+      setNotes((prev) =>
+        prev.map((n) => (n.folderId === id ? { ...n, folderId: null } : n))
+      );
+
+      try {
+        const { error } = await supabase.from("folders").delete().eq("id", id);
+        if (error) throw error;
+        toast.success("Pasta excluída");
+      } catch (error) {
+        setFolders(prevFolders);
+        setNotes(prevNotes);
+        toast.error("Erro ao excluir pasta");
+      }
+    },
+    [folders, notes]
+  );
+
+  // --- UPDATE FOLDER ---
+  const updateFolder = useCallback(
+    async (id: string, name: string) => {
+      const prevFolders = [...folders];
+      setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name } : f)));
+
+      try {
+        const { error } = await supabase
+          .from("folders")
+          .update({ name })
+          .eq("id", id);
+        if (error) throw error;
+      } catch (error) {
+        setFolders(prevFolders);
+        toast.error("Erro ao renomear pasta");
+      }
+    },
+    [folders]
+  );
+
+  const getNote = useCallback(
+    (id: string) => notes.find((n) => n.id === id),
+    [notes]
+  );
+
+  const value = useMemo(
     () => ({
       notes,
       folders,
-      addNote: addNote as any, // Cast necessário pois mudamos para async
+      addNote,
       updateNote,
-      deleteNote,
+      deleteNote, // Agora está implementado!
       getNote,
-      addFolder,
-      deleteFolder,
-      updateFolder,
+      addFolder, // Agora está implementado!
+      deleteFolder, // Agora está implementado!
+      updateFolder, // Agora está implementado!
     }),
     [
       notes,
@@ -437,17 +278,14 @@ export function NotesProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <NotesContext.Provider value={value}>
-      {/* Opcional: Mostrar loading se necessário, ou apenas renderizar children */}
+    <NotesContext.Provider value={value as any}>
       {children}
     </NotesContext.Provider>
   );
 }
 
-export function useNotes(): NotesContextValue {
+export function useNotes() {
   const context = useContext(NotesContext);
-  if (!context) {
-    throw new Error("useNotes must be used within a NotesProvider");
-  }
+  if (!context) throw new Error("useNotes must be used within a NotesProvider");
   return context;
 }

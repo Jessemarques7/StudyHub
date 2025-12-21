@@ -1,3 +1,4 @@
+// components/notes/Editor.tsx
 "use client";
 
 import { useParams } from "next/navigation";
@@ -7,11 +8,13 @@ import { Block } from "@blocknote/core";
 import Blocknote from "./Blocknote";
 import { NoteHeader } from "./NoteHeader";
 import { NoteTitleInput } from "./NoteTitleInput";
+import { debounce } from "lodash";
 
 export default function Editor() {
   const params = useParams<{ noteid: string }>();
   const { notes, updateNote, getNote } = useNotes();
 
+  // Otimização: Memoizar a nota atual para evitar recálculos excessivos
   const currentNote = useMemo(
     () => getNote(params.noteid),
     [params.noteid, getNote]
@@ -19,82 +22,75 @@ export default function Editor() {
 
   const [title, setTitle] = useState("");
 
-  // Sincroniza o título quando a nota muda
+  // Sincroniza estado local do título apenas quando a nota muda de fato
   useEffect(() => {
-    if (currentNote) {
-      setTitle(currentNote.title);
-    }
-  }, [currentNote?.id]);
+    if (currentNote) setTitle(currentNote.title);
+  }, [currentNote?.id, currentNote?.title]);
+
+  // Debounce para o conteúdo (evita salvar a cada letra digitada)
+  const debouncedUpdateContent = useMemo(
+    () =>
+      debounce((noteId: string, content: Block[]) => {
+        updateNote(noteId, { content });
+      }, 1000),
+    [updateNote]
+  );
 
   const handleUpdateContent = useCallback(
     (updatedContent: Block[]) => {
       if (!params.noteid) return;
-      updateNote(params.noteid, { content: updatedContent });
+      debouncedUpdateContent(params.noteid, updatedContent);
     },
-    [params.noteid, updateNote]
+    [params.noteid, debouncedUpdateContent]
   );
 
-  const handleTitleChange = useCallback((newTitle: string) => {
-    setTitle(newTitle);
-  }, []);
-
+  // Manipulador para salvar o título (passado para o onSave do input)
   const handleTitleSave = useCallback(() => {
-    if (!params.noteid || !title.trim()) return;
-    updateNote(params.noteid, { title: title.trim() });
-  }, [params.noteid, title, updateNote]);
+    if (params.noteid && title.trim() !== currentNote?.title) {
+      updateNote(params.noteid, { title: title.trim() });
+    }
+  }, [params.noteid, title, currentNote?.title, updateNote]);
+
+  const handleTitleChange = (newTitle: string) => setTitle(newTitle);
 
   const handleIconUpdate = useCallback(
     (icon: string | null) => {
-      if (!params.noteid) return;
-      updateNote(params.noteid, { icon });
+      if (params.noteid) updateNote(params.noteid, { icon });
     },
     [params.noteid, updateNote]
   );
 
   const handleCoverUpdate = useCallback(
     (coverImage: string | null) => {
-      if (!params.noteid) return;
-      updateNote(params.noteid, { coverImage });
+      if (params.noteid) updateNote(params.noteid, { coverImage });
     },
     [params.noteid, updateNote]
   );
 
-  if (!currentNote) {
+  if (!currentNote)
     return (
-      <div className="flex flex-1 items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-400 mb-2">
-            No note selected
-          </h2>
-          <p className="text-gray-500">
-            Select a note from the sidebar or create a new one
-          </p>
-        </div>
+      <div className="flex flex-1 items-center justify-center text-muted-foreground">
+        No note selected
       </div>
     );
-  }
 
   return (
-    <div className="flex flex-1 flex-col h-full bg-slate-950">
-      {/* Container de Scroll Único para Header e Conteúdo */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden relative">
-        {/* Header agora faz parte do fluxo, garantindo largura total correta */}
+    <div className="flex flex-1 flex-col h-full bg-background">
+      <div className="flex-1 overflow-y-auto relative scrollbar-hide">
         <NoteHeader
           note={currentNote}
           onIconUpdate={handleIconUpdate}
           onCoverUpdate={handleCoverUpdate}
         />
 
-        {/* Wrapper do Conteúdo: Aqui aplicamos o padding e centralização */}
         <div className="w-full flex justify-center p-2 md:px-10 md:py-6">
           <div className="w-full min-h-[70vh] max-w-[770px]">
             <NoteTitleInput
               value={title}
               onChange={handleTitleChange}
-              onSave={handleTitleSave}
+              onSave={handleTitleSave} // <--- CORREÇÃO: Usando onSave, não onBlur
             />
 
-            {/* CORREÇÃO CRÍTICA: key={currentNote.id} força o editor a reiniciar ao trocar de nota */}
             <Blocknote
               key={currentNote.id}
               onUpdateNote={handleUpdateContent}

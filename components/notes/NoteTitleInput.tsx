@@ -1,3 +1,4 @@
+// components/notes/NoteTitleInput.tsx
 import { useState, useCallback, useRef, useEffect } from "react";
 
 interface NoteTitleInputProps {
@@ -11,55 +12,42 @@ export function NoteTitleInput({
   onChange,
   onSave,
 }: NoteTitleInputProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [initialValue, setInitialValue] = useState(value);
+  // Guardamos o valor inicial apenas ao focar, para o "Escape" funcionar corretamente
+  const [snapshotValue, setSnapshotValue] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    setInitialValue(value);
+  const handleFocus = useCallback(() => {
+    setSnapshotValue(value); // Tira uma "foto" do valor atual ao entrar
   }, [value]);
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(e.target.value);
-    },
-    [onChange]
-  );
-
   const handleBlur = useCallback(() => {
-    setIsEditing(false);
-    onSave();
+    onSave(); // Salva ao sair
   }, [onSave]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter") {
-        e.currentTarget.blur();
+        e.currentTarget.blur(); // Dispara o onBlur -> onSave
       } else if (e.key === "Escape") {
-        onChange(initialValue);
-        setIsEditing(false);
+        onChange(snapshotValue); // Reverte para o valor da "foto"
         e.currentTarget.blur();
       }
     },
-    [initialValue, onChange]
+    [snapshotValue, onChange]
   );
-
-  const handleFocus = useCallback(() => {
-    setIsEditing(true);
-  }, []);
 
   return (
     <input
       ref={inputRef}
       type="text"
       value={value}
-      onChange={handleChange}
+      onChange={(e) => onChange(e.target.value)}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
       onFocus={handleFocus}
       placeholder="Untitled"
       aria-label="Note title"
-      className="w-full px-[54px] mt-10 mb-4 text-gray-50 text-5xl font-bold bg-transparent border-none outline-none placeholder:text-gray-400 focus:placeholder:text-gray-500 transition-colors"
+      className="w-full px-[54px] mt-10 mb-4 text-foreground text-5xl font-bold bg-transparent border-none outline-none placeholder:text-muted-foreground focus:placeholder:text-gray-500 transition-colors"
     />
   );
 }

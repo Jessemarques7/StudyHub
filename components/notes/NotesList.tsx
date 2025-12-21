@@ -223,7 +223,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
   return (
     <div className="flex-1">
       {/* Header Principal */}
-      <div className="mb-2">
+      <div className="">
         <div className="flex items-center justify-between w-full text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-blue-900/30 rounded-md px-2 py-2 transition-colors group">
           <button
             onClick={() => setNotesOpen(!notesOpen)}
