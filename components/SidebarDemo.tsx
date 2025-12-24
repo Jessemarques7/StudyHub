@@ -9,6 +9,7 @@ import Image from "next/image";
 import NotesList from "./notes/NotesList";
 import DiagramsList from "./diagram/DiagramsList"; // Importar
 import { IconCards, IconFile, IconSitemap } from "@tabler/icons-react";
+import { LogoutButton } from "./auth/LogoutButton";
 
 export function SidebarDemo({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -63,6 +64,7 @@ export function SidebarDemo({ children }: { children: React.ReactNode }) {
                 <DiagramsList opensidebar={open} />
               </div>
             </div>
+            <LogoutButton />
           </div>
         </SidebarBody>
       </Sidebar>

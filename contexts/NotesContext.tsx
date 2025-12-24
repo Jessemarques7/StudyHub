@@ -43,6 +43,13 @@ export function NotesProvider({ children }: { children: ReactNode }) {
   // Carregamento inicial
   useEffect(() => {
     async function loadData() {
+      // --- ADICIONE ISTO AQUI PARA TESTAR ---
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      console.log("USUÁRIO LOGADO NO CONTEXTO:", user?.email || "NÃO LOGADO");
+      // --------------------------------------
+
       const [foldersRes, notesRes] = await Promise.all([
         supabase.from("folders").select("*").order("created_at"),
         supabase
