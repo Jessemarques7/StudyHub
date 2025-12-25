@@ -163,7 +163,23 @@ export function NoteHeader({
 
               {emojiPickerVisible && (
                 <div className="absolute top-full mt-2 z-50">
-                  <EmojiPicker theme="dark" onEmojiClick={handleEmojiSelect} />
+                  <EmojiPicker
+                    style={
+                      {
+                        "--epr-bg-color": "var(--color-slate-900)",
+                        "--epr-category-label-bg-color":
+                          "var(--color-slate-850)",
+                        "--epr-search-bg-color": "var(--color-slate-800)",
+                        "--epr-search-text-color": "var(--color-slate-100)",
+                        "--epr-emoji-hover-bg-color": "var(--color-slate-700)",
+                        "--epr-scrollbar-bg-color": "var(--color-slate-800)",
+                        "--epr-scrollbar-thumb-bg-color":
+                          "var(--color-slate-700)",
+                      } as React.CSSProperties
+                    }
+                    theme="dark"
+                    onEmojiClick={handleEmojiSelect}
+                  />
                 </div>
               )}
             </div>

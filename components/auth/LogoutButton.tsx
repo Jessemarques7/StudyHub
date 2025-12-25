@@ -22,10 +22,10 @@ export function LogoutButton() {
   return (
     <Button
       variant="ghost"
-      className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-100/10"
+      className="w-full justify-start text-red-500 hover:text-red-600 cursor-pointer "
       onClick={handleLogout}
     >
-      <LogOut className="mr-2 h-4 w-4" />
+      <LogOut className="mr-2 " />
       Sign Out
     </Button>
   );

@@ -5,10 +5,17 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { z } from "zod";
 
-// This was missing!
-const authSchema = z.object({
+// Schema for Login (Email & Password only)
+const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
+});
+
+// Schema for Signup (Includes Name)
+const signupSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
 });
 
 export async function login(formData: FormData) {
@@ -16,7 +23,7 @@ export async function login(formData: FormData) {
 
   // Validate data
   const data = Object.fromEntries(formData);
-  const parsed = authSchema.safeParse(data);
+  const parsed = loginSchema.safeParse(data);
 
   if (!parsed.success) {
     return { error: "Invalid email or password format" };
@@ -39,15 +46,22 @@ export async function signup(formData: FormData) {
   const supabase = await createClient();
 
   const data = Object.fromEntries(formData);
-  const parsed = authSchema.safeParse(data);
+  const parsed = signupSchema.safeParse(data);
 
   if (!parsed.success) {
-    return { error: "Invalid email or password format" };
+    return {
+      error: "Invalid input data. Password must be 6+ chars and name 2+ chars.",
+    };
   }
 
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
+    options: {
+      data: {
+        full_name: parsed.data.name,
+      },
+    },
   });
 
   if (error) {

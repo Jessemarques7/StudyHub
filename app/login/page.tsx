@@ -98,11 +98,21 @@ export default function AuthPage() {
             <CardHeader>
               <CardTitle>Create Account</CardTitle>
               <CardDescription>
-                Enter your email below to create a new account.
+                Enter your details below to create a new account.
               </CardDescription>
             </CardHeader>
             <form action={(formData) => handleSubmit(formData, "signup")}>
               <CardContent className="space-y-2">
+                <div className="space-y-1">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    placeholder="John Doe"
+                    required
+                  />
+                </div>
                 <div className="space-y-1">
                   <Label htmlFor="email">Email</Label>
                   <Input
