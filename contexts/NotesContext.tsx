@@ -40,21 +40,31 @@ export function NotesProvider({ children }: { children: ReactNode }) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
 
-  // Carregamento inicial
+  // Carregamento inicial com filtro de usuário
   useEffect(() => {
     async function loadData() {
-      // --- ADICIONE ISTO AQUI PARA TESTAR ---
+      // 1. Verificar usuário
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      console.log("USUÁRIO LOGADO NO CONTEXTO:", user?.email || "NÃO LOGADO");
-      // --------------------------------------
 
+      if (!user) {
+        setNotes([]);
+        setFolders([]);
+        return;
+      }
+
+      // 2. Buscar dados apenas deste usuário
       const [foldersRes, notesRes] = await Promise.all([
-        supabase.from("folders").select("*").order("created_at"),
+        supabase
+          .from("folders")
+          .select("*")
+          .eq("user_id", user.id) // FILTRO
+          .order("created_at"),
         supabase
           .from("notes")
           .select("*")
+          .eq("user_id", user.id) // FILTRO
           .order("updated_at", { ascending: false }),
       ]);
 
@@ -100,6 +110,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
           .from("notes")
           .update(dbUpdates)
           .eq("id", id);
+
         if (error) throw error;
       } catch (error) {
         console.error("Erro ao atualizar nota:", error);
@@ -113,6 +124,15 @@ export function NotesProvider({ children }: { children: ReactNode }) {
   // --- CREATE NOTE ---
   const addNote = useCallback(
     async (input: CreateNoteInput = {}): Promise<Note> => {
+      // Obter usuário atual
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Você precisa estar logado para criar notas");
+        throw new Error("Usuário não autenticado");
+      }
+
       const tempId = crypto.randomUUID();
       const newNoteOptimistic: Note = {
         id: tempId,
@@ -138,6 +158,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
             cover_image: newNoteOptimistic.coverImage,
             content: newNoteOptimistic.content,
             folder_id: newNoteOptimistic.folderId,
+            user_id: user.id, // VINCULA AO USUÁRIO
           })
           .select()
           .single();
@@ -163,17 +184,16 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     async (id: string) => {
       const previousNotes = [...notes];
 
-      // Remove da UI imediatamente
       setNotes((prev) => prev.filter((n) => n.id !== id));
-      toast.success("Nota movida para lixeira"); // Feedback imediato
+      toast.success("Nota movida para lixeira");
 
       try {
         const { error } = await supabase.from("notes").delete().eq("id", id);
         if (error) throw error;
       } catch (error) {
         console.error("Erro ao deletar nota:", error);
-        setNotes(previousNotes); // Restaura se falhar
-        toast.error("Erro ao excluir nota. Verifique permissões.");
+        setNotes(previousNotes);
+        toast.error("Erro ao excluir nota.");
       }
     },
     [notes]
@@ -181,6 +201,15 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 
   // --- ADD FOLDER ---
   const addFolder = useCallback(async (name: string) => {
+    // Obter usuário
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Login necessário");
+      return;
+    }
+
     const tempId = crypto.randomUUID();
     const newFolder: Folder = { id: tempId, name, createdAt: new Date() };
 
@@ -189,9 +218,13 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from("folders")
-        .insert({ name })
+        .insert({
+          name,
+          user_id: user.id, // VINCULA AO USUÁRIO
+        })
         .select()
         .single();
+
       if (error) throw error;
 
       const createdFolder = {
@@ -215,7 +248,6 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       const prevFolders = [...folders];
       const prevNotes = [...notes];
 
-      // Remove pasta e remove notas dessa pasta visualmente
       setFolders((prev) => prev.filter((f) => f.id !== id));
       setNotes((prev) =>
         prev.map((n) => (n.folderId === id ? { ...n, folderId: null } : n))
@@ -265,11 +297,11 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       folders,
       addNote,
       updateNote,
-      deleteNote, // Agora está implementado!
+      deleteNote,
       getNote,
-      addFolder, // Agora está implementado!
-      deleteFolder, // Agora está implementado!
-      updateFolder, // Agora está implementado!
+      addFolder,
+      deleteFolder,
+      updateFolder,
     }),
     [
       notes,

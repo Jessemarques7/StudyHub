@@ -1,6 +1,6 @@
 // components/SidebarDemo.tsx
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Sidebar, SidebarBody } from "./ui/aceternity-sidebar";
 import { motion } from "framer-motion"; // Note: verify import 'motion/react' vs 'framer-motion'
 import { cn } from "@/lib/utils";
@@ -10,9 +10,27 @@ import NotesList from "./notes/NotesList";
 import DiagramsList from "./diagram/DiagramsList"; // Importar
 import { IconCards, IconFile, IconSitemap } from "@tabler/icons-react";
 import { LogoutButton } from "./auth/LogoutButton";
+import { User } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 
 export function SidebarDemo({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  // Buscar usuário ao carregar o componente
+  useEffect(() => {
+    async function getUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+    }
+    getUser();
+  }, []);
+
+  // Helper para pegar a inicial ou ícone padrão
+  const userInitial = user?.email;
+
   return (
     <div
       className={cn(
@@ -64,7 +82,10 @@ export function SidebarDemo({ children }: { children: React.ReactNode }) {
                 <DiagramsList opensidebar={open} />
               </div>
             </div>
-            <LogoutButton />
+            <div className=" 9">
+              <div>{userInitial}</div>
+              <LogoutButton />
+            </div>
           </div>
         </SidebarBody>
       </Sidebar>

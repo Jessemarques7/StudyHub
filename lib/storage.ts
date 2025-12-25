@@ -1,7 +1,8 @@
+// lib/storage.ts
 import { supabase } from "@/lib/supabase";
-import { Deck, Flashcard, StudyStats } from "@/types/flashcard";
+import { Deck, Flashcard } from "@/types/flashcard";
 
-// Agora aceita um bucket opcional, padrão 'flashcard-media' para não quebrar o código anterior
+// Agora aceita um bucket opcional
 export async function uploadMedia(
   file: File,
   bucket: string = "flashcard-media"
@@ -22,12 +23,20 @@ export async function uploadMedia(
   return data.publicUrl;
 }
 
-// ... (mantenha o restante das funções de Decks e Cards como estão)
+// --- Decks ---
+
 export async function getAllDecks(): Promise<Deck[]> {
-  // ... código existente ...
+  // 1. Obter usuário
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  // 2. Filtrar decks do usuário
   const { data, error } = await supabase
     .from("decks")
     .select("*")
+    .eq("user_id", user.id) // FILTRO
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -42,18 +51,25 @@ export async function getAllDecks(): Promise<Deck[]> {
 }
 
 export async function saveDeck(deck: Deck): Promise<void> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Usuário não autenticado");
+
   const { error } = await supabase.from("decks").upsert({
     id: deck.id,
     name: deck.name,
     description: deck.description,
+    user_id: user.id, // VINCULA AO USUÁRIO
     updated_at: new Date().toISOString(),
-    // created_at é gerado automaticamente no insert, ou mantido no update se omitido
+    // created_at é gerado automaticamente ou mantido
   });
 
   if (error) throw error;
 }
 
 export async function deleteDeck(deckId: string): Promise<void> {
+  // Opcional: Adicionar .eq('user_id', user.id) para segurança extra
   const { error } = await supabase.from("decks").delete().eq("id", deckId);
 
   if (error) throw error;
@@ -62,6 +78,8 @@ export async function deleteDeck(deckId: string): Promise<void> {
 // --- Cards ---
 
 export async function getCardsByDeck(deckId: string): Promise<Flashcard[]> {
+  // Como os decks já são filtrados por usuário, quem tem o deckId tem acesso aos cards.
+  // Se quiser segurança extra, verifique se o deck pertence ao usuário antes.
   const { data, error } = await supabase
     .from("flashcards")
     .select("*")
