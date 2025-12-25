@@ -34,7 +34,7 @@ export async function updateProfileName(prevState: any, formData: FormData) {
   // Validação Zod
   const parsed = profileSchema.safeParse({ fullName });
   if (!parsed.success) {
-    return { error: parsed.error.errors[0].message };
+    return { error: parsed.error.issues[0].message };
   }
 
   // Atualiza os metadados do usuário no Supabase Auth

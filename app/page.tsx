@@ -39,7 +39,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden selection:bg-primary/20 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground overflow-hidden selection:bg-primary/20 flex flex-col bg-[radial-gradient(at_7%_13%,hsl(206,74%,17%)_0,transparent_29%),radial-gradient(at_82%_65%,hsl(217,59%,21%)_0,transparent_45%)] ">
       {/* Background Gradients Ambientais */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/5 blur-[120px]" />
@@ -47,7 +47,7 @@ export default function Home() {
       </div>
 
       {/* Navbar */}
-      <nav className="relative z-10 container mx-auto px-6 h-20 flex items-center justify-between border-b border-border/40 backdrop-blur-sm">
+      <nav className="relative z-10 container mx-auto px-6 h-20 flex items-center justify-between  backdrop-blur-sm">
         <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
           <div className="h-8 w-8 rounded-lg bg-primary/10  flex items-center justify-center text-primary shadow-glow">
             <Image alt="logo" width={50} height={50} src={"/logo.png"} />
