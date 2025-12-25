@@ -57,7 +57,7 @@ export async function updatePassword(prevState: any, formData: FormData) {
   // Validação Zod
   const parsed = passwordSchema.safeParse({ password, confirmPassword });
   if (!parsed.success) {
-    return { error: parsed.error.errors[0].message };
+    return { error: parsed.error.issues[0].message };
   }
 
   // Atualiza a senha
