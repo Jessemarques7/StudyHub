@@ -19,13 +19,14 @@ import {
   Panel,
   Node,
   Edge,
+  type OnNodesChange,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useDiagrams } from "@/contexts/DiagramsContext";
-import { NodeChange } from "reactflow";
+
 // Note: If you are using the newer package, import from '@xyflow/react' instead.
 
 // Configurações e Tipos
@@ -86,7 +87,7 @@ function Flow() {
   }, [nodes, edges, diagramid, updateDiagram]);
 
   const onNodesChange = useCallback(
-    (changes: NodeChange[]) =>
+    (changes: OnNodesChange[]) =>
       setNodes((nds) => applyNodeChanges(changes, nds)),
     []
   );
