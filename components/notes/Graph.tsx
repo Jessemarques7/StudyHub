@@ -4,38 +4,32 @@ import ForceGraphComponent from "./ForceGraph";
 import { GraphData, GraphLink } from "@/types/notes";
 import { Block } from "@blocknote/core";
 
-// Updated interface to handle both old and new mention structures
 interface MentionContent {
   type: string;
   props?: {
-    // New structure (flat)
     id?: string;
-    // Old structure (nested)
     note?: {
       id: string;
     };
   };
 }
 
-interface ParagraphBlock extends Block {
+// FIX: Changed from 'interface' to 'type' to allow intersection with Block union type
+type ParagraphBlock = Block & {
   type: "paragraph";
   content?: MentionContent[];
-}
+};
 
 function isParagraphBlock(block: Block): block is ParagraphBlock {
-  return (
-    block.type === "paragraph" &&
-    Array.isArray((block as ParagraphBlock).content)
-  );
+  return block.type === "paragraph" && Array.isArray((block as any).content);
 }
 
-// Updated extractor to check both locations
 function extractMentionId(contentItem: MentionContent): string | null {
   if (contentItem.type !== "mention" || !contentItem.props) {
     return null;
   }
 
-  // 1. Check new flat structure (from recent fix)
+  // 1. Check new flat structure
   if (contentItem.props.id) {
     return contentItem.props.id;
   }
@@ -57,16 +51,17 @@ export default function Graph() {
     const validNoteIds = new Set(notes.map((n) => n.id));
 
     notes.forEach((note) => {
+      // Cast note.content to any[] or Block[] to iterate safely if needed
       if (!Array.isArray(note.content)) return;
 
       note.content.forEach((block) => {
-        if (!isParagraphBlock(block)) return;
+        // block is treated as Block here
+        if (!isParagraphBlock(block as Block)) return;
 
         block.content?.forEach((contentItem) => {
           const targetId = extractMentionId(contentItem);
 
           if (targetId && validNoteIds.has(targetId)) {
-            // Avoid self-loops if desired, though some graphs allow them
             if (note.id !== targetId) {
               extractedLinks.push({
                 source: note.id,
