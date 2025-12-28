@@ -1,3 +1,4 @@
+// components/diagram/CustomEdge.tsx
 import { memo, useState } from "react";
 import {
   EdgeToolbar,
@@ -18,12 +19,15 @@ function CustomEdge({ id, selected, style, markerEnd, ...props }: EdgeProps) {
   const { deleteElements, setEdges } = useReactFlow();
   const [showColorPicker, setShowColorPicker] = useState(false);
 
+  // FIX: Only pass the coordinate properties required for path calculation.
+  // We explicitly select them from 'props' to avoid passing 'id', 'selected', etc.
   const [edgePath, centerX, centerY] = getBezierPath({
-    ...props,
-    id,
-    selected,
-    style,
-    markerEnd,
+    sourceX: props.sourceX,
+    sourceY: props.sourceY,
+    sourcePosition: props.sourcePosition,
+    targetX: props.targetX,
+    targetY: props.targetY,
+    targetPosition: props.targetPosition,
   });
 
   const onDelete = () => {
