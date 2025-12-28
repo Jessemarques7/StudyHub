@@ -1,27 +1,28 @@
 import { createReactInlineContentSpec } from "@blocknote/react";
 import Link from "next/link";
-import { MentionProps } from "@/types/notes";
 
 // Componente de menção inline
 export const Mention = createReactInlineContentSpec(
   {
     type: "mention",
     propSchema: {
-      note: {
-        default: {
-          id: "",
-          title: "Unknown",
-        },
+      // Define properties as primitives (strings), not objects
+      id: {
+        default: "",
+      },
+      title: {
+        default: "Unknown",
       },
     },
     content: "none",
   },
   {
     render: (props) => {
-      const noteData = props.inlineContent.props.note as MentionProps["note"];
+      // Access props directly now that they are flattened
+      const { id, title } = props.inlineContent.props;
 
       // Validação de dados
-      if (!noteData || !noteData.id) {
+      if (!id) {
         return (
           <span
             style={{
@@ -39,7 +40,7 @@ export const Mention = createReactInlineContentSpec(
 
       return (
         <Link
-          href={`/notes/${noteData.id}`}
+          href={`/notes/${id}`}
           style={{
             // backgroundColor: "#9124ff",
             textDecoration: "none",
@@ -50,9 +51,9 @@ export const Mention = createReactInlineContentSpec(
             fontWeight: "bold",
           }}
           className="mention-link "
-          title={`Go to: ${noteData.title}`}
+          title={`Go to: ${title}`}
         >
-          @{noteData.title || "Untitled"}
+          @{title || "Untitled"}
         </Link>
       );
     },

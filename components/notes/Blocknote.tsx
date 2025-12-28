@@ -1,4 +1,3 @@
-// components/notes/Blocknote.tsx
 "use client";
 
 import "@blocknote/core/fonts/inter.css";
@@ -69,11 +68,9 @@ export default function Blocknote({
               {
                 type: "mention",
                 props: {
-                  note: {
-                    id: note.id,
-                    title: note.title,
-                    // content: note.content <--- REMOVED: This caused the type error
-                  },
+                  // Pass id and title directly as flat props
+                  id: note.id,
+                  title: note.title,
                 },
               },
               " ",

@@ -4,9 +4,13 @@ import ForceGraphComponent from "./ForceGraph";
 import { GraphData, GraphLink } from "@/types/notes";
 import { Block } from "@blocknote/core";
 
+// Updated interface to handle both old and new mention structures
 interface MentionContent {
   type: string;
   props?: {
+    // New structure (flat)
+    id?: string;
+    // Old structure (nested)
     note?: {
       id: string;
     };
@@ -25,10 +29,23 @@ function isParagraphBlock(block: Block): block is ParagraphBlock {
   );
 }
 
+// Updated extractor to check both locations
 function extractMentionId(contentItem: MentionContent): string | null {
-  return contentItem.type === "mention" && contentItem.props?.note?.id
-    ? contentItem.props.note.id
-    : null;
+  if (contentItem.type !== "mention" || !contentItem.props) {
+    return null;
+  }
+
+  // 1. Check new flat structure (from recent fix)
+  if (contentItem.props.id) {
+    return contentItem.props.id;
+  }
+
+  // 2. Check old nested structure (backward compatibility)
+  if (contentItem.props.note?.id) {
+    return contentItem.props.note.id;
+  }
+
+  return null;
 }
 
 export default function Graph() {
@@ -49,10 +66,13 @@ export default function Graph() {
           const targetId = extractMentionId(contentItem);
 
           if (targetId && validNoteIds.has(targetId)) {
-            extractedLinks.push({
-              source: note.id,
-              target: targetId,
-            });
+            // Avoid self-loops if desired, though some graphs allow them
+            if (note.id !== targetId) {
+              extractedLinks.push({
+                source: note.id,
+                target: targetId,
+              });
+            }
           }
         });
       });
