@@ -25,7 +25,7 @@ export interface CreateNoteInput {
   content?: Block[];
   icon?: string;
   coverImage?: string;
-  folderId?: string | null; // Adicionar ao input
+  folderId?: string | null;
 }
 
 export interface UpdateNoteInput {
@@ -33,7 +33,7 @@ export interface UpdateNoteInput {
   content?: Block[];
   icon?: string | null;
   coverImage?: string | null;
-  folderId?: string | null; // Adicionar ao input
+  folderId?: string | null;
 }
 
 export interface NotesContextValue {
@@ -73,7 +73,9 @@ export interface MentionNote {
 }
 
 export interface MentionProps {
-  note: MentionNote;
+  id: string;
+  title: string;
+  // note?: MentionNote; // Optional: Keep this if you need backward compatibility for old notes
 }
 
 export const DEFAULT_NOTE_ICON = "📘";
