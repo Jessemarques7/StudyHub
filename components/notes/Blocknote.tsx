@@ -68,7 +68,8 @@ export default function Blocknote({
               {
                 type: "mention",
                 props: {
-                  // Pass id and title directly as flat props
+                  // UPDATED: Pass id and title directly (flattened props)
+                  // This matches the schema fix in Mention.tsx
                   id: note.id,
                   title: note.title,
                 },
@@ -91,13 +92,16 @@ export default function Blocknote({
     schema,
     initialContent:
       currentNote.content && currentNote.content.length > 0
-        ? currentNote.content
-        : undefined, // undefined faz o BlockNote criar um parágrafo vazio padrão
+        ? (currentNote.content as any) // Cast initial content if needed
+        : undefined,
     uploadFile,
   });
 
   const handleChange = useCallback(() => {
-    debouncedUpdate(editor.document);
+    // FIX: Cast editor.document to 'unknown' then 'Block[]' to satisfy the strict type check.
+    // The custom 'mention' type makes editor.document technically incompatible with the default Block type,
+    // but it is safe to store as JSON.
+    debouncedUpdate(editor.document as unknown as Block[]);
   }, [editor, debouncedUpdate]);
 
   return (
