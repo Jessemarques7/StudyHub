@@ -19,7 +19,8 @@ import {
   Panel,
   Node,
   Edge,
-  ConnectionMode, // Added Import
+  ConnectionMode,
+  BackgroundVariant, // Added Import
   type OnNodesChange,
   type OnEdgesChange,
   type OnConnect,
@@ -181,7 +182,7 @@ function Flow() {
         onReconnect={onReconnect}
         onReconnectStart={onReconnectStart}
         onReconnectEnd={onReconnectEnd}
-        connectionMode={ConnectionMode.Loose} // Fixed: Use Enum
+        connectionMode={ConnectionMode.Loose}
         fitView
         defaultEdgeOptions={defaultEdgeOptions}
       >
@@ -215,7 +216,8 @@ function Flow() {
             </button>
           </div>
         </Panel>
-        <Background variant="dots" gap={12} size={1} />
+        {/* Fixed: Use BackgroundVariant.Dots */}
+        <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
     </div>
   );
