@@ -1,3 +1,4 @@
+// components/diagram/ImageNode.tsx
 "use client";
 import { useCallback, useState, useRef } from "react";
 import {
@@ -6,6 +7,8 @@ import {
   NodeResizer,
   NodeToolbar,
   useReactFlow,
+  type NodeProps,
+  type Node,
 } from "@xyflow/react";
 import { cn } from "@/lib/utils";
 import {
@@ -17,13 +20,26 @@ import {
 } from "@tabler/icons-react";
 import ColorPicker from "./ColorPicker";
 
-export default function ImageNode({ id, data, selected }) {
-  const { deleteElements, updateNodeData, getNodes, setNodes } = useReactFlow();
+// Define the shape of your node's data
+type ImageNodeData = {
+  image?: string;
+  color?: string;
+  toolbarVisible?: boolean;
+  toolbarPosition?: Position;
+};
+
+// Apply the type to the component props
+export default function ImageNode({
+  id,
+  data,
+  selected,
+}: NodeProps<Node<ImageNodeData>>) {
+  const { deleteElements, updateNodeData, setNodes } = useReactFlow();
   const [showColorPicker, setShowColorPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isCustomColor = !!data.color;
-  const currentColor = (data.color as string) || "#9e86ed";
+  const currentColor = data.color || "#9e86ed";
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -107,10 +123,8 @@ export default function ImageNode({ id, data, selected }) {
 
       <div className="w-full h-full flex items-center justify-center">
         {data.image ? (
-          // object-cover garante que preencha o espaço sem distorcer visualmente
-          // pointer-events-none impede que arraste a imagem "fantasma" do navegador
           <img
-            src={data.image as string}
+            src={data.image}
             alt="Node content"
             className="w-full h-full object-cover pointer-events-none"
           />
@@ -138,7 +152,7 @@ export default function ImageNode({ id, data, selected }) {
 
       <NodeToolbar
         isVisible={data.toolbarVisible || selected}
-        position={data.toolbarPosition || "top"}
+        position={data.toolbarPosition || Position.Top}
         align="center"
         offset={10}
       >
