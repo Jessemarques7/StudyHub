@@ -48,23 +48,23 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
     return null;
   }
 
-  // ADDED TYPE: node: NodeObject
-  function handleNodeClick(node: NodeObject) {
-    router.push(`/notes/${node.id}`);
+  // Use 'any' to satisfy the library's strict type checking against its own internal types
+  function handleNodeClick(node: any) {
+    if (node && node.id) {
+      router.push(`/notes/${node.id}`);
+    }
   }
 
-  // ADDED TYPE: node: NodeObject | null
-  function handleNodeHover(node: NodeObject | null) {
+  function handleNodeHover(node: any) {
     setHoveredNodeId(node ? node.id : null);
   }
 
-  // ADDED TYPES: node: NodeObject, ctx: CanvasRenderingContext2D, globalScale: number
   function drawNode(
-    node: NodeObject,
+    node: any,
     ctx: CanvasRenderingContext2D,
     globalScale: number
   ) {
-    // Add safety check for coordinates (ForceGraph assigns these, but TS might worry)
+    // Add safety check for coordinates (ForceGraph assigns these)
     const x = node.x ?? 0;
     const y = node.y ?? 0;
 
@@ -92,7 +92,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
       graphData={data}
       nodeCanvasObject={drawNode}
       nodePointerAreaPaint={(
-        node: NodeObject,
+        node: any,
         color: string,
         ctx: CanvasRenderingContext2D
       ) => {
