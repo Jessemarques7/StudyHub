@@ -14,16 +14,6 @@ interface MentionContent {
   };
 }
 
-// FIX: Changed from 'interface' to 'type' to allow intersection with Block union type
-type ParagraphBlock = Block & {
-  type: "paragraph";
-  content?: MentionContent[];
-};
-
-function isParagraphBlock(block: Block): block is ParagraphBlock {
-  return block.type === "paragraph" && Array.isArray((block as any).content);
-}
-
 function extractMentionId(contentItem: MentionContent): string | null {
   if (contentItem.type !== "mention" || !contentItem.props) {
     return null;
@@ -51,25 +41,29 @@ export default function Graph() {
     const validNoteIds = new Set(notes.map((n) => n.id));
 
     notes.forEach((note) => {
-      // Cast note.content to any[] or Block[] to iterate safely if needed
+      // Safety check for note content
       if (!Array.isArray(note.content)) return;
 
       note.content.forEach((block) => {
-        // block is treated as Block here
-        if (!isParagraphBlock(block as Block)) return;
+        // Explicitly check if content is an array before iterating
+        // This avoids TypeScript errors with TableContent (which is an object)
+        if (block.type === "paragraph" && Array.isArray(block.content)) {
+          // Cast to unknown first, then to our expected array type to safely iterate
+          const contentItems = block.content as unknown as MentionContent[];
 
-        block.content?.forEach((contentItem) => {
-          const targetId = extractMentionId(contentItem);
+          contentItems.forEach((contentItem) => {
+            const targetId = extractMentionId(contentItem);
 
-          if (targetId && validNoteIds.has(targetId)) {
-            if (note.id !== targetId) {
-              extractedLinks.push({
-                source: note.id,
-                target: targetId,
-              });
+            if (targetId && validNoteIds.has(targetId)) {
+              if (note.id !== targetId) {
+                extractedLinks.push({
+                  source: note.id,
+                  target: targetId,
+                });
+              }
             }
-          }
-        });
+          });
+        }
       });
     });
 
