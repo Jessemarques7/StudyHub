@@ -1,5 +1,5 @@
-// components/ForceGraph.tsx
-"use client"; // This component will only run on the client
+// components/notes/ForceGraph.tsx
+"use client";
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
@@ -48,21 +48,32 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
     return null;
   }
 
-  function handleNodeClick(node) {
+  // ADDED TYPE: node: NodeObject
+  function handleNodeClick(node: NodeObject) {
     router.push(`/notes/${node.id}`);
   }
 
-  function handleNodeHover(node) {
+  // ADDED TYPE: node: NodeObject | null
+  function handleNodeHover(node: NodeObject | null) {
     setHoveredNodeId(node ? node.id : null);
   }
 
-  function drawNode(node, ctx, globalScale) {
+  // ADDED TYPES: node: NodeObject, ctx: CanvasRenderingContext2D, globalScale: number
+  function drawNode(
+    node: NodeObject,
+    ctx: CanvasRenderingContext2D,
+    globalScale: number
+  ) {
+    // Add safety check for coordinates (ForceGraph assigns these, but TS might worry)
+    const x = node.x ?? 0;
+    const y = node.y ?? 0;
+
     const isHovered = node.id === hoveredNodeId;
     const nodeRadius = Math.sqrt(node.val || 1) * (isHovered ? 1.5 : 1);
 
     // Draw the node circle
     ctx.beginPath();
-    ctx.arc(node.x, node.y, nodeRadius, 0, 2 * Math.PI);
+    ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
     ctx.fillStyle = isHovered ? "#d88ef8be" : "#c5c2ccbe";
     ctx.fill();
 
@@ -73,23 +84,29 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(label, node.x, node.y + nodeRadius + 2);
+    ctx.fillText(label, x, y + nodeRadius + 2);
   }
 
   return (
     <ForceGraph2D
       graphData={data}
       nodeCanvasObject={drawNode}
-      nodePointerAreaPaint={(node, color, ctx) => {
+      nodePointerAreaPaint={(
+        node: NodeObject,
+        color: string,
+        ctx: CanvasRenderingContext2D
+      ) => {
+        const x = node.x ?? 0;
+        const y = node.y ?? 0;
         const nodeRadius = Math.sqrt(node.val || 1) * 2;
         ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, nodeRadius, 0, 2 * Math.PI);
+        ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
         ctx.fill();
       }}
       onNodeClick={handleNodeClick}
       onNodeHover={handleNodeHover}
-      linkWidth={(link) =>
+      linkWidth={(link: any) =>
         link.source?.id === hoveredNodeId || link.target?.id === hoveredNodeId
           ? 1.5
           : 1
@@ -102,7 +119,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
       width={420}
       height={window.innerHeight}
       backgroundColor="transparent"
-      linkColor={(link) =>
+      linkColor={(link: any) =>
         link.source?.id === hoveredNodeId || link.target?.id === hoveredNodeId
           ? "#d88ef8bd"
           : "#ffffff33"
