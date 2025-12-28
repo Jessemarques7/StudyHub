@@ -19,15 +19,13 @@ import {
   Panel,
   Node,
   Edge,
-  type OnNodesChange,
+  type OnNodesChange, // Ensure this is imported
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useDiagrams } from "@/contexts/DiagramsContext";
-
-// Note: If you are using the newer package, import from '@xyflow/react' instead.
 
 // Configurações e Tipos
 const nodeTypes = {
@@ -50,8 +48,7 @@ const defaultEdgeOptions = {
   type: "default",
 };
 
-const id = 4;
-const getId = () => `n${Date.now()}`; // Melhor usar timestamp para evitar colisão
+const getId = () => `n${Date.now()}`;
 
 function Flow() {
   const { diagramid } = useParams<{ diagramid: string }>();
@@ -81,14 +78,14 @@ function Flow() {
       updateDiagram(diagramid, {
         content: { nodes, edges },
       });
-    }, 1000); // Salva 1s após a última alteração
+    }, 1000);
 
     return () => clearTimeout(timeoutId);
   }, [nodes, edges, diagramid, updateDiagram]);
 
-  const onNodesChange = useCallback(
-    (changes: OnNodesChange[]) =>
-      setNodes((nds) => applyNodeChanges(changes, nds)),
+  // FIX: Type the function variable instead of the parameter
+  const onNodesChange: OnNodesChange = useCallback(
+    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
     []
   );
 
