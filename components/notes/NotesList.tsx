@@ -55,14 +55,25 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
 
   // --- Handlers de Criação ---
 
+  // FIX: Make async to handle the Promise returned by addNote
   const handleCreateNewNote = useCallback(
-    (folderId?: string) => {
-      const newNote = addNote({ title: "New Note", folderId });
-      // Abrir a pasta se a nota foi criada dentro dela
-      if (folderId) {
-        setOpenFolders((prev) => ({ ...prev, [folderId]: true }));
+    async (folderId?: string) => {
+      try {
+        // FIX: Await the promise to get the actual Note object
+        const newNote = await addNote({ title: "New Note", folderId });
+
+        // Abrir a pasta se a nota foi criada dentro dela
+        if (folderId) {
+          setOpenFolders((prev) => ({ ...prev, [folderId]: true }));
+        }
+
+        // Check if newNote exists before accessing id
+        if (newNote && newNote.id) {
+          router.push(`/notes/${newNote.id}`);
+        }
+      } catch (error) {
+        console.error("Failed to create note:", error);
       }
-      router.push(`/notes/${newNote.id}`);
     },
     [addNote, router]
   );
