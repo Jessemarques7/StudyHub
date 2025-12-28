@@ -23,9 +23,9 @@ import {
   type OnEdgesChange,
   type OnConnect,
   type OnReconnect,
-  type NodeChange, // Added
-  type EdgeChange, // Added
-  type Connection, // Added
+  type NodeChange,
+  type EdgeChange,
+  type Connection,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
@@ -89,21 +89,18 @@ function Flow() {
     return () => clearTimeout(timeoutId);
   }, [nodes, edges, diagramid, updateDiagram]);
 
-  // Fixed: explicitly typed parameters using NodeChange[]
   const onNodesChange: OnNodesChange = useCallback(
     (changes: NodeChange[]) =>
       setNodes((nds) => applyNodeChanges(changes, nds)),
     []
   );
 
-  // Fixed: explicitly typed parameters using EdgeChange[]
   const onEdgesChange: OnEdgesChange = useCallback(
     (changes: EdgeChange[]) =>
       setEdges((eds) => applyEdgeChanges(changes, eds)),
     []
   );
 
-  // Fixed: explicitly typed params using Connection
   const onConnect: OnConnect = useCallback(
     (params: Connection) =>
       setEdges((eds) => addEdge({ ...params, type: "customEdge" }, eds)),
@@ -114,7 +111,6 @@ function Flow() {
     edgeReconnectSuccessful.current = false;
   }, []);
 
-  // Fixed: explicitly typed params
   const onReconnect: OnReconnect = useCallback(
     (oldEdge: Edge, newConnection: Connection) => {
       edgeReconnectSuccessful.current = true;
@@ -127,8 +123,6 @@ function Flow() {
     edgeReconnectSuccessful.current = true;
   }, []);
 
-  // Fixed: Used 'any' for event/connectionState to prevent further strict mode errors
-  // (You can refine these types later if needed, but this is safe for build)
   const onConnectEnd = useCallback(
     (event: any, connectionState: any) => {
       if (!connectionState.isValid) {
@@ -136,14 +130,18 @@ function Flow() {
         const { clientX, clientY } =
           "changedTouches" in event ? event.changedTouches[0] : event;
         const position = screenToFlowPosition({ x: clientX, y: clientY });
-        const newNode = {
+
+        // Fix: Added 'as [number, number]' to origin
+        const newNode: Node = {
           id,
           type: "textUpdater",
           position,
           data: { label: `New Node` },
-          origin: [0.5, 0.0],
+          origin: [0.5, 0.0] as [number, number],
         };
+
         setNodes((nds) => nds.concat(newNode));
+
         const newEdge = {
           id,
           ...defaultEdgeOptions,
