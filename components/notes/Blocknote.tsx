@@ -1,3 +1,4 @@
+// components/notes/Blocknote.tsx
 "use client";
 
 import "@blocknote/core/fonts/inter.css";
@@ -71,7 +72,7 @@ export default function Blocknote({
                   note: {
                     id: note.id,
                     title: note.title,
-                    content: note.content,
+                    // content: note.content <--- REMOVED: This caused the type error
                   },
                 },
               },
