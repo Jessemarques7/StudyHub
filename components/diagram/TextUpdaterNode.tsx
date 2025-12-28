@@ -1,3 +1,4 @@
+// components/diagram/TextUpdaterNode.tsx
 "use client";
 import { useCallback, useState } from "react";
 import {
@@ -6,6 +7,8 @@ import {
   NodeResizer,
   NodeToolbar,
   useReactFlow,
+  type NodeProps,
+  type Node,
 } from "@xyflow/react";
 import { cn } from "@/lib/utils";
 import {
@@ -16,7 +19,19 @@ import {
 } from "@tabler/icons-react";
 import ColorPicker from "./ColorPicker";
 
-export default function TextUpdaterNode({ id, data, selected }) {
+// Define the shape of the node data
+type TextUpdaterNodeData = {
+  text?: string;
+  color?: string;
+  toolbarVisible?: boolean;
+  toolbarPosition?: Position;
+};
+
+export default function TextUpdaterNode({
+  id,
+  data,
+  selected,
+}: NodeProps<Node<TextUpdaterNodeData>>) {
   const { deleteElements, updateNodeData } = useReactFlow();
   const [showColorPicker, setShowColorPicker] = useState(false);
 
@@ -24,10 +39,10 @@ export default function TextUpdaterNode({ id, data, selected }) {
   const isCustomColor = !!data.color;
 
   // Define a cor ativa (se não houver cor salva, usa roxo apenas para seleção)
-  const currentColor = (data.color as string) || "#9e86ed";
+  const currentColor = data.color || "#9e86ed";
 
   const onChange = useCallback(
-    (evt) => {
+    (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
       updateNodeData(id, { text: evt.target.value });
     },
     [id, updateNodeData]
@@ -69,7 +84,7 @@ export default function TextUpdaterNode({ id, data, selected }) {
         id="text"
         name="text"
         rows={1}
-        defaultValue={data.text as string}
+        defaultValue={data.text}
         onChange={onChange}
         className="resize-none flex w-full h-full px-4 py-2 focus:outline-none focus:ring-0 bg-transparent text-white"
       />
@@ -85,7 +100,7 @@ export default function TextUpdaterNode({ id, data, selected }) {
 
       <NodeToolbar
         isVisible={data.toolbarVisible || selected}
-        position={data.toolbarPosition}
+        position={data.toolbarPosition || Position.Top}
         align="center"
       >
         <div className="bg-slate-900 px-4 py-2 mb-2 rounded-[8px] flex items-center justify-center gap-4 border border-slate-700 shadow-xl">
@@ -123,8 +138,8 @@ export default function TextUpdaterNode({ id, data, selected }) {
 
       <Handle id="top" type="source" position={Position.Top} />
       <Handle id="bottom" type="source" position={Position.Bottom} />
-      <Handle id="right" position={Position.Right} />
-      <Handle id="left" position={Position.Left} />
+      <Handle id="right" type="source" position={Position.Right} />
+      <Handle id="left" type="source" position={Position.Left} />
     </div>
   );
 }
