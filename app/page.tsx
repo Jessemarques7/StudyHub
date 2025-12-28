@@ -1,3 +1,4 @@
+// app/page.tsx
 "use client";
 
 import Link from "next/link";
@@ -32,7 +33,7 @@ export default function Home() {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const, // Fixed: Added 'as const' to resolve type error
         stiffness: 50,
       },
     },
