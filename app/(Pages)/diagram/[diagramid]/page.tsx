@@ -19,6 +19,7 @@ import {
   Panel,
   Node,
   Edge,
+  ConnectionMode, // Added Import
   type OnNodesChange,
   type OnEdgesChange,
   type OnConnect,
@@ -131,7 +132,6 @@ function Flow() {
           "changedTouches" in event ? event.changedTouches[0] : event;
         const position = screenToFlowPosition({ x: clientX, y: clientY });
 
-        // Fix: Added 'as [number, number]' to origin
         const newNode: Node = {
           id,
           type: "textUpdater",
@@ -181,7 +181,7 @@ function Flow() {
         onReconnect={onReconnect}
         onReconnectStart={onReconnectStart}
         onReconnectEnd={onReconnectEnd}
-        connectionMode="loose"
+        connectionMode={ConnectionMode.Loose} // Fixed: Use Enum
         fitView
         defaultEdgeOptions={defaultEdgeOptions}
       >
