@@ -19,8 +19,6 @@ function CustomEdge({ id, selected, style, markerEnd, ...props }: EdgeProps) {
   const { deleteElements, setEdges } = useReactFlow();
   const [showColorPicker, setShowColorPicker] = useState(false);
 
-  // FIX: Only pass the coordinate properties required for path calculation.
-  // We explicitly select them from 'props' to avoid passing 'id', 'selected', etc.
   const [edgePath, centerX, centerY] = getBezierPath({
     sourceX: props.sourceX,
     sourceY: props.sourceY,
@@ -38,12 +36,21 @@ function CustomEdge({ id, selected, style, markerEnd, ...props }: EdgeProps) {
     setEdges((edges) =>
       edges.map((edge) => {
         if (edge.id === id) {
+          // Handle markerEnd logic safely for strings and objects
+          let newMarkerEnd = edge.markerEnd;
+
+          if (typeof newMarkerEnd === "string") {
+            // If it's a string, convert to object
+            newMarkerEnd = { type: newMarkerEnd as any, color: color };
+          } else if (newMarkerEnd && typeof newMarkerEnd === "object") {
+            // If it's an object, we can safely spread it
+            newMarkerEnd = { ...newMarkerEnd, color: color };
+          }
+
           return {
             ...edge,
-            style: { ...edge.style, stroke: color }, // Muda a cor da linha
-            markerEnd: edge.markerEnd
-              ? { ...edge.markerEnd, color: color }
-              : undefined,
+            style: { ...edge.style, stroke: color },
+            markerEnd: newMarkerEnd,
           };
         }
         return edge;
