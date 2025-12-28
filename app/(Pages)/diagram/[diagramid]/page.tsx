@@ -19,7 +19,13 @@ import {
   Panel,
   Node,
   Edge,
-  type OnNodesChange, // Ensure this is imported
+  type OnNodesChange,
+  type OnEdgesChange,
+  type OnConnect,
+  type OnReconnect,
+  type NodeChange, // Added
+  type EdgeChange, // Added
+  type Connection, // Added
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
@@ -83,19 +89,23 @@ function Flow() {
     return () => clearTimeout(timeoutId);
   }, [nodes, edges, diagramid, updateDiagram]);
 
-  // FIX: Type the function variable instead of the parameter
+  // Fixed: explicitly typed parameters using NodeChange[]
   const onNodesChange: OnNodesChange = useCallback(
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    (changes: NodeChange[]) =>
+      setNodes((nds) => applyNodeChanges(changes, nds)),
     []
   );
 
-  const onEdgesChange = useCallback(
-    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+  // Fixed: explicitly typed parameters using EdgeChange[]
+  const onEdgesChange: OnEdgesChange = useCallback(
+    (changes: EdgeChange[]) =>
+      setEdges((eds) => applyEdgeChanges(changes, eds)),
     []
   );
 
-  const onConnect = useCallback(
-    (params) =>
+  // Fixed: explicitly typed params using Connection
+  const onConnect: OnConnect = useCallback(
+    (params: Connection) =>
       setEdges((eds) => addEdge({ ...params, type: "customEdge" }, eds)),
     []
   );
@@ -104,17 +114,23 @@ function Flow() {
     edgeReconnectSuccessful.current = false;
   }, []);
 
-  const onReconnect = useCallback((oldEdge, newConnection) => {
+  // Fixed: explicitly typed params
+  const onReconnect: OnReconnect = useCallback(
+    (oldEdge: Edge, newConnection: Connection) => {
+      edgeReconnectSuccessful.current = true;
+      setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+    },
+    []
+  );
+
+  const onReconnectEnd = useCallback((_: any, edge: Edge) => {
     edgeReconnectSuccessful.current = true;
-    setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
   }, []);
 
-  const onReconnectEnd = useCallback((_, edge) => {
-    edgeReconnectSuccessful.current = true;
-  }, []);
-
+  // Fixed: Used 'any' for event/connectionState to prevent further strict mode errors
+  // (You can refine these types later if needed, but this is safe for build)
   const onConnectEnd = useCallback(
-    (event, connectionState) => {
+    (event: any, connectionState: any) => {
       if (!connectionState.isValid) {
         const id = getId();
         const { clientX, clientY } =
