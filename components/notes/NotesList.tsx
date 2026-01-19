@@ -18,6 +18,7 @@ import Link from "next/link";
 import { useNotes } from "@/contexts/NotesContext";
 import { useSidebar } from "@/components/ui/aceternity-sidebar";
 import { Note, Folder } from "@/types/notes";
+import { Smile } from "lucide-react";
 
 export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempTitle, setTempTitle] = useState("");
   const [editingType, setEditingType] = useState<"note" | "folder" | null>(
-    null
+    null,
   );
 
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
@@ -75,7 +76,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
         console.error("Failed to create note:", error);
       }
     },
-    [addNote, router]
+    [addNote, router],
   );
 
   const handleCreateFolder = useCallback(
@@ -83,7 +84,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
       e.stopPropagation();
       addFolder("New Folder");
     },
-    [addFolder]
+    [addFolder],
   );
 
   // --- Handlers de Toggle ---
@@ -102,7 +103,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
       e: React.MouseEvent,
       id: string,
       title: string,
-      type: "note" | "folder"
+      type: "note" | "folder",
     ) => {
       e.preventDefault();
       e.stopPropagation();
@@ -110,7 +111,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
       setEditingType(type);
       setTempTitle(title);
     },
-    []
+    [],
   );
 
   const handleSaveRename = useCallback(() => {
@@ -145,7 +146,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
         deleteNote(id);
         if (id === currentNoteId) {
           router.push(
-            updatedNotes.length > 0 ? `/notes/${updatedNotes[0].id}` : "/notes"
+            updatedNotes.length > 0 ? `/notes/${updatedNotes[0].id}` : "/notes",
           );
         }
       } else {
@@ -154,10 +155,21 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
         }
       }
     },
-    [notes, deleteNote, deleteFolder, currentNoteId, router]
+    [notes, deleteNote, deleteFolder, currentNoteId, router],
   );
 
   // --- Renderização de Itens ---
+  const renderIcon = (note: Note) => {
+    if (!note.icon) {
+      return <Smile className="w-16 h-16 text-slate-600 p-2" />;
+    }
+
+    if (note.icon.startsWith("data:")) {
+      return <img src={note.icon} alt="Note icon" className="" />;
+    }
+
+    return <span className="text-sm">{note.icon}</span>;
+  };
 
   const renderNoteItem = (note: Note) => (
     <div
@@ -186,11 +198,11 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
             "flex items-center gap-2 px-2 py-1.5 rounded-md transition-all group/note",
             currentNoteId === note.id
               ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
-              : "hover:bg-neutral-200 dark:hover:bg-blue-900/30 text-neutral-700 dark:text-neutral-200"
+              : "hover:bg-neutral-200 dark:hover:bg-blue-900/30 text-neutral-700 dark:text-neutral-200",
           )}
         >
           <span className="h-4 w-4 text-xs flex items-center justify-center flex-shrink-0">
-            {note.icon || "📄"}
+            {renderIcon(note) || "📄"}
           </span>
           <motion.span
             animate={{ opacity: open ? 1 : 0, width: open ? "auto" : 0 }}
@@ -309,7 +321,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
                       <IconChevronDown
                         className={cn(
                           "h-3 w-3 transition-transform",
-                          !isFolderOpen && "-rotate-90"
+                          !isFolderOpen && "-rotate-90",
                         )}
                       />
                       <IconFolder className="h-3.5 w-3.5 text-blue-400" />
@@ -322,7 +334,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
                         "flex items-center gap-1",
                         open && hoveredItemId === folder.id
                           ? "opacity-100"
-                          : "opacity-0"
+                          : "opacity-0",
                       )}
                     >
                       <button
@@ -341,7 +353,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
                             e,
                             folder.id,
                             folder.name,
-                            "folder"
+                            "folder",
                           )
                         }
                         className="p-1 hover:bg-neutral-600 rounded"

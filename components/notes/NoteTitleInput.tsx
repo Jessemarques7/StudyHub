@@ -1,5 +1,5 @@
 // components/notes/NoteTitleInput.tsx
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 
 interface NoteTitleInputProps {
   value: string;
@@ -37,7 +37,7 @@ export function NoteTitleInput({
   );
 
   return (
-    <input
+    <textarea
       ref={inputRef}
       type="text"
       value={value}
@@ -47,7 +47,7 @@ export function NoteTitleInput({
       onFocus={handleFocus}
       placeholder="Untitled"
       aria-label="Note title"
-      className="w-full px-[54px] mt-10 mb-4 text-foreground text-5xl font-bold bg-transparent border-none outline-none placeholder:text-muted-foreground focus:placeholder:text-gray-500 transition-colors"
+      className="flex w-full px-[54px] focus:outline-none focus:ring-0  mt-10 mb-4 resize-none text-foreground text-3xl md:text-5xl font-bold bg-transparent border-none outline-none placeholder:text-muted-foreground focus:placeholder:text-gray-500 transition-colors"
     />
   );
 }

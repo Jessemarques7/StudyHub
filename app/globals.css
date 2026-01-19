@@ -157,6 +157,15 @@
   }
 }
 
+/* Ajuste para mobile (telas menores que 768px)
+@media (max-width: 768px) {
+  .bn-editor {
+    /* Reduz de 54px para 16px (ou o valor que preferir) */
+/* padding-left: 16px !important;
+    padding-right: 16px !important;
+  } */
+/* } */
+
 /* BlockNote Menu Customization */
 
 /* Menus principais (toolbar, suggestion menu, etc) */
