@@ -36,13 +36,13 @@ export default function DiagramsList({
     deleteFolder,
     updateFolder,
   } = useDiagrams();
-  const { open } = useSidebar();
+  const open = true;
 
   const [listOpen, setListOpen] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempTitle, setTempTitle] = useState("");
   const [editingType, setEditingType] = useState<"diagram" | "folder" | null>(
-    null
+    null,
   );
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
   const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({});
@@ -68,7 +68,7 @@ export default function DiagramsList({
         console.error("Failed to create diagram", e);
       }
     },
-    [addDiagram, router]
+    [addDiagram, router],
   );
 
   const handleCreateFolder = useCallback(
@@ -76,7 +76,7 @@ export default function DiagramsList({
       e.stopPropagation();
       addFolder("New Folder");
     },
-    [addFolder]
+    [addFolder],
   );
 
   const toggleFolder = (folderId: string) => {
@@ -88,7 +88,7 @@ export default function DiagramsList({
       e: React.MouseEvent,
       id: string,
       title: string,
-      type: "diagram" | "folder"
+      type: "diagram" | "folder",
     ) => {
       e.preventDefault();
       e.stopPropagation();
@@ -96,7 +96,7 @@ export default function DiagramsList({
       setEditingType(type);
       setTempTitle(title);
     },
-    []
+    [],
   );
 
   const handleSaveRename = useCallback(async () => {
@@ -124,7 +124,7 @@ export default function DiagramsList({
         if (confirm("Delete folder?")) await deleteFolder(id);
       }
     },
-    [deleteDiagram, deleteFolder, currentDiagramId, router]
+    [deleteDiagram, deleteFolder, currentDiagramId, router],
   );
 
   const renderDiagramItem = (diagram: Diagram) => (
@@ -151,7 +151,7 @@ export default function DiagramsList({
             "flex items-center gap-2 px-2 py-1.5 rounded-md transition-all",
             currentDiagramId === diagram.id
               ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
-              : "hover:bg-neutral-200 dark:hover:bg-blue-900/30 text-neutral-700 dark:text-neutral-200"
+              : "hover:bg-neutral-200 dark:hover:bg-blue-900/30 text-neutral-700 dark:text-neutral-200",
           )}
         >
           <IconSitemap className="h-4 w-4 shrink-0" />
@@ -235,7 +235,7 @@ export default function DiagramsList({
         {folders.map((folder) => {
           const isFolderOpen = openFolders[folder.id];
           const folderDiagrams = diagrams.filter(
-            (d) => d.folderId === folder.id
+            (d) => d.folderId === folder.id,
           );
 
           return (
@@ -270,7 +270,7 @@ export default function DiagramsList({
                         "flex gap-1",
                         open && hoveredItemId === folder.id
                           ? "opacity-100"
-                          : "opacity-0"
+                          : "opacity-0",
                       )}
                     >
                       <button
@@ -288,7 +288,7 @@ export default function DiagramsList({
                             e,
                             folder.id,
                             folder.name,
-                            "folder"
+                            "folder",
                           )
                         }
                         className="p-1 hover:bg-neutral-600 rounded"

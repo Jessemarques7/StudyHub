@@ -4,7 +4,7 @@
 import CustomEdge from "@/components/diagram/CustomEdge";
 import TextUpdaterNode from "@/components/diagram/TextUpdaterNode";
 import ImageNode from "@/components/diagram/ImageNode";
-import { IconNote, IconPhoto } from "@tabler/icons-react";
+import { IconLayoutSidebar, IconNote, IconPhoto } from "@tabler/icons-react";
 import {
   Background,
   Controls,
@@ -29,11 +29,14 @@ import {
   type EdgeChange,
   type Connection,
 } from "@xyflow/react";
+import { Button } from "@/components/notes/ui/button";
 
 import "@xyflow/react/dist/style.css";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useDiagrams } from "@/contexts/DiagramsContext";
+import NotesList from "@/components/notes/NotesList";
+import DiagramsList from "@/components/diagram/DiagramsList";
 
 // Configurações e Tipos
 const nodeTypes = {
@@ -64,6 +67,7 @@ function Flow() {
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const reactFlowWrapper = useRef(null);
   const edgeReconnectSuccessful = useRef(true);
   const { screenToFlowPosition } = useReactFlow();
@@ -94,19 +98,19 @@ function Flow() {
   const onNodesChange: OnNodesChange = useCallback(
     (changes: NodeChange[]) =>
       setNodes((nds) => applyNodeChanges(changes, nds)),
-    []
+    [],
   );
 
   const onEdgesChange: OnEdgesChange = useCallback(
     (changes: EdgeChange[]) =>
       setEdges((eds) => applyEdgeChanges(changes, eds)),
-    []
+    [],
   );
 
   const onConnect: OnConnect = useCallback(
     (params: Connection) =>
       setEdges((eds) => addEdge({ ...params, type: "customEdge" }, eds)),
-    []
+    [],
   );
 
   const onReconnectStart = useCallback(() => {
@@ -118,7 +122,7 @@ function Flow() {
       edgeReconnectSuccessful.current = true;
       setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
     },
-    []
+    [],
   );
 
   const onReconnectEnd = useCallback((_: any, edge: Edge) => {
@@ -154,7 +158,7 @@ function Flow() {
         setEdges((eds) => eds.concat(newEdge));
       }
     },
-    [screenToFlowPosition]
+    [screenToFlowPosition],
   );
 
   const addImageNode = () => {
@@ -168,7 +172,7 @@ function Flow() {
   };
 
   return (
-    <div className="w-full h-full" ref={reactFlowWrapper}>
+    <div className="w-full h-[92vh]" ref={reactFlowWrapper}>
       <ReactFlow
         colorMode="dark"
         nodes={nodes}
@@ -186,6 +190,21 @@ function Flow() {
         fitView
         defaultEdgeOptions={defaultEdgeOptions}
       >
+        {/* Botão de toggle */}
+        <Button
+          onClick={() => setIsSidebarVisible(!isSidebarVisible)}
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 left-4 z-50 text-white hover:bg-slate-700 hover:text-white"
+        >
+          <IconLayoutSidebar className="h-8 w-8" />
+        </Button>
+        {/* Container do Grafo com renderização condicional */}
+        {isSidebarVisible && (
+          <div className=" w-fit h-full absolute z-10 px-4 py-10 flex-shrink-0 border   bg-slate-900 ">
+            <DiagramsList opensidebar={isSidebarVisible} />
+          </div>
+        )}
         <Controls
           position={"center-right"}
           className="bg-slate-900 border border-neutral-700 rounded-xl p-1"
@@ -200,7 +219,7 @@ function Flow() {
                     type: "textUpdater",
                     position: { x: 0, y: 0 },
                     data: { label: `New Node` },
-                  })
+                  }),
                 );
               }}
               className="cursor-pointer hover:text-slate-300 transition-colors"

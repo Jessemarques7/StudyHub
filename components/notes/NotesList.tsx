@@ -33,7 +33,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
     deleteFolder,
     updateFolder,
   } = useNotes();
-  const { open } = useSidebar();
+  const open = true;
 
   const [notesOpen, setNotesOpen] = useState(true); // Default open
 
