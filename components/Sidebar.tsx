@@ -15,7 +15,7 @@ const links = [
     icon: (
       <IconFile className="h-6 w-6 m-1 shrink-0 text-neutral-700 dark:text-neutral-200" />
     ),
-    href: "/",
+    href: "/notes",
   },
   {
     label: "Flashcards",
