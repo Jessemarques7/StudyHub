@@ -62,7 +62,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
   function drawNode(
     node: any,
     ctx: CanvasRenderingContext2D,
-    globalScale: number
+    globalScale: number,
   ) {
     // Add safety check for coordinates (ForceGraph assigns these)
     const x = node.x ?? 0;
@@ -94,7 +94,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
       nodePointerAreaPaint={(
         node: any,
         color: string,
-        ctx: CanvasRenderingContext2D
+        ctx: CanvasRenderingContext2D,
       ) => {
         const x = node.x ?? 0;
         const y = node.y ?? 0;

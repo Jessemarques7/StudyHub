@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { useNotes } from "@/contexts/NotesContext";
 import ForceGraphComponent from "./ForceGraph";
 import { GraphData, GraphLink } from "@/types/notes";
-import { Block } from "@blocknote/core";
 
 interface MentionContent {
   type: string;
@@ -83,11 +82,11 @@ export default function Graph() {
     links.forEach((link) => {
       connectionCount.set(
         link.source,
-        (connectionCount.get(link.source) || 0) + 1
+        (connectionCount.get(link.source) || 0) + 1,
       );
       connectionCount.set(
         link.target,
-        (connectionCount.get(link.target) || 0) + 1
+        (connectionCount.get(link.target) || 0) + 1,
       );
     });
 
@@ -113,7 +112,7 @@ export default function Graph() {
   }
 
   return (
-    <div className="relative bg-slate-950 h-full">
+    <div className="relative bg-red-950 h-full">
       <ForceGraphComponent data={graphData} />
     </div>
   );

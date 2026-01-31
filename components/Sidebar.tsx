@@ -7,7 +7,12 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 
-import { IconCards, IconFile, IconSitemap } from "@tabler/icons-react";
+import {
+  IconCards,
+  IconChartDots3,
+  IconFile,
+  IconSitemap,
+} from "@tabler/icons-react";
 
 const links = [
   {
@@ -30,6 +35,13 @@ const links = [
       <IconSitemap className="h-6 w-6 m-1 shrink-0 text-neutral-700 dark:text-neutral-200" />
     ),
     href: "/diagram",
+  },
+  {
+    label: "Graph",
+    icon: (
+      <IconChartDots3 className="h-6 w-6 m-1 shrink-0 text-neutral-700 dark:text-neutral-200" />
+    ),
+    href: "/graph",
   },
 ];
 
