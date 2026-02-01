@@ -13,6 +13,8 @@ import {
   Github,
 } from "lucide-react";
 import Image from "next/image";
+import { StarsBackground } from "@/components/ui/stars-background";
+import { ShootingStars } from "@/components/ui/shooting-stars";
 
 export default function Home() {
   // Variáveis de animação para o container e itens
@@ -40,7 +42,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden selection:bg-primary/20 flex flex-col bg-[radial-gradient(at_7%_13%,hsl(206,74%,17%)_0,transparent_29%),radial-gradient(at_82%_65%,hsl(217,59%,21%)_0,transparent_45%)] ">
+    <div className="min-h-screen antialiased relative  text-foreground overflow-hidden selection:bg-primary/20 flex flex-col bg-[radial-gradient(at_7%_13%,hsl(206,74%,17%)_0,transparent_29%),radial-gradient(at_82%_65%,hsl(217,59%,21%)_0,transparent_45%)]">
       {/* Background Gradients Ambientais */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/5 blur-[120px]" />
@@ -237,6 +239,8 @@ export default function Home() {
           contínuo.
         </p>
       </footer>
+      <ShootingStars className="-z-50" minDelay={2000} maxDelay={5000} />
+      <StarsBackground className="-z-50" />
     </div>
   );
 }

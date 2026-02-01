@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { useNotes } from "@/contexts/NotesContext";
 import ForceGraphComponent from "./ForceGraph";
 import { GraphData, GraphLink } from "@/types/notes";
+import { StarsBackground } from "../ui/stars-background";
+import { ShootingStars } from "../ui/shooting-stars";
 
 interface MentionContent {
   type: string;
@@ -31,7 +33,7 @@ function extractMentionId(contentItem: MentionContent): string | null {
   return null;
 }
 
-export default function Graph() {
+export default function Graph({ classname }: { classname?: string }) {
   const { notes } = useNotes();
 
   // Extrai os links das menções nas notas
@@ -111,9 +113,12 @@ export default function Graph() {
     );
   }
 
+  // Altere o final do componente Graph.tsx
   return (
-    <div className="relative bg-red-950 h-full">
+    <div className={`relative  overflow-hidden  ${classname || ""}`}>
       <ForceGraphComponent data={graphData} />
+      <ShootingStars className="-z-40" minDelay={2000} maxDelay={5000} />
+      <StarsBackground className="-z-40" />
     </div>
   );
 }

@@ -4,8 +4,8 @@ import Graph from "@/components/notes/Graph";
 
 export default function page() {
   return (
-    <div>
-      <Graph />
+    <div className="min-h-screen h-full antialiased relative  text-foreground overflow-hidden ">
+      <Graph classname={"h-full w-full"} />
     </div>
   );
 }
