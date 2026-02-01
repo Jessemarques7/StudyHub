@@ -54,7 +54,7 @@ export default function NotePage() {
         {/* Container do Grafo com renderização condicional */}
         {isGraphVisible && (
           <div className="flex flex-shrink-0 border border-neutral-200   dark:border-neutral-700">
-            <Graph classname={"w-[420px] h-full"} />
+            <Graph classname={"w-[420px] h-screen"} />
           </div>
         )}
       </div>
