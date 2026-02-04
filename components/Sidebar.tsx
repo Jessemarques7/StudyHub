@@ -8,6 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import {
+  IconCalendarFilled,
   IconCards,
   IconChartDots3,
   IconFile,
@@ -42,6 +43,13 @@ const links = [
       <IconChartDots3 className="h-6 w-6 m-1 shrink-0 text-neutral-700 dark:text-neutral-200" />
     ),
     href: "/graph",
+  },
+  {
+    label: "Calendar",
+    icon: (
+      <IconCalendarFilled className="h-6 w-6 m-1 shrink-0 text-neutral-700 dark:text-neutral-200" />
+    ),
+    href: "/calendar",
   },
 ];
 
