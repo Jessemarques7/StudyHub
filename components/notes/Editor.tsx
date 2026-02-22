@@ -17,7 +17,7 @@ export default function Editor() {
   // Otimização: Memoizar a nota atual para evitar recálculos excessivos
   const currentNote = useMemo(
     () => getNote(params.noteid),
-    [params.noteid, getNote]
+    [params.noteid, getNote],
   );
 
   const [title, setTitle] = useState("");
@@ -33,7 +33,7 @@ export default function Editor() {
       debounce((noteId: string, content: Block[]) => {
         updateNote(noteId, { content });
       }, 1000),
-    [updateNote]
+    [updateNote],
   );
 
   const handleUpdateContent = useCallback(
@@ -41,7 +41,7 @@ export default function Editor() {
       if (!params.noteid) return;
       debouncedUpdateContent(params.noteid, updatedContent);
     },
-    [params.noteid, debouncedUpdateContent]
+    [params.noteid, debouncedUpdateContent],
   );
 
   // Manipulador para salvar o título (passado para o onSave do input)
@@ -57,14 +57,14 @@ export default function Editor() {
     (icon: string | null) => {
       if (params.noteid) updateNote(params.noteid, { icon });
     },
-    [params.noteid, updateNote]
+    [params.noteid, updateNote],
   );
 
   const handleCoverUpdate = useCallback(
     (coverImage: string | null) => {
       if (params.noteid) updateNote(params.noteid, { coverImage });
     },
-    [params.noteid, updateNote]
+    [params.noteid, updateNote],
   );
 
   if (!currentNote)

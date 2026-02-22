@@ -31,7 +31,7 @@ export default async function HeaderPages() {
   }
 
   return (
-    <div className=" py-3 px-6 bg-slate-950 rounded-tl-2xl flex items-center justify-between">
+    <div className=" py-3 px-6 bg-background-secondary rounded-tl-2xl flex items-center justify-between">
       {/* <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>

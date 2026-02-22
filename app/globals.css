@@ -26,6 +26,7 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -324,7 +325,9 @@
 /* Design System Variables */
 @theme {
   /* Colors */
-  --color-background: oklch(12.9% 0.042 264.695);
+  --color-background: rgb(2, 6, 23);
+  --color-background-secondary: rgba(2, 6, 23, 0.6);
+
   --color-foreground: oklch(0.985 0 0);
 
   --color-card: oklch(20.8% 0.042 265.755);
