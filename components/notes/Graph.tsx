@@ -117,8 +117,6 @@ export default function Graph({ classname }: { classname?: string }) {
   return (
     <div className={`relative  overflow-hidden  ${classname || ""}`}>
       <ForceGraphComponent data={graphData} />
-      <ShootingStars className="-z-40" minDelay={2000} maxDelay={5000} />
-      <StarsBackground className="-z-40" />
     </div>
   );
 }

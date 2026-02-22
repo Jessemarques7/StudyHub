@@ -30,20 +30,7 @@ const links = [
     ),
     href: "/flashcards",
   },
-  {
-    label: "Canvas",
-    icon: (
-      <IconSitemap className="h-6 w-6 m-1 shrink-0 text-neutral-700 dark:text-neutral-200" />
-    ),
-    href: "/diagram",
-  },
-  {
-    label: "Graph",
-    icon: (
-      <IconChartDots3 className="h-6 w-6 m-1 shrink-0 text-neutral-700 dark:text-neutral-200" />
-    ),
-    href: "/graph",
-  },
+
   {
     label: "Calendar",
     icon: (

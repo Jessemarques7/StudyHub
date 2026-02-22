@@ -31,35 +31,17 @@ export default async function HeaderPages() {
   }
 
   return (
-    <div className=" py-3 px-6 bg-background-secondary rounded-tl-2xl flex items-center justify-between">
-      {/* <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/">Home</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/notes">Notes</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb> */}
+    <div className=" py-3 z-50 px-6 w-full  bg-background-secondary  flex items-center justify-between">
       <div></div>
 
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger className="">
           <Avatar className="w-8 h-8">
             <AvatarImage
               src={user.user_metadata?.avatar_url || undefined}
               alt="User Avatar"
             />
+
             <AvatarFallback>
               {user.user_metadata?.full_name
                 ? user.user_metadata.full_name.charAt(0)
@@ -67,6 +49,7 @@ export default async function HeaderPages() {
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
+
         <DropdownMenuContent align="end" className="bg-slate-900">
           <DropdownMenuLabel>
             {user.user_metadata?.full_name || "User"}

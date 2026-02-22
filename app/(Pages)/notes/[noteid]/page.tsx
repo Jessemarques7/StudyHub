@@ -8,6 +8,8 @@ import { Button } from "@/components/notes/ui/button";
 
 import { IconChartDots3, IconLayoutSidebar } from "@tabler/icons-react";
 import NotesList from "@/components/notes/NotesList";
+import { StarsBackground } from "@/components/ui/stars-background";
+import { ShootingStars } from "@/components/ui/shooting-stars";
 
 export default function NotePage() {
   const [isGraphVisible, setIsGraphVisible] = useState(false);
@@ -55,6 +57,8 @@ export default function NotePage() {
         {isGraphVisible && (
           <div className="flex flex-shrink-0 border border-neutral-200   dark:border-neutral-700">
             <Graph classname={"w-[420px] h-screen"} />
+            <ShootingStars className="-z-10" minDelay={2000} maxDelay={5000} />
+            <StarsBackground className="-z-10" />
           </div>
         )}
       </div>
