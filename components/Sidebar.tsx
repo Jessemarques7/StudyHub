@@ -12,7 +12,9 @@ import {
   IconCards,
   IconChartDots3,
   IconFile,
+  IconHome,
   IconSitemap,
+  IconTargetArrow,
 } from "@tabler/icons-react";
 
 const links = [
@@ -29,6 +31,20 @@ const links = [
       <IconCards className="h-6 w-6 m-1 shrink-0 text-neutral-700 dark:text-neutral-200" />
     ),
     href: "/flashcards",
+  },
+  {
+    label: "Home",
+    icon: (
+      <IconHome className="h-6 w-6 m-1 shrink-0 text-neutral-700 dark:text-neutral-200" />
+    ),
+    href: "/",
+  },
+  {
+    label: "Habits",
+    icon: (
+      <IconTargetArrow className="h-6 w-6 m-1 shrink-0 text-neutral-700 dark:text-neutral-200" />
+    ),
+    href: "/habits",
   },
 
   {
