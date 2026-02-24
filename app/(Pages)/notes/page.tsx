@@ -260,7 +260,7 @@ export default function WorkspacePage() {
   };
 
   return (
-    <div className="min-h-screen  p-4 md:p-8  text-foreground selection:bg-primary/20 flex flex-col bg-[radial-gradient(at_7%_13%,hsl(206,74%,17%)_0,transparent_29%),radial-gradient(at_82%_65%,hsl(217,59%,21%)_0,transparent_45%)]">
+    <div className="min-h-screen mt-14  p-4 md:p-8  text-foreground selection:bg-primary/20 flex flex-col bg-[radial-gradient(at_7%_13%,hsl(206,74%,17%)_0,transparent_29%),radial-gradient(at_82%_65%,hsl(217,59%,21%)_0,transparent_45%)]">
       <div className="max-w-7xl mx-auto w-full flex flex-col h-full gap-6">
         {/* Cabeçalho e Ações Principais */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

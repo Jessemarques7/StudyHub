@@ -235,7 +235,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-zinc-100 font-sans selection:bg-blue-500/30 pb-20">
+    <div className="min-h-screen mt-24 bg-background text-zinc-100 font-sans selection:bg-blue-500/30 pb-20">
       <main className="max-w-7xl mx-auto px-6 space-y-12">
         {/* Overall Progress Chart */}
         <section>

@@ -317,7 +317,7 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen mt-24 bg-background">
       <div className="max-w-7xl mx-auto p-6 md:p-8">
         <header className="mb-12 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-4 text-gradient">

@@ -19,13 +19,13 @@ export default function NotePage() {
     <>
       {/* Main content area */}
 
-      <div className="flex flex-row  relative">
+      <div className="flex flex-row mt-14 relative">
         {/* Botão de toggle */}
         <Button
           onClick={() => setIsSidebarVisible(!isSidebarVisible)}
           variant="ghost"
           size="icon"
-          className="absolute -top-11 left-4 z-50 text-white hover:bg-slate-700 hover:text-white"
+          className="absolute top-2 left-4 z-50 text-white hover:bg-slate-700 hover:text-white"
         >
           <IconLayoutSidebar className="h-8 w-8" />
         </Button>
