@@ -29,6 +29,9 @@ interface EventModalState {
   start: string;
   end: string;
 }
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { IconSun } from "@tabler/icons-react";
 
 export default function CalendarPage() {
   const [events, setEvents] = useState<any[]>([]);
@@ -37,6 +40,8 @@ export default function CalendarPage() {
 
   // 1. MUDANÇA: Estado inicial agora é a Semana
   const [currentView, setCurrentView] = useState("timeGridWeek");
+
+  const [value, setValue] = useState([6, 22]);
 
   const [currentDateTitle, setCurrentDateTitle] = useState("");
   const { toast } = useToast();
@@ -268,7 +273,7 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="h-full my-8 mx-4 md:mx-16 flex flex-col rounded-2xl glass text-foreground shadow-glow border border-white/10 relative overflow-hidden bg-background/30">
+    <div className="h-full my-32 mx-4 md:mx-16 flex flex-col rounded-2xl glass text-foreground shadow-glow border border-white/10 relative overflow-hidden bg-background/30">
       <header className="flex flex-col md:flex-row items-center justify-between px-6 py-6 border-b border-white/10 gap-4 bg-black/20 backdrop-blur-md">
         <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
           <div className="flex items-center gap-3">
@@ -307,6 +312,33 @@ export default function CalendarPage() {
         </div>
 
         <div className="flex items-center gap-4">
+          <div>
+            <div className="mx-auto grid w-full max-w-xs gap-3">
+              <div className="flex items-center justify-center mr-6 gap-2">
+                <Label htmlFor="slider-demo-temperature text-center">
+                  <IconSun className="h-5 w-5  shrink-0 text-neutral-700 dark:text-neutral-200" />
+                  Time
+                </Label>
+              </div>
+              <div className="flex w-42 items-center space-x-2">
+                <span className="text-muted-foreground text-sm">
+                  {value[0]}:00
+                </span>
+                <Slider
+                  id="slider-demo-temperature"
+                  value={value}
+                  onValueChange={setValue}
+                  min={0}
+                  max={24}
+                  step={1}
+                />
+                <span className="text-muted-foreground text-sm">
+                  {value[1]}:00
+                </span>
+              </div>
+            </div>
+          </div>
+
           <Button
             onClick={() =>
               setModal({
@@ -380,6 +412,9 @@ export default function CalendarPage() {
           select={handleDateSelect}
           eventDrop={handleEventDrop}
           eventResize={handleEventResize}
+          /* PROPRIEDADES QUE ESCONDEM OS HORÁRIOS */
+          slotMinTime={`${value[0]}:00:00`}
+          slotMaxTime={`${value[1]}:00:00`}
           eventDidMount={(info) => {
             const theme = info.event.extendedProps.theme;
             if (theme) {

@@ -5,10 +5,8 @@ import HeaderPages from "@/components/ui/HeaderPages";
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <main>
-      <SidebarPages>
-        <HeaderPages />
-        {children}
-      </SidebarPages>
+      <HeaderPages />
+      <SidebarPages>{children}</SidebarPages>
     </main>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   XAxis,
   YAxis,
@@ -13,8 +13,8 @@ import {
 import { User, Plus, Check, Flame, Award } from "lucide-react";
 
 // --- Mock Data & Constants ---
-const DAYS_IN_VIEW = 28; // 4 weeks
-const WEEKS = ["Semana 1", "Semana 2", "Semana 3", "Semana 4"];
+const DAYS_IN_VIEW = 14; // 2 weeks
+const WEEKS = ["Semana Passada", "Semana Atual"];
 const HABITS_INITIAL = [
   {
     id: 1,
@@ -114,19 +114,6 @@ const HABITS_INITIAL = [
   },
 ];
 
-const CHART_DATA = [
-  { day: 1, progress: 100 },
-  { day: 2, progress: 95 },
-  { day: 3, progress: 90 },
-  { day: 4, progress: 85 },
-  { day: 5, progress: 20 },
-  { day: 6, progress: 5 },
-  { day: 7, progress: 0 },
-  { day: 14, progress: 0 },
-  { day: 21, progress: 0 },
-  { day: 28, progress: 0 },
-];
-
 // --- Helper Functions ---
 
 const calculateStreaks = (completed = []) => {
@@ -157,7 +144,7 @@ const calculateStreaks = (completed = []) => {
   return { current, max };
 };
 
-const ProgressBar = ({ progress, color = "bg-red-600" }) => (
+const ProgressBar = ({ progress, color = "bg-blue-600" }) => (
   <div className="w-24 bg-zinc-800 rounded-full h-1.5 overflow-hidden">
     <div
       className={`${color} h-full transition-all duration-500`}
@@ -168,6 +155,63 @@ const ProgressBar = ({ progress, color = "bg-red-600" }) => (
 
 export default function App() {
   const [habits, setHabits] = useState(HABITS_INITIAL);
+
+  // --- Calendar Logic ---
+  const calendarDays = useMemo(() => {
+    const days = [];
+    const today = new Date();
+    const currentDayOfWeek = today.getDay();
+    // Set start point to Monday of the previous week
+    const distanceToMonday = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+    const thisMonday = new Date(today);
+    thisMonday.setDate(today.getDate() - distanceToMonday);
+
+    const lastMonday = new Date(thisMonday);
+    lastMonday.setDate(thisMonday.getDate() - 7);
+
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(lastMonday);
+      d.setDate(lastMonday.getDate() + i);
+      days.push(d);
+    }
+    return days;
+  }, []);
+
+  // --- Functional Graph Data ---
+  const chartData = useMemo(() => {
+    return calendarDays.map((date, index) => {
+      const totalHabits = habits.length;
+      const completedHabits = habits.filter((h) => h.completed[index]).length;
+      const progress =
+        totalHabits === 0
+          ? 0
+          : Math.round((completedHabits / totalHabits) * 100);
+
+      return {
+        day: date.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+        }),
+        progress,
+        isToday: date.toDateString() === new Date().toDateString(),
+      };
+    });
+  }, [habits, calendarDays]);
+
+  // --- Current Week Efficiency ---
+  const thisWeekProgress = useMemo(() => {
+    const totalPossible = habits.length * 7;
+    let totalDone = 0;
+    habits.forEach((h) => {
+      // Indices 7 through 13 represent "Semana Atual"
+      for (let i = 7; i < 14; i++) {
+        if (h.completed[i]) totalDone++;
+      }
+    });
+    return totalPossible === 0
+      ? 0
+      : Math.round((totalDone / totalPossible) * 100);
+  }, [habits]);
 
   const toggleHabit = (habitId, dayIndex) => {
     setHabits((prev) =>
@@ -191,9 +235,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-zinc-100 font-sans selection:bg-red-500/30 pb-20">
-      {/* Header */}
-
+    <div className="min-h-screen bg-background text-zinc-100 font-sans selection:bg-blue-500/30 pb-20">
       <main className="max-w-7xl mx-auto px-6 space-y-12">
         {/* Overall Progress Chart */}
         <section>
@@ -205,15 +247,16 @@ export default function App() {
 
           <div className="relative bg-zinc-900/30 rounded-2xl p-6 border border-zinc-800/50">
             <div className="flex justify-between text-[10px] text-zinc-500 uppercase tracking-[0.2em] font-bold mb-6 px-12">
-              <span className="w-1/4 text-center">Semana 1</span>
-              <span className="w-1/4 text-center">Semana 2</span>
-              <span className="w-1/4 text-center">Semana 3</span>
-              <span className="w-1/4 text-center">Semana 4</span>
+              <span className="w-1/2 text-center">Semana 1</span>
+              <span className="w-1/2 text-center">Semana 2</span>
             </div>
 
             <div className="h-48 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={CHART_DATA} margin={{ left: -20 }}>
+                <AreaChart
+                  data={chartData}
+                  margin={{ left: -20, top: 10, right: 10, bottom: 0 }}
+                >
                   <defs>
                     <linearGradient
                       id="colorProgress"
@@ -222,8 +265,8 @@ export default function App() {
                       x2="0"
                       y2="1"
                     >
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
@@ -231,7 +274,13 @@ export default function App() {
                     vertical={false}
                     stroke="#27272a"
                   />
-                  <XAxis dataKey="day" hide />
+                  <XAxis
+                    dataKey="day"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#71717a", fontSize: 10 }}
+                    dy={10}
+                  />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
@@ -245,13 +294,12 @@ export default function App() {
                       color: "#fff",
                       borderRadius: "12px",
                     }}
-                    itemStyle={{ color: "#ef4444" }}
-                    labelClassName="hidden"
+                    itemStyle={{ color: "#2563eb" }}
                   />
                   <Area
                     type="monotone"
                     dataKey="progress"
-                    stroke="#ef4444"
+                    stroke="#2563eb"
                     strokeWidth={3}
                     fillOpacity={1}
                     fill="url(#colorProgress)"
@@ -269,7 +317,7 @@ export default function App() {
             <h2 className="text-2xl font-bold tracking-tight">
               Grade de Hábitos
             </h2>
-            <button className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-red-600/20">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20">
               <Plus size={16} /> Adicionar Hábito
             </button>
           </div>
@@ -286,11 +334,22 @@ export default function App() {
                     >
                       <div className="mb-2 text-center">{week}</div>
                       <div className="flex justify-between gap-1 px-1">
-                        {[1, 2, 3, 4, 5, 6, 7].map((d) => (
-                          <span key={d} className="w-7 text-center opacity-60">
-                            {d + wIdx * 7}
-                          </span>
-                        ))}
+                        {[0, 1, 2, 3, 4, 5, 6].map((d) => {
+                          const dayIdx = wIdx * 7 + d;
+                          const dateObj = calendarDays[dayIdx];
+                          const isToday =
+                            dateObj.toDateString() ===
+                            new Date().toDateString();
+
+                          return (
+                            <span
+                              key={d}
+                              className={`w-7 text-center ${isToday ? "text-blue-500 font-bold bg-blue-500/10 rounded-full" : "opacity-60"}`}
+                            >
+                              {dateObj.getDate()}
+                            </span>
+                          );
+                        })}
                       </div>
                     </th>
                   ))}
@@ -314,7 +373,7 @@ export default function App() {
 
                           {/* Streak Statistics */}
                           <div className="flex items-center gap-3 text-[10px] font-bold">
-                            <div className="flex items-center gap-1 text-red-500">
+                            <div className="flex items-center gap-1 text-blue-500">
                               <Flame size={10} fill="currentColor" />
                               <span>{current} DIAS ATUAL</span>
                             </div>
@@ -348,7 +407,7 @@ export default function App() {
                                   className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 transform active:scale-75
                                     ${
                                       isCompleted
-                                        ? "bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+                                        ? "bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]"
                                         : "border-2 border-zinc-800 hover:border-zinc-600 bg-zinc-900/50"
                                     }`}
                                 >
@@ -373,14 +432,19 @@ export default function App() {
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-zinc-900/40 p-6 rounded-3xl border border-zinc-800/50">
             <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">
-              Eficiência Semanal
+              Eficiência da Semana Atual
             </h3>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Semana 1</span>
-              <span className="text-lg font-bold text-green-500">82%</span>
+              <span className="text-sm font-medium">Semana 2</span>
+              <span className="text-lg font-bold text-green-500">
+                {thisWeekProgress}%
+              </span>
             </div>
             <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
-              <div className="bg-green-500 h-full w-[82%] shadow-[0_0_10px_rgba(34,197,94,0.3)]" />
+              <div
+                className="bg-green-500 h-full transition-all duration-1000 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
+                style={{ width: `${thisWeekProgress}%` }}
+              />
             </div>
           </div>
           <div className="bg-zinc-900/40 p-6 rounded-3xl border border-zinc-800/50 flex flex-col justify-center items-center text-center">

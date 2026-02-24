@@ -8,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,7 @@ import {
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import Image from "next/image";
 
 export default async function HeaderPages() {
   const supabase = await createClient();
@@ -31,8 +33,13 @@ export default async function HeaderPages() {
   }
 
   return (
-    <div className=" py-3 z-50 px-6 w-full  bg-background-secondary  flex items-center justify-between">
-      <div></div>
+    <div className=" border-b-blue-950 bg-gradient-to-t from-blue-950 border-b-1  py-3 z-50 px-6 w-full absolute bg-background-secondary  flex 1items-center justify-between">
+      <div className="h-8 w-8 ml-12 shrink-0 flex gap-4 items-center justify-center rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm ">
+        <Image alt="logo" width={50} height={50} src={"/logo.png"} />
+        <span className="font-medium whitespace-pre text-black dark:text-white ">
+          StudyHub
+        </span>
+      </div>
 
       <DropdownMenu>
         <DropdownMenuTrigger className="">
