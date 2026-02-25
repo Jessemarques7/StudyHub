@@ -12,10 +12,17 @@ import {
 } from "recharts";
 import { User, Plus, Check, Flame, Award } from "lucide-react";
 
+// --- Types ---
+type Habit = {
+  id: number;
+  name: string;
+  completed: boolean[];
+};
+
 // --- Mock Data & Constants ---
 const DAYS_IN_VIEW = 14; // 2 weeks
 const WEEKS = ["Semana Passada", "Semana Atual"];
-const HABITS_INITIAL = [
+const HABITS_INITIAL: Habit[] = [
   {
     id: 1,
     name: "Estudar",
@@ -116,7 +123,7 @@ const HABITS_INITIAL = [
 
 // --- Helper Functions ---
 
-const calculateStreaks = (completed = []) => {
+const calculateStreaks = (completed: boolean[] = []) => {
   let current = 0;
   let max = 0;
   let tempMax = 0;
@@ -144,7 +151,14 @@ const calculateStreaks = (completed = []) => {
   return { current, max };
 };
 
-const ProgressBar = ({ progress, color = "bg-blue-600" }) => (
+// Added types for ProgressBar props
+const ProgressBar = ({
+  progress,
+  color = "bg-blue-600",
+}: {
+  progress: number;
+  color?: string;
+}) => (
   <div className="w-24 bg-zinc-800 rounded-full h-1.5 overflow-hidden">
     <div
       className={`${color} h-full transition-all duration-500`}
@@ -154,11 +168,11 @@ const ProgressBar = ({ progress, color = "bg-blue-600" }) => (
 );
 
 export default function App() {
-  const [habits, setHabits] = useState(HABITS_INITIAL);
+  const [habits, setHabits] = useState<Habit[]>(HABITS_INITIAL);
 
   // --- Calendar Logic ---
   const calendarDays = useMemo(() => {
-    const days = [];
+    const days: Date[] = [];
     const today = new Date();
     const currentDayOfWeek = today.getDay();
     // Set start point to Monday of the previous week
@@ -213,7 +227,8 @@ export default function App() {
       : Math.round((totalDone / totalPossible) * 100);
   }, [habits]);
 
-  const toggleHabit = (habitId, dayIndex) => {
+  // Added types for habitId and dayIndex
+  const toggleHabit = (habitId: number, dayIndex: number) => {
     setHabits((prev) =>
       prev.map((h) => {
         if (h.id === habitId) {
@@ -228,7 +243,8 @@ export default function App() {
     );
   };
 
-  const getOverallProgress = (completedArray) => {
+  // Added types for completedArray
+  const getOverallProgress = (completedArray: boolean[]) => {
     if (!completedArray || completedArray.length === 0) return 0;
     const count = completedArray.filter(Boolean).length;
     return Math.round((count / DAYS_IN_VIEW) * 100);
@@ -401,20 +417,23 @@ export default function App() {
                               const dayIdx = wIdx * 7 + d;
                               const isCompleted = habit.completed?.[dayIdx];
                               return (
-                                <button
-                                  key={d}
-                                  onClick={() => toggleHabit(habit.id, dayIdx)}
-                                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 transform active:scale-75
-                                    ${
-                                      isCompleted
-                                        ? "bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]"
-                                        : "border-2 border-zinc-800 hover:border-zinc-600 bg-zinc-900/50"
-                                    }`}
-                                >
-                                  {isCompleted && (
-                                    <Check size={14} strokeWidth={4} />
-                                  )}
-                                </button>
+                                <div key={d}>
+                                  <button
+                                    onClick={() =>
+                                      toggleHabit(habit.id, dayIdx)
+                                    }
+                                    className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 transform active:scale-75
+                                      ${
+                                        isCompleted
+                                          ? "bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]"
+                                          : "border-2 border-zinc-800 hover:border-zinc-600 bg-zinc-900/50"
+                                      }`}
+                                  >
+                                    {isCompleted && (
+                                      <Check size={14} strokeWidth={4} />
+                                    )}
+                                  </button>
+                                </div>
                               );
                             })}
                           </div>
