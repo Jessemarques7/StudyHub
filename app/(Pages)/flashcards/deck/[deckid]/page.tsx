@@ -391,7 +391,7 @@ export default function DeckView() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="mt-32 bg-background p-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -429,8 +429,8 @@ export default function DeckView() {
                     {card.type === "one-sided"
                       ? "One-Sided"
                       : card.type === "multiple-choice"
-                      ? "Multiple Choice"
-                      : "Regular"}
+                        ? "Multiple Choice"
+                        : "Regular"}
                   </Badge>
                   <div className="flex gap-2">
                     <Button

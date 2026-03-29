@@ -15,13 +15,16 @@ import {
   Plus,
   X,
   Trash2,
-  Sunrise, // Adicionado
-  Sun, // Adicionado
-  Moon, // Adicionado
+  Sunrise,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { IconSun } from "@tabler/icons-react";
 
 interface EventModalState {
   isOpen: boolean;
@@ -31,36 +34,55 @@ interface EventModalState {
   description: string;
   start: string;
   end: string;
+  colorId?: string;
+  recurrenceRule?: string;
+  recurrenceDays?: string[];
+  // Novos campos para gerir edições de eventos recorrentes
+  recurringEventId?: string;
+  updateMode?: "this" | "all" | "following";
 }
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { IconSun } from "@tabler/icons-react";
+
+const DAYS_OF_WEEK = [
+  { value: "SU", label: "Dom" },
+  { value: "MO", label: "Seg" },
+  { value: "TU", label: "Ter" },
+  { value: "WE", label: "Qua" },
+  { value: "TH", label: "Qui" },
+  { value: "FR", label: "Sex" },
+  { value: "SA", label: "Sáb" },
+];
+
+// Helper para formatar a data ISO para o input type="datetime-local"
+const formatDateTimeLocal = (dateStr: string) => {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
 
 export default function CalendarPage() {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const calendarRef = useRef<FullCalendar>(null);
 
-  // 1. MUDANÇA: Estado inicial agora é a Semana
-  // 1. MUDANÇA: Estado inicial agora é a Semana
   const [currentView, setCurrentView] = useState("timeGridWeek");
   const [value, setValue] = useState([6, 22]);
 
-  // --- NOVOS ESTADOS PARA A BARRA LATERAL SINCRONIZADA ---
   const sidebarScrollRef = useRef<HTMLDivElement>(null);
   const [gridHeight, setGridHeight] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
 
-  // Efeito para sincronizar scroll e altura com o FullCalendar
   useEffect(() => {
     if (currentView !== "timeGridWeek") return;
 
-    // Declaramos as variáveis fora do setTimeout para que o React consiga limpá-las depois
     let resizeObserver: ResizeObserver | null = null;
     let scrollerEl: Element | null = null;
     let onScroll: ((e: Event) => void) | null = null;
 
-    // Timeout rápido para garantir que o FullCalendar já montou o DOM
     const timer = setTimeout(() => {
       const calendarEl = document.querySelector(".calendar-wrapper");
       if (!calendarEl) return;
@@ -71,7 +93,6 @@ export default function CalendarPage() {
 
       if (!scrollerEl || !timeGridBody) return;
 
-      // 1. Sincronizar Scroll
       onScroll = (e: Event) => {
         if (sidebarScrollRef.current) {
           sidebarScrollRef.current.scrollTop = (
@@ -81,7 +102,6 @@ export default function CalendarPage() {
       };
       scrollerEl.addEventListener("scroll", onScroll);
 
-      // 2. Observar mudanças de tamanho do grid interno (ResizeObserver)
       resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
           if (entry.target === timeGridBody)
@@ -94,22 +114,19 @@ export default function CalendarPage() {
       resizeObserver.observe(timeGridBody);
       if (headerElement) resizeObserver.observe(headerElement);
 
-      // Setar valores iniciais
       setGridHeight(timeGridBody.getBoundingClientRect().height);
       if (headerElement)
         setHeaderHeight(headerElement.getBoundingClientRect().height);
     }, 100);
 
-    // FUNÇÃO DE LIMPEZA CORRETA (Executada pelo React quando o componente desmonta/atualiza)
     return () => {
-      clearTimeout(timer); // Usa a função nativa do navegador
+      clearTimeout(timer);
       if (resizeObserver) resizeObserver.disconnect();
       if (scrollerEl && onScroll)
         scrollerEl.removeEventListener("scroll", onScroll);
     };
-  }, [currentView, value, events]); // Recalcula se as horas (value) ou eventos mudarem
+  }, [currentView, value, events]);
 
-  // Cálculos matemáticos exatos (Manhã até 12h, Tarde até 18h)
   const minHour = value[0];
   const maxHour = value[1];
   const totalHours = Math.max(1, maxHour - minHour);
@@ -126,7 +143,6 @@ export default function CalendarPage() {
     tarde: getPercent(12, 18),
     noite: getPercent(18, 24),
   };
-  // -------------------------------------------------------
 
   const [currentDateTitle, setCurrentDateTitle] = useState("");
   const { toast } = useToast();
@@ -139,6 +155,9 @@ export default function CalendarPage() {
     description: "",
     start: "",
     end: "",
+    colorId: "11",
+    recurrenceRule: "NONE",
+    recurrenceDays: [],
   });
 
   const ICON_THEMES: {
@@ -226,6 +245,8 @@ export default function CalendarPage() {
         extendedProps: {
           description: event.description,
           theme: event.colorId ? ICON_THEMES[event.colorId] : ICON_THEMES["11"],
+          colorId: event.colorId || "11",
+          recurringEventId: event.recurringEventId, // CAPTURA O ID DO EVENTO REPETIDO
         },
       }));
     } catch {
@@ -233,11 +254,26 @@ export default function CalendarPage() {
     }
   };
 
+  const buildRecurrenceRule = () => {
+    if (modal.recurrenceRule === "DAILY") return ["RRULE:FREQ=DAILY"];
+    else if (
+      modal.recurrenceRule === "WEEKLY" &&
+      modal.recurrenceDays &&
+      modal.recurrenceDays.length > 0
+    ) {
+      return [`RRULE:FREQ=WEEKLY;BYDAY=${modal.recurrenceDays.join(",")}`];
+    }
+    return undefined;
+  };
+
   const handleCreateEvent = async () => {
     try {
       setLoading(true);
       const token = await getProviderToken();
       if (!token) throw new Error("Não autenticado");
+
+      const recurrence = buildRecurrenceRule();
+      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
       const res = await fetch("/api/calendar", {
         method: "POST",
@@ -250,6 +286,9 @@ export default function CalendarPage() {
           description: modal.description,
           start: modal.start,
           end: modal.end,
+          colorId: modal.colorId,
+          timeZone: userTimeZone,
+          ...(recurrence && { recurrence }),
         }),
       });
 
@@ -268,13 +307,23 @@ export default function CalendarPage() {
     try {
       setLoading(true);
       const token = await getProviderToken();
+      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      const payload = {
+        ...updates,
+        colorId: updates.colorId || modal.colorId,
+        timeZone: userTimeZone,
+        updateMode: modal.updateMode, // Envia o modo escolhido
+        recurringEventId: modal.recurringEventId, // Envia o ID mestre
+      };
+
       const res = await fetch(`/api/calendar?eventId=${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(updates),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error("Erro ao atualizar");
@@ -318,6 +367,9 @@ export default function CalendarPage() {
       description: "",
       start: selectInfo.startStr,
       end: selectInfo.endStr,
+      colorId: "11",
+      recurrenceRule: "NONE",
+      recurrenceDays: [],
     });
   };
 
@@ -325,6 +377,7 @@ export default function CalendarPage() {
     handleUpdateEvent(info.event.id, {
       start: info.event.startStr,
       end: info.event.endStr || info.event.startStr,
+      updateMode: "this", // Drops e resizes aplicam-se por defeito só ao evento atual
     });
   };
 
@@ -332,6 +385,7 @@ export default function CalendarPage() {
     handleUpdateEvent(info.event.id, {
       start: info.event.startStr,
       end: info.event.endStr || info.event.startStr,
+      updateMode: "this",
     });
   };
 
@@ -358,7 +412,7 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] mt-15 mx-8   flex flex-col rounded-2xl glass text-foreground  border-white/10 shadow-glow border relative overflow-hidden bg-background/30">
+    <div className="h-[calc(100vh-4rem)] mt-15 mx-32 flex flex-col rounded-2xl glass text-foreground border-white/10 shadow-glow border relative overflow-hidden bg-background/30">
       <header className="flex flex-col md:flex-row items-center justify-between px-6 py-3 border-b border-white/10 gap-4 bg-black/20 backdrop-blur-md">
         <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
           <div className="flex items-center gap-3">
@@ -401,7 +455,7 @@ export default function CalendarPage() {
             <div className="mx-auto grid w-full max-w-xs gap-2">
               <div className="flex items-center justify-center mr-6 gap-2">
                 <Label htmlFor="slider-demo-temperature text-center">
-                  <IconSun className="h-5 w-5  shrink-0 text-neutral-700 dark:text-neutral-200" />
+                  <IconSun className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
                   Time
                 </Label>
               </div>
@@ -425,23 +479,28 @@ export default function CalendarPage() {
           </div>
 
           <Button
-            onClick={() =>
+            onClick={() => {
+              // Quando clica no botão externo, inicializa a data/hora agora até +1h
+              const now = new Date();
+              const end = new Date(now.getTime() + 60 * 60 * 1000);
               setModal({
                 isOpen: true,
                 mode: "create",
                 title: "",
                 description: "",
-                start: new Date().toISOString(),
-                end: new Date(Date.now() + 3600000).toISOString(),
-              })
-            }
+                start: now.toISOString(),
+                end: end.toISOString(),
+                colorId: "11",
+                recurrenceRule: "NONE",
+                recurrenceDays: [],
+              });
+            }}
             className="hidden md:flex gradient-primary hover:opacity-90 text-white h-10 px-6 rounded-xl shadow-lg font-bold border border-white/10"
           >
             <Plus className="w-5 h-5 mr-1" /> Novo Evento
           </Button>
 
           <div className="flex bg-slate-900/80 p-1.5 rounded-xl border border-white/10">
-            {/* 2. MUDANÇA: Opção Dia removida do array */}
             {["timeGridWeek", "dayGridMonth"].map((view) => (
               <button
                 key={view}
@@ -471,24 +530,19 @@ export default function CalendarPage() {
           </div>
         )}
 
-        {/* --- BARRA LATERAL DOS PERÍODOS SINCRONIZADA --- */}
         {currentView === "timeGridWeek" && (
           <div className="hidden md:flex flex-col w-20 shrink-0 mr-1 border-r border-white/5 relative z-10">
-            {/* Espaçador Dinâmico do Header (alinha perfeitamente com os dias) */}
             <div
               style={{
                 height: headerHeight > 0 ? `${headerHeight}px` : "50px",
               }}
               className="w-full border-b border-white/5 shrink-0 transition-all duration-200"
             />
-
-            {/* Container scrollável que copia o scroll do FullCalendar */}
             <div
               ref={sidebarScrollRef}
               className="flex-1 overflow-hidden"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }} // Esconde a barra nativa do navegador
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              {/* Esta div tem exatamente a mesma altura em pixels das linhas de horas do calendário */}
               <div
                 style={{ height: gridHeight > 0 ? `${gridHeight}px` : "100%" }}
                 className="w-full flex flex-col transition-all duration-200"
@@ -540,33 +594,29 @@ export default function CalendarPage() {
               listPlugin,
             ]}
             dayHeaderContent={(args) => {
-              const isToday = args.isToday;
               const dayName = args.date.toLocaleDateString("pt-BR", {
                 weekday: "long",
               });
-              const dayNum = args.date.getDate();
               const shortDay =
-                dayName.charAt(0).toUpperCase() + dayName.slice(1, 3); // "Seg", "Ter"...
-
+                dayName.charAt(0).toUpperCase() + dayName.slice(1, 3);
               return (
-                <div className="flex  items-center gap-1 pb-2">
+                <div className="flex items-center gap-1 pb-2">
                   <span className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
                     {shortDay}
                   </span>
                   <span
                     className={cn(
                       "text-lg font-bold w-7 h-7 flex items-center justify-center rounded-sm transition-all",
-                      isToday
+                      args.isToday
                         ? "bg-primary text-white shadow-[0_0_12px_rgba(145,36,255,0.5)]"
                         : "text-slate-300",
                     )}
                   >
-                    {dayNum}
+                    {args.date.getDate()}
                   </span>
                 </div>
               );
             }}
-            /* 3. MUDANÇA: View inicial definida para a Semana */
             initialView="timeGridWeek"
             headerToolbar={false}
             events={events}
@@ -585,16 +635,13 @@ export default function CalendarPage() {
             select={handleDateSelect}
             eventDrop={handleEventDrop}
             eventResize={handleEventResize}
-            /* PROPRIEDADES QUE ESCONDEM OS HORÁRIOS */
             slotMinTime={`${value[0]}:00:00`}
             slotMaxTime={`${value[1]}:00:00`}
             eventDidMount={(info) => {
               const theme = info.event.extendedProps.theme;
               if (theme) {
                 const el = info.el;
-
                 if (info.view.type === "dayGridMonth") {
-                  // VISÃO MENSAL: Estilo da Imagem (Bolinha colorida + Texto)
                   el.style.setProperty(
                     "background-color",
                     "transparent",
@@ -602,8 +649,6 @@ export default function CalendarPage() {
                   );
                   el.style.setProperty("border", "none", "important");
                   el.style.setProperty("padding", "2px 4px", "important");
-
-                  // Restaura a bolinha colorida e ajusta a cor
                   const dot = el.querySelector(
                     ".fc-daygrid-event-dot",
                   ) as HTMLElement;
@@ -613,17 +658,14 @@ export default function CalendarPage() {
                     dot.style.borderWidth = "4px";
                     dot.style.marginRight = "8px";
                   }
-
-                  // Deixa o texto do evento em um tom claro
                   const titleEl = el.querySelector(
                     ".fc-event-title",
                   ) as HTMLElement;
                   if (titleEl) {
-                    titleEl.style.color = "#cbd5e1"; // Cor clara como na imagem
+                    titleEl.style.color = "#cbd5e1";
                     titleEl.style.fontWeight = "500";
                   }
                 } else {
-                  // VISÃO SEMANAL: Mantém o estilo de bloco que você já tem
                   el.style.setProperty(
                     "background-color",
                     theme.bg,
@@ -636,7 +678,6 @@ export default function CalendarPage() {
                   );
                   el.style.setProperty("color", theme.text, "important");
                   el.style.borderRadius = "12px";
-
                   const titleEl = el.querySelector(
                     ".fc-event-title",
                   ) as HTMLElement;
@@ -661,6 +702,9 @@ export default function CalendarPage() {
                 description: info.event.extendedProps.description || "",
                 start: info.event.startStr,
                 end: info.event.endStr || info.event.startStr,
+                colorId: info.event.extendedProps.colorId || "11",
+                recurringEventId: info.event.extendedProps.recurringEventId, // Puxa do Google API
+                updateMode: "this", // Padrão: atualizar só a instância
               })
             }
             datesSet={handleDatesSet}
@@ -670,7 +714,7 @@ export default function CalendarPage() {
 
       {modal.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in zoom-in duration-300">
-          <div className="bg-slate-900/90 border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-8 glass">
+          <div className="bg-slate-900/90 border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-8 glass overflow-y-auto max-h-screen">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gradient">
                 {modal.mode === "create" ? "Novo Evento" : "Editar Evento"}
@@ -701,6 +745,160 @@ export default function CalendarPage() {
                   autoFocus
                 />
               </div>
+
+              {/* CAMPOS DE DATA E HORA INSERIDOS AQUI */}
+              <div className="flex gap-4">
+                <div className="space-y-1 flex-1">
+                  <label className="text-xs font-bold text-gray-400 ml-1 uppercase">
+                    Início
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={formatDateTimeLocal(modal.start)}
+                    onChange={(e) => {
+                      if (e.target.value)
+                        setModal({
+                          ...modal,
+                          start: new Date(e.target.value).toISOString(),
+                        });
+                    }}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner [color-scheme:dark]"
+                  />
+                </div>
+                <div className="space-y-1 flex-1">
+                  <label className="text-xs font-bold text-gray-400 ml-1 uppercase">
+                    Fim
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={formatDateTimeLocal(modal.end)}
+                    onChange={(e) => {
+                      if (e.target.value)
+                        setModal({
+                          ...modal,
+                          end: new Date(e.target.value).toISOString(),
+                        });
+                    }}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner [color-scheme:dark]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 ml-1 uppercase">
+                  Cor do Evento
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(ICON_THEMES).map(([id, theme]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setModal({ ...modal, colorId: id })}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${modal.colorId === id ? "ring-2 ring-offset-2 ring-offset-slate-900 scale-110" : "hover:scale-105"}`}
+                      style={{
+                        backgroundColor: theme.bg,
+                        borderColor: theme.border,
+                        borderWidth: "1px",
+                      }}
+                    >
+                      {modal.colorId === id && (
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: theme.text }}
+                        />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* MODO EDIÇÃO PARA EVENTOS REPETIDOS */}
+              {modal.mode === "edit" && modal.recurringEventId && (
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 ml-1 uppercase text-yellow-500">
+                    Evento Repetido
+                  </label>
+                  <select
+                    value={modal.updateMode}
+                    onChange={(e) =>
+                      setModal({ ...modal, updateMode: e.target.value as any })
+                    }
+                    className="w-full bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 text-yellow-400 focus:ring-2 focus:ring-yellow-500 outline-none transition-all"
+                  >
+                    <option value="this" className="bg-slate-900 text-white">
+                      Apenas este evento
+                    </option>
+                    <option
+                      value="following"
+                      className="bg-slate-900 text-white"
+                    >
+                      Este e os seguintes
+                    </option>
+                    <option value="all" className="bg-slate-900 text-white">
+                      Todos os eventos
+                    </option>
+                  </select>
+                </div>
+              )}
+
+              {modal.mode === "create" && (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-400 ml-1 uppercase">
+                      Repetição
+                    </label>
+                    <select
+                      value={modal.recurrenceRule}
+                      onChange={(e) =>
+                        setModal({ ...modal, recurrenceRule: e.target.value })
+                      }
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner"
+                    >
+                      <option value="NONE" className="bg-slate-900">
+                        Não se repete
+                      </option>
+                      <option value="DAILY" className="bg-slate-900">
+                        Todos os dias
+                      </option>
+                      <option value="WEEKLY" className="bg-slate-900">
+                        Semanalmente (Escolher dias)
+                      </option>
+                    </select>
+                  </div>
+
+                  {modal.recurrenceRule === "WEEKLY" && (
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-gray-400 ml-1 uppercase">
+                        Repetir nos dias
+                      </label>
+                      <div className="flex gap-2 flex-wrap">
+                        {DAYS_OF_WEEK.map((day) => (
+                          <button
+                            key={day.value}
+                            type="button"
+                            onClick={() => {
+                              const days = modal.recurrenceDays || [];
+                              const isSelected = days.includes(day.value);
+                              const newDays = isSelected
+                                ? days.filter((d) => d !== day.value)
+                                : [...days, day.value];
+                              setModal({ ...modal, recurrenceDays: newDays });
+                            }}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                              (modal.recurrenceDays || []).includes(day.value)
+                                ? "bg-primary text-white border border-primary shadow-glow"
+                                : "bg-black/40 text-gray-400 border border-white/10 hover:bg-white/5"
+                            }`}
+                          >
+                            {day.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-400 ml-1 uppercase">
                   Descrição
@@ -714,6 +912,7 @@ export default function CalendarPage() {
                   placeholder="Detalhes adicionais..."
                 />
               </div>
+
               <div className="flex justify-end gap-3 pt-4">
                 {modal.mode === "edit" && modal.id && (
                   <Button
@@ -740,6 +939,9 @@ export default function CalendarPage() {
                           handleUpdateEvent(modal.id!, {
                             title: modal.title,
                             description: modal.description,
+                            start: modal.start,
+                            end: modal.end,
+                            colorId: modal.colorId,
                           })
                   }
                   className="gradient-primary rounded-xl px-8 shadow-glow font-bold text-white"
@@ -752,7 +954,9 @@ export default function CalendarPage() {
         </div>
       )}
 
+      {/* Mantém todos os estilos CSS do <style jsx global> ... */}
       <style jsx global>{`
+        /* Seus estilos originais da tag style ... */
         .calendar-wrapper .fc {
           --fc-border-color: rgba(255, 255, 255, 0.03);
           --fc-today-bg-color: rgba(145, 36, 255, 0.05);

@@ -165,12 +165,12 @@ export function SidebarPages({ children }: { children: React.ReactNode }) {
       */}
       <FloatingDock
         items={links}
-        mobileClassName="fixed bottom-4 right-4 z-50"
+        mobileClassName="fixed bottom-4  right-4 z-50"
       />
 
       {/* Main Content Area */}
       {/* Notice md:pl-28 adds space on desktop to avoid content clipping under the dock */}
-      <div className="h-full w-full  overflow-auto md:pl-28 pt-4 md:pt-0">
+      <div className="h-full w-full  overflow-auto  pt-4 md:pt-0">
         {children}
       </div>
     </div>

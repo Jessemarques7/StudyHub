@@ -1,75 +1,4 @@
-// import { NextResponse } from "next/server";
-// import { createClient } from "@/utils/supabase/server";
-
-// export async function GET(request: Request) {
-//   const supabase = await createClient();
-
-//   // 1. Pegar Sessão
-//   const {
-//     data: { session },
-//   } = await supabase.auth.getSession();
-
-//   if (!session) {
-//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-//   }
-
-//   // 2. Extrair o Token do Google
-//   const providerToken = session.provider_token;
-
-//   if (!providerToken) {
-//     return NextResponse.json(
-//       {
-//         error:
-//           "Google Access Token not found. Please sign out and sign in with Google again.",
-//       },
-//       { status: 401 },
-//     );
-//   }
-
-//   // 3. Ler as datas que o Frontend enviou (start e end)
-//   const { searchParams } = new URL(request.url);
-//   // Se não vier data, usa o padrão (hoje e hoje+30 dias)
-//   const start = searchParams.get("start") || new Date().toISOString();
-//   const end =
-//     searchParams.get("end") ||
-//     new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-
-//   try {
-//     // 4. Chamar a API do Google com timeMin e timeMax dinâmicos
-//     const url = new URL(
-//       "https://www.googleapis.com/calendar/v3/calendars/primary/events",
-//     );
-//     url.searchParams.append("timeMin", start);
-//     url.searchParams.append("timeMax", end);
-//     url.searchParams.append("singleEvents", "true");
-//     url.searchParams.append("orderBy", "startTime");
-//     // Removemos o limite de maxResults ou aumentamos bastante (2500 é o máximo por página)
-//     url.searchParams.append("maxResults", "2500");
-
-//     const response = await fetch(url.toString(), {
-//       headers: {
-//         Authorization: `Bearer ${providerToken}`,
-//       },
-//     });
-
-//     if (!response.ok) {
-//       const errorDetails = await response.text();
-//       console.error("Google Calendar API Error:", errorDetails);
-//       throw new Error("Failed to fetch calendar events");
-//     }
-
-//     const data = await response.json();
-
-//     return NextResponse.json(data.items);
-//   } catch (error) {
-//     console.error(error);
-//     return NextResponse.json(
-//       { error: "Internal Server Error" },
-//       { status: 500 },
-//     );
-//   }
-// }
-
+// app/api/calendar/route.ts
 import { NextResponse } from "next/server";
 
 const GOOGLE_CALENDAR_URL =
@@ -137,12 +66,20 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const event = {
+
+    // Fallback para um timezone padrão caso não venha no body
+    const timeZone = body.timeZone || "America/Sao_Paulo";
+
+    const event: any = {
       summary: body.title,
       description: body.description,
-      start: { dateTime: body.start },
-      end: { dateTime: body.end },
+      // O Google exige o timeZone quando há recurrence!
+      start: { dateTime: body.start, timeZone },
+      end: { dateTime: body.end, timeZone },
     };
+
+    if (body.colorId) event.colorId = body.colorId;
+    if (body.recurrence) event.recurrence = body.recurrence;
 
     const response = await fetch(GOOGLE_CALENDAR_URL, {
       method: "POST",
@@ -181,13 +118,34 @@ export async function PATCH(request: Request) {
     if (!eventId)
       return NextResponse.json({ error: "Missing eventId" }, { status: 400 });
 
+    const timeZone = body.timeZone || "America/Sao_Paulo";
     const eventUpdates: any = {};
+
     if (body.title) eventUpdates.summary = body.title;
     if (body.description) eventUpdates.description = body.description;
-    if (body.start) eventUpdates.start = { dateTime: body.start };
-    if (body.end) eventUpdates.end = { dateTime: body.end };
 
-    const response = await fetch(`${GOOGLE_CALENDAR_URL}/${eventId}`, {
+    if (body.start) eventUpdates.start = { dateTime: body.start, timeZone };
+    if (body.end) eventUpdates.end = { dateTime: body.end, timeZone };
+
+    if (body.colorId) eventUpdates.colorId = body.colorId;
+    if (body.recurrence) eventUpdates.recurrence = body.recurrence;
+
+    // LÓGICA DE REPETIÇÃO: Decidir qual ID atualizar
+    let targetEventId = eventId;
+
+    if (body.updateMode === "all" && body.recurringEventId) {
+      // Atualiza a "série" inteira (o evento mestre)
+      targetEventId = body.recurringEventId;
+    } else if (body.updateMode === "following" && body.recurringEventId) {
+      // Nota: A API do Google Calendar é bem complexa para "Este e os seguintes"
+      // via REST (exige truncar o atual e criar um novo).
+      // Para fins práticos na rota simples, redirecionamos para a série ("all")
+      // ou aplicamos só à instância ("this"). Aqui aplicaremos ao mestre como fallback seguro,
+      // mas você pode ajustar conforme a necessidade estrita.
+      targetEventId = body.recurringEventId;
+    }
+
+    const response = await fetch(`${GOOGLE_CALENDAR_URL}/${targetEventId}`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -208,7 +166,6 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }
-
 // DELETAR EVENTO (DELETE)
 export async function DELETE(request: Request) {
   const token = getTokenFromHeader(request);

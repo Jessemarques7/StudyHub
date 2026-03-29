@@ -76,6 +76,9 @@ export default function Editor() {
 
   return (
     <div className="flex flex-1 flex-col h-full bg-background">
+      {/* --- Efeitos de Fundo Globais --- */}
+      <div className="stars"></div>
+      <div className="nebula"></div>
       <div className="flex-1 overflow-y-auto relative scrollbar-hide">
         <NoteHeader
           note={currentNote}
