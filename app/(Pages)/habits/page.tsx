@@ -44,22 +44,19 @@ const toDateString = (d: Date) => {
   return `${year}-${month}-${day}`;
 };
 
-const isPlainObject = (
-  value: unknown,
-): value is Record<string, unknown> => {
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 };
 
-const normalizeCompletedDates = (
-  value: unknown,
-): Record<string, boolean> => {
+const normalizeCompletedDates = (value: unknown): Record<string, boolean> => {
   if (!isPlainObject(value)) {
     return {};
   }
 
   return Object.fromEntries(
     Object.entries(value).filter(
-      ([date, completed]) => typeof date === "string" && completed === true,
+      (entry): entry is [string, boolean] =>
+        typeof entry[0] === "string" && entry[1] === true,
     ),
   );
 };
@@ -579,7 +576,7 @@ export default function App() {
         name: trimmedName,
         icon: optimisticHabit.icon,
         completedDates: {},
-/*
+        /*
         name: trimmedName,
         icon: "ðŸŽ¯",
         completedDates: {},
@@ -656,7 +653,9 @@ export default function App() {
     setEditingId(null);
 
     try {
-      const savedHabit = await updateHabitRecord(habitId, { name: trimmedName });
+      const savedHabit = await updateHabitRecord(habitId, {
+        name: trimmedName,
+      });
 
       setHabits((prev) =>
         prev.map((habit) => (habit.id === habitId ? savedHabit : habit)),
