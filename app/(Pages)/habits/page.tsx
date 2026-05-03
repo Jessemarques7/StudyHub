@@ -19,19 +19,20 @@ import {
   ChevronLeft,
   ChevronRight,
   Edit2,
+  Loader2,
 } from "lucide-react";
-import { useLocalStorage } from "@/hooks/useLocalStorageState";
 import { ProgressRing } from "@/components/ui/ProgressRing";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import { cn } from "@/lib/utils";
-
-// --- Types ---
-type Habit = {
-  id: number;
-  name: string;
-  icon: string;
-  completedDates: Record<string, boolean>;
-};
+import {
+  createHabit as createHabitRecord,
+  createManyHabits,
+  deleteHabit as deleteHabitRecord,
+  getAllHabits,
+  updateHabit as updateHabitRecord,
+} from "@/lib/habits";
+import type { CreateHabitInput, Habit } from "@/types/habits";
+import { toast } from "sonner";
 
 type TabType = "emoji" | "upload" | "link";
 
@@ -41,6 +42,46 @@ const toDateString = (d: Date) => {
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+};
+
+const isPlainObject = (
+  value: unknown,
+): value is Record<string, unknown> => {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+};
+
+const normalizeCompletedDates = (
+  value: unknown,
+): Record<string, boolean> => {
+  if (!isPlainObject(value)) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(value).filter(
+      ([date, completed]) => typeof date === "string" && completed === true,
+    ),
+  );
+};
+
+const normalizeHabitSeed = (value: unknown): CreateHabitInput | null => {
+  if (!isPlainObject(value) || typeof value.name !== "string") {
+    return null;
+  }
+
+  const name = value.name.trim();
+  if (!name) {
+    return null;
+  }
+
+  const icon =
+    typeof value.icon === "string" && value.icon.trim() ? value.icon : "🎯";
+
+  return {
+    name,
+    icon,
+    completedDates: normalizeCompletedDates(value.completedDates),
+  };
 };
 
 const isImageUrl = (str: string) => {
@@ -102,11 +143,7 @@ function HabitIconPicker({
 
   const uploadRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = typeof window !== "undefined";
 
   const handleOpen = () => {
     if (triggerRef.current) {
@@ -283,35 +320,120 @@ function HabitIconPicker({
 
 // --- Constants ---
 const DAYS_IN_VIEW = 7;
-const HABITS_INITIAL: Habit[] = [
+const LEGACY_STORAGE_KEY = "studyhub_habits_v3";
+const DEFAULT_HABIT_SEEDS: CreateHabitInput[] = [
   {
-    id: 1,
     name: "Estudar Programação",
     icon: "💻",
     completedDates: { [toDateString(new Date())]: true },
   },
   {
-    id: 2,
     name: "Beber 4l de água",
     icon: "💧",
     completedDates: {},
   },
 ];
 
-export default function App() {
-  const [habits, setHabits] = useLocalStorage<Habit[]>(
-    "studyhub_habits_v3",
-    HABITS_INITIAL,
-  );
+const readLegacyHabits = (): {
+  exists: boolean;
+  habits: CreateHabitInput[];
+} => {
+  if (typeof window === "undefined") {
+    return { exists: false, habits: [] };
+  }
 
+  const rawValue = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+  if (rawValue === null) {
+    return { exists: false, habits: [] };
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue);
+    if (!Array.isArray(parsed)) {
+      return { exists: true, habits: [] };
+    }
+
+    return {
+      exists: true,
+      habits: parsed
+        .map((habit) => normalizeHabitSeed(habit))
+        .filter((habit): habit is CreateHabitInput => habit !== null),
+    };
+  } catch (error) {
+    console.warn("Erro ao ler habitos legados:", error);
+    return { exists: true, habits: [] };
+  }
+};
+
+export default function App() {
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [newHabitName, setNewHabitName] = useState("");
   const [weekOffset, setWeekOffset] = useState(0);
+  const hasLoadedRef = useRef(false);
 
   // Edit State
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const editInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (hasLoadedRef.current) {
+      return;
+    }
+
+    hasLoadedRef.current = true;
+    let cancelled = false;
+
+    const loadHabits = async () => {
+      try {
+        const remoteHabits = await getAllHabits();
+        if (cancelled) {
+          return;
+        }
+
+        if (remoteHabits.length > 0) {
+          setHabits(remoteHabits);
+          return;
+        }
+
+        const legacyHabits = readLegacyHabits();
+        const seeds = legacyHabits.exists
+          ? legacyHabits.habits
+          : DEFAULT_HABIT_SEEDS;
+
+        if (seeds.length === 0) {
+          setHabits([]);
+          return;
+        }
+
+        const migratedHabits = await createManyHabits(seeds);
+        if (cancelled) {
+          return;
+        }
+
+        setHabits(migratedHabits);
+
+        if (legacyHabits.exists) {
+          window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar habitos:", error);
+        toast.error("Nao foi possivel carregar seus habitos.");
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadHabits();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Auto-focus input when editing starts
   useEffect(() => {
@@ -394,60 +516,189 @@ export default function App() {
   }, [habits, calendarDays]);
 
   // --- Actions ---
-  const toggleHabit = (habitId: number, dateStr: string) => {
-    setHabits((prev) =>
-      prev.map((h) => {
-        if (h.id === habitId) {
-          const newDates = { ...(h.completedDates || {}) };
-          if (newDates[dateStr]) {
-            delete newDates[dateStr];
-          } else {
-            newDates[dateStr] = true;
-          }
-          return { ...h, completedDates: newDates };
-        }
-        return h;
-      }),
-    );
-  };
+  const toggleHabit = async (habitId: string, dateStr: string) => {
+    if (loading) return;
 
-  const handleAddHabit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newHabitName.trim()) return;
+    const currentHabit = habits.find((habit) => habit.id === habitId);
+    if (!currentHabit) return;
 
-    const newHabit: Habit = {
-      id: Date.now(),
-      name: newHabitName.trim(),
-      icon: "🎯",
-      completedDates: {},
+    const newDates = { ...(currentHabit.completedDates || {}) };
+    if (newDates[dateStr]) {
+      delete newDates[dateStr];
+    } else {
+      newDates[dateStr] = true;
+    }
+
+    const optimisticHabit = {
+      ...currentHabit,
+      completedDates: newDates,
+      updatedAt: new Date(),
     };
 
-    setHabits((prev) => [...prev, newHabit]);
-    setNewHabitName("");
-    setIsAdding(false);
-  };
+    setHabits((prev) =>
+      prev.map((habit) => (habit.id === habitId ? optimisticHabit : habit)),
+    );
 
-  const handleDeleteHabit = (habitId: number) => {
-    if (confirm("Tem certeza que deseja remover este hábito?")) {
-      setHabits((prev) => prev.filter((h) => h.id !== habitId));
+    try {
+      const savedHabit = await updateHabitRecord(habitId, {
+        completedDates: newDates,
+      });
+
+      setHabits((prev) =>
+        prev.map((habit) => (habit.id === habitId ? savedHabit : habit)),
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar check-in do habito:", error);
+      setHabits((prev) =>
+        prev.map((habit) => (habit.id === habitId ? currentHabit : habit)),
+      );
+      toast.error("Nao foi possivel atualizar este habito.");
     }
   };
 
-  const handleSaveEdit = (habitId: number) => {
-    if (!editName.trim()) {
+  const handleAddHabit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loading || !newHabitName.trim()) return;
+
+    const trimmedName = newHabitName.trim();
+    const optimisticHabit: Habit = {
+      id: `temp-${crypto.randomUUID()}`,
+      name: trimmedName,
+      icon: "🎯",
+      completedDates: {},
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    setHabits((prev) => [...prev, optimisticHabit]);
+    setNewHabitName("");
+    setIsAdding(false);
+
+    try {
+      const savedHabit = await createHabitRecord({
+        name: trimmedName,
+        icon: optimisticHabit.icon,
+        completedDates: {},
+/*
+        name: trimmedName,
+        icon: "ðŸŽ¯",
+        completedDates: {},
+*/
+      });
+
+      setHabits((prev) =>
+        prev.map((habit) =>
+          habit.id === optimisticHabit.id ? savedHabit : habit,
+        ),
+      );
+      toast.success("Habito criado com sucesso.");
+    } catch (error) {
+      console.error("Erro ao criar habito:", error);
+      setHabits((prev) =>
+        prev.filter((habit) => habit.id !== optimisticHabit.id),
+      );
+      toast.error("Nao foi possivel criar o habito.");
+    }
+  };
+
+  const handleDeleteHabit = async (habitId: string) => {
+    if (loading) return;
+
+    const habitIndex = habits.findIndex((habit) => habit.id === habitId);
+    if (habitIndex === -1) return;
+
+    const habitToDelete = habits[habitIndex];
+    if (confirm("Tem certeza que deseja remover este hábito?")) {
+      setHabits((prev) => prev.filter((habit) => habit.id !== habitId));
+
+      try {
+        await deleteHabitRecord(habitId);
+        toast.success("Habito removido.");
+      } catch (error) {
+        console.error("Erro ao remover habito:", error);
+        setHabits((prev) => {
+          const next = [...prev];
+          next.splice(habitIndex, 0, habitToDelete);
+          return next;
+        });
+        toast.error("Nao foi possivel remover este habito.");
+      }
+    }
+  };
+
+  const handleSaveEdit = async (habitId: string) => {
+    const currentHabit = habits.find((habit) => habit.id === habitId);
+    if (!currentHabit) {
       setEditingId(null);
       return;
     }
+
+    const trimmedName = editName.trim();
+    if (!trimmedName) {
+      setEditingId(null);
+      return;
+    }
+
+    if (loading || trimmedName === currentHabit.name) {
+      setEditingId(null);
+      return;
+    }
+
+    const optimisticHabit = {
+      ...currentHabit,
+      name: trimmedName,
+      updatedAt: new Date(),
+    };
+
     setHabits((prev) =>
-      prev.map((h) => (h.id === habitId ? { ...h, name: editName.trim() } : h)),
+      prev.map((habit) => (habit.id === habitId ? optimisticHabit : habit)),
     );
     setEditingId(null);
+
+    try {
+      const savedHabit = await updateHabitRecord(habitId, { name: trimmedName });
+
+      setHabits((prev) =>
+        prev.map((habit) => (habit.id === habitId ? savedHabit : habit)),
+      );
+    } catch (error) {
+      console.error("Erro ao renomear habito:", error);
+      setHabits((prev) =>
+        prev.map((habit) => (habit.id === habitId ? currentHabit : habit)),
+      );
+      toast.error("Nao foi possivel salvar o nome do habito.");
+    }
   };
 
-  const handleIconChange = (habitId: number, newIcon: string) => {
+  const handleIconChange = async (habitId: string, newIcon: string) => {
+    if (loading) return;
+
+    const currentHabit = habits.find((habit) => habit.id === habitId);
+    if (!currentHabit || currentHabit.icon === newIcon) return;
+
+    const optimisticHabit = {
+      ...currentHabit,
+      icon: newIcon,
+      updatedAt: new Date(),
+    };
+
     setHabits((prev) =>
-      prev.map((h) => (h.id === habitId ? { ...h, icon: newIcon } : h)),
+      prev.map((habit) => (habit.id === habitId ? optimisticHabit : habit)),
     );
+
+    try {
+      const savedHabit = await updateHabitRecord(habitId, { icon: newIcon });
+
+      setHabits((prev) =>
+        prev.map((habit) => (habit.id === habitId ? savedHabit : habit)),
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar icone do habito:", error);
+      setHabits((prev) =>
+        prev.map((habit) => (habit.id === habitId ? currentHabit : habit)),
+      );
+      toast.error("Nao foi possivel salvar o icone.");
+    }
   };
 
   const getOverallProgress = (completedDates: Record<string, boolean>) => {
@@ -575,6 +826,7 @@ export default function App() {
             {!isAdding && (
               <button
                 onClick={() => setIsAdding(true)}
+                disabled={loading}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
               >
                 <Plus size={16} /> Adicionar Hábito
@@ -591,6 +843,7 @@ export default function App() {
               <input
                 type="text"
                 autoFocus
+                disabled={loading}
                 placeholder="Qual novo hábito você quer construir?"
                 className="flex-1 bg-transparent border-none text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-0"
                 value={newHabitName}
@@ -600,13 +853,14 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setIsAdding(false)}
+                  disabled={loading}
                   className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full transition-colors"
                 >
                   <X size={18} />
                 </button>
                 <button
                   type="submit"
-                  disabled={!newHabitName.trim()}
+                  disabled={loading || !newHabitName.trim()}
                   className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-full text-xs font-bold transition-all"
                 >
                   Salvar
@@ -659,7 +913,17 @@ export default function App() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/30">
-                {habits.length === 0 && (
+                {loading && (
+                  <tr>
+                    <td colSpan={3} className="py-12 text-center">
+                      <div className="flex items-center justify-center gap-3 text-zinc-500 text-sm">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Carregando habitos...
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {!loading && habits.length === 0 && (
                   <tr>
                     <td
                       colSpan={3}
