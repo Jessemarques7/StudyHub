@@ -4,7 +4,7 @@ import HeaderPages from "@/components/ui/HeaderPages";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <main style={{ paddingTop: "var(--header-height)" }}>
+    <main>
       <HeaderPages />
       <SidebarPages>{children}</SidebarPages>
     </main>
