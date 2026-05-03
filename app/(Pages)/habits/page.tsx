@@ -1,5 +1,7 @@
 "use client";
 
+import "../../stars.css";
+
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -197,7 +199,7 @@ function HabitIconPicker({
 
       {/* Positioned Popover Modal */}
       <div
-        className="absolute bg-slate-900 border border-slate-700 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-4 w-full max-w-[340px] animate-in fade-in zoom-in-95 duration-200 custom-emoji-theme"
+        className="absolute bg-background border border-slate-700 rounded-xl shadow-card p-4 w-full max-w-[340px] animate-in fade-in zoom-in-95 duration-200 custom-emoji-theme"
         style={{
           top: topPos,
           left: rect ? rect.left : 0,
@@ -710,7 +712,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen mt-24 bg-background text-zinc-100 font-sans selection:bg-blue-500/30 pb-20">
+    <div className="min-h-screen bg-background text-zinc-100 font-sans selection:bg-blue-500/30 pb-20">
       {/* Global override to style the React Emoji Picker */}
       <style>{`
         .custom-emoji-theme .EmojiPickerReact {

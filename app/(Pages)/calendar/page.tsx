@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { IconSun } from "@tabler/icons-react";
+import styles from "./calendar.module.css";
 
 interface EventModalState {
   isOpen: boolean;
@@ -78,19 +79,18 @@ export default function CalendarPage() {
 
   useEffect(() => {
     if (currentView !== "timeGridWeek") return;
-
     let resizeObserver: ResizeObserver | null = null;
     let scrollerEl: Element | null = null;
     let onScroll: ((e: Event) => void) | null = null;
+    let mounted = true;
 
     const timer = setTimeout(() => {
+      if (!mounted) return;
       const calendarEl = document.querySelector(".calendar-wrapper");
       if (!calendarEl) return;
-
       const timeGridBody = calendarEl.querySelector(".fc-timegrid-body");
       scrollerEl = timeGridBody?.closest(".fc-scroller") || null;
       const headerElement = calendarEl.querySelector(".fc-col-header");
-
       if (!scrollerEl || !timeGridBody) return;
 
       onScroll = (e: Event) => {
@@ -104,26 +104,21 @@ export default function CalendarPage() {
 
       resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
-          if (entry.target === timeGridBody)
-            setGridHeight(entry.contentRect.height);
-          if (entry.target === headerElement)
-            setHeaderHeight(entry.contentRect.height);
+          if (entry.target === timeGridBody) setGridHeight(entry.contentRect.height);
+          if (entry.target === headerElement) setHeaderHeight(entry.contentRect.height);
         }
       });
-
       resizeObserver.observe(timeGridBody);
       if (headerElement) resizeObserver.observe(headerElement);
-
       setGridHeight(timeGridBody.getBoundingClientRect().height);
-      if (headerElement)
-        setHeaderHeight(headerElement.getBoundingClientRect().height);
+      if (headerElement) setHeaderHeight(headerElement.getBoundingClientRect().height);
     }, 100);
 
     return () => {
+      mounted = false;
       clearTimeout(timer);
       if (resizeObserver) resizeObserver.disconnect();
-      if (scrollerEl && onScroll)
-        scrollerEl.removeEventListener("scroll", onScroll);
+      if (scrollerEl && onScroll) scrollerEl.removeEventListener("scroll", onScroll);
     };
   }, [currentView, value, events]);
 
@@ -164,59 +159,59 @@ export default function CalendarPage() {
     [key: string]: { bg: string; border: string; text: string };
   } = {
     "1": {
-      bg: "rgba(99, 102, 241, 0.1)",
-      border: "rgba(99, 102, 241, 0.2)",
-      text: "#818cf8",
+      bg: "var(--calendar-color-1-bg)",
+      border: "var(--calendar-color-1-border)",
+      text: "var(--calendar-color-1-text)",
     },
     "2": {
-      bg: "rgba(34, 197, 94, 0.1)",
-      border: "rgba(34, 197, 94, 0.2)",
-      text: "#4ade80",
+      bg: "var(--calendar-color-2-bg)",
+      border: "var(--calendar-color-2-border)",
+      text: "var(--calendar-color-2-text)",
     },
     "3": {
-      bg: "rgba(168, 85, 247, 0.1)",
-      border: "rgba(168, 85, 247, 0.2)",
-      text: "#c084fc",
+      bg: "var(--calendar-color-3-bg)",
+      border: "var(--calendar-color-3-border)",
+      text: "var(--calendar-color-3-text)",
     },
     "4": {
-      bg: "rgba(244, 63, 94, 0.1)",
-      border: "rgba(244, 63, 94, 0.2)",
-      text: "#fb7185",
+      bg: "var(--calendar-color-4-bg)",
+      border: "var(--calendar-color-4-border)",
+      text: "var(--calendar-color-4-text)",
     },
     "5": {
-      bg: "rgba(245, 158, 11, 0.1)",
-      border: "rgba(245, 158, 11, 0.2)",
-      text: "#fbbf24",
+      bg: "var(--calendar-color-5-bg)",
+      border: "var(--calendar-color-5-border)",
+      text: "var(--calendar-color-5-text)",
     },
     "6": {
-      bg: "rgba(239, 68, 68, 0.1)",
-      border: "rgba(239, 68, 68, 0.2)",
-      text: "#f87171",
+      bg: "var(--calendar-color-6-bg)",
+      border: "var(--calendar-color-6-border)",
+      text: "var(--calendar-color-6-text)",
     },
     "7": {
-      bg: "rgba(14, 165, 233, 0.1)",
-      border: "rgba(14, 165, 233, 0.2)",
-      text: "#7dd3fc",
+      bg: "var(--calendar-color-7-bg)",
+      border: "var(--calendar-color-7-border)",
+      text: "var(--calendar-color-7-text)",
     },
     "8": {
-      bg: "rgba(100, 116, 139, 0.1)",
-      border: "rgba(100, 116, 139, 0.2)",
-      text: "#94a3b8",
+      bg: "var(--calendar-color-8-bg)",
+      border: "var(--calendar-color-8-border)",
+      text: "var(--calendar-color-8-text)",
     },
     "9": {
-      bg: "rgba(59, 130, 246, 0.1)",
-      border: "rgba(59, 130, 246, 0.2)",
-      text: "#60a5fa",
+      bg: "var(--calendar-color-9-bg)",
+      border: "var(--calendar-color-9-border)",
+      text: "var(--calendar-color-9-text)",
     },
     "10": {
-      bg: "rgba(16, 185, 129, 0.1)",
-      border: "rgba(16, 185, 129, 0.2)",
-      text: "#34d399",
+      bg: "var(--calendar-color-10-bg)",
+      border: "var(--calendar-color-10-border)",
+      text: "var(--calendar-color-10-text)",
     },
     "11": {
-      bg: "rgba(124, 58, 237, 0.1)",
-      border: "rgba(124, 58, 237, 0.2)",
-      text: "#a78bfa",
+      bg: "var(--calendar-color-11-bg)",
+      border: "var(--calendar-color-11-border)",
+      text: "var(--calendar-color-11-text)",
     },
   };
 
@@ -416,7 +411,7 @@ export default function CalendarPage() {
       <header className="flex flex-col md:flex-row items-center justify-between px-6 py-3 border-b border-white/10 gap-4 bg-black/20 backdrop-blur-md">
         <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-[0_0_15px_rgba(145,36,255,0.1)] transition-transform hover:scale-110">
+            <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-glow transition-transform hover:scale-110">
               <CalendarIcon size={24} />
             </div>
             <span className="text-2xl font-bold tracking-tight text-gradient capitalize">
@@ -424,7 +419,7 @@ export default function CalendarPage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-1 ml-4 bg-slate-900/50 p-1 rounded-xl border border-white/5">
+          <div className="flex items-center gap-1 ml-4 bg-background-secondary p-1 rounded-xl border border-white/5">
             <Button
               variant="ghost"
               size="icon"
@@ -500,7 +495,7 @@ export default function CalendarPage() {
             <Plus className="w-5 h-5 mr-1" /> Novo Evento
           </Button>
 
-          <div className="flex bg-slate-900/80 p-1.5 rounded-xl border border-white/10">
+          <div className="flex bg-background-secondary p-1.5 rounded-xl border border-white/10">
             {["timeGridWeek", "dayGridMonth"].map((view) => (
               <button
                 key={view}
@@ -523,7 +518,12 @@ export default function CalendarPage() {
         </div>
       </header>
 
-      <div className="flex-1 relative p-4 calendar-wrapper overflow-hidden flex flex-row">
+      <div
+        className={cn(
+          "flex-1 relative p-4 calendar-wrapper overflow-hidden flex flex-row",
+          styles.calendarWrapper,
+        )}
+      >
         {loading && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/20 backdrop-blur-sm">
             <Loader2 className="w-12 h-12 animate-spin text-primary shadow-glow" />
@@ -608,7 +608,7 @@ export default function CalendarPage() {
                     className={cn(
                       "text-lg font-bold w-7 h-7 flex items-center justify-center rounded-sm transition-all",
                       args.isToday
-                        ? "bg-primary text-white shadow-[0_0_12px_rgba(145,36,255,0.5)]"
+                        ? "bg-primary text-white shadow-glow"
                         : "text-slate-300",
                     )}
                   >
@@ -714,7 +714,7 @@ export default function CalendarPage() {
 
       {modal.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in zoom-in duration-300">
-          <div className="bg-slate-900/90 border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-8 glass overflow-y-auto max-h-screen">
+          <div className="bg-background-secondary border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-8 glass overflow-y-auto max-h-screen">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gradient">
                 {modal.mode === "create" ? "Novo Evento" : "Editar Evento"}
@@ -825,16 +825,16 @@ export default function CalendarPage() {
                     }
                     className="w-full bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 text-yellow-400 focus:ring-2 focus:ring-yellow-500 outline-none transition-all"
                   >
-                    <option value="this" className="bg-slate-900 text-white">
+                    <option value="this" className="bg-background text-white">
                       Apenas este evento
                     </option>
                     <option
                       value="following"
-                      className="bg-slate-900 text-white"
+                      className="bg-background text-white"
                     >
                       Este e os seguintes
                     </option>
-                    <option value="all" className="bg-slate-900 text-white">
+                    <option value="all" className="bg-background text-white">
                       Todos os eventos
                     </option>
                   </select>
@@ -854,13 +854,13 @@ export default function CalendarPage() {
                       }
                       className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner"
                     >
-                      <option value="NONE" className="bg-slate-900">
+                      <option value="NONE" className="bg-background">
                         Não se repete
                       </option>
-                      <option value="DAILY" className="bg-slate-900">
+                      <option value="DAILY" className="bg-background">
                         Todos os dias
                       </option>
-                      <option value="WEEKLY" className="bg-slate-900">
+                      <option value="WEEKLY" className="bg-background">
                         Semanalmente (Escolher dias)
                       </option>
                     </select>
@@ -954,245 +954,7 @@ export default function CalendarPage() {
         </div>
       )}
 
-      {/* Mantém todos os estilos CSS do <style jsx global> ... */}
-      <style jsx global>{`
-        /* Seus estilos originais da tag style ... */
-        .calendar-wrapper .fc {
-          --fc-border-color: rgba(255, 255, 255, 0.03);
-          --fc-today-bg-color: rgba(145, 36, 255, 0.05);
-          background: transparent;
-        }
 
-        .fc-theme-standard .fc-scrollgrid {
-          border: none !important;
-        }
-
-        .fc-event,
-        .fc-timegrid-event {
-          padding: 4px 8px !important;
-          margin: 2px 4px !important;
-          cursor: pointer;
-          transition: all 0.2s ease !important;
-          background-clip: padding-box;
-        }
-
-        .fc-v-event .fc-event-main,
-        .fc-event-title,
-        .fc-event-time {
-          color: inherit !important;
-          font-weight: 700 !important;
-          font-size: 0.75rem !important;
-        }
-
-        .fc-event:hover {
-          transform: scale(1.02) !important;
-          filter: brightness(1.2);
-          z-index: 50;
-        }
-
-        .fc-col-header-cell-cushion {
-          color: unset !important;
-          font-weight: unset !important;
-          font-size: unset !important;
-          padding: 0 !important;
-          text-transform: unset !important;
-          text-decoration: none !important;
-        }
-
-        .fc-col-header-cell {
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-        }
-
-        .fc-daygrid-day-number {
-          color: #94a3b8;
-          font-size: 0.8rem;
-          padding: 12px !important;
-          font-weight: 600;
-        }
-
-        .fc-timegrid-event {
-          border-radius: 12px !important;
-          box-shadow: none !important;
-          padding: 6px 10px !important;
-        }
-
-        .fc-timegrid-event:hover {
-          transform: scale(1.05) !important;
-        }
-
-        .fc-timegrid-slot-label-cushion {
-          color: #64748b;
-          font-size: 0.7rem;
-        }
-
-        .fc-daygrid-more-link {
-          font-size: 0.7rem;
-          font-weight: bold;
-          color: #64748b !important;
-          padding-left: 8px;
-        }
-        .fc-daygrid-more-link:hover {
-          color: var(--color-primary) !important;
-          background: transparent !important;
-        }
-
-        /* --- ESTILOS DO POPOVER (Eventos Extras) --- */
-        .fc-theme-standard .fc-popover {
-          background: rgba(15, 23, 42, 0.95) !important;
-          backdrop-filter: blur(16px) !important;
-          border: 1px solid rgba(255, 255, 255, 0.1) !important;
-          border-radius: 12px !important;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-          z-index: 100 !important;
-          overflow: hidden;
-        }
-
-        .fc-theme-standard .fc-popover-header {
-          background: rgba(0, 0, 0, 0.2) !important;
-          color: #f8fafc !important;
-          padding: 12px 16px !important;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-        }
-
-        .fc-theme-standard .fc-popover-title {
-          font-weight: 700 !important;
-          font-size: 0.85rem !important;
-          letter-spacing: 0.02em;
-        }
-
-        .fc-popover-close {
-          color: #94a3b8 !important;
-          opacity: 1 !important;
-          transition: color 0.2s ease !important;
-          cursor: pointer;
-        }
-
-        .fc-popover-close:hover {
-          color: #ffffff !important;
-          background: transparent !important;
-        }
-
-        .fc-theme-standard .fc-popover-body {
-          padding: 12px !important;
-          background: transparent !important;
-        }
-
-        .fc-popover-body .fc-daygrid-event-harness {
-          margin-bottom: 6px !important;
-        }
-
-        /* -------------------------------------------------- */
-        /* ESTILOS ESPECÍFICOS PARA A VISÃO MENSAL (CARDS)    */
-        /* -------------------------------------------------- */
-
-        /* Remove todas as bordas internas e externas da tabela na visão mensal */
-        .fc-theme-standard td,
-        .fc-theme-standard th {
-          border: none !important;
-        }
-
-        /* Cria o efeito de "Card" solto para cada dia na visão mensal */
-        .fc-daygrid-day-frame {
-          background-color: rgba(
-            15,
-            23,
-            42,
-            0.4
-          ); /* Fundo escuro sutil (slate-900) */
-          border-radius: 12px;
-          margin: 6px !important; /* Cria o "espaço" entre os cards */
-          padding: 8px !important;
-          min-height: 120px !important;
-          transition: background-color 0.2s ease;
-        }
-
-        .fc-daygrid-day-frame:hover {
-          background-color: rgba(
-            15,
-            23,
-            42,
-            0.7
-          ); /* Efeito hover no card inteiro */
-        }
-
-        /* Alinha o número do dia lá no topo à esquerda */
-        .fc-daygrid-day-top {
-          flex-direction: row !important;
-          justify-content: flex-start !important;
-          margin-bottom: 8px;
-        }
-
-        .fc-daygrid-day-number {
-          color: #f8fafc !important; /* Cor branca/clara para o dia */
-          font-weight: 700 !important;
-          font-size: 0.9rem !important;
-          padding: 4px 8px !important;
-        }
-
-        /* ESTILIZAÇÃO EXCLUSIVA DO DIA ATUAL (HOJE) NA VISÃO MENSAL */
-        .fc-day-today .fc-daygrid-day-frame {
-          border: 1px solid rgba(59, 130, 246, 0.4) !important; /* Borda azul sutil */
-          background-color: rgba(
-            30,
-            58,
-            138,
-            0.15
-          ) !important; /* Fundo azul escuro */
-        }
-
-        .fc-day-today .fc-daygrid-day-number {
-          background-color: #3b82f6 !important; /* Círculo azul vibrante para o dia de hoje */
-          color: #ffffff !important;
-          border-radius: 50%;
-          width: 28px;
-          height: 28px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0 !important;
-          margin-left: 4px;
-        }
-
-        /* Ajustes no Link "+X mais" (caso tenha muitos eventos num dia) */
-        .fc-daygrid-more-link {
-          margin-top: 4px;
-          display: inline-block;
-        }
-        /* -------------------------------------------------- */
-        /* AJUSTES FINAIS: DIAS VAZIOS E FONTES (MÊS)         */
-        /* -------------------------------------------------- */
-
-        /* 1. Mata a variável nativa do FullCalendar que causa o cinza de fundo */
-        .calendar-wrapper .fc {
-          --fc-neutral-bg-color: transparent !important;
-        }
-
-        /* 2. Garante que a célula original da tabela fique invisível */
-        .fc-theme-standard td.fc-day-other,
-        .fc-day-other,
-        .fc-day-other .fc-daygrid-day-bg {
-          background: transparent !important;
-          background-color: transparent !important;
-          border: none !important;
-        }
-
-        /* 3. Aplica o visual de "Card Apagado" no frame do dia */
-        .fc-day-other .fc-daygrid-day-frame {
-          background-color: rgba(15, 23, 42, 0.4) !important;
-          opacity: 0.5; /* Dá o efeito de dia fora do mês igual à referência */
-          border-radius: 12px;
-          margin: 6px !important;
-          min-height: 120px !important;
-        }
-
-        /* 4. Tira o negrito e diminui a fonte dos eventos APENAS na visão Mensal */
-        .fc-daygrid-event .fc-event-title,
-        .fc-daygrid-event .fc-event-time {
-          font-weight: 400 !important; /* Tira o negrito */
-          font-size: 0.65rem !important; /* Fonte menor (o padrão estava 0.75rem) */
-          letter-spacing: 0.02em; /* Dá um respiro entre as letras */
-        }
-      `}</style>
     </div>
   );
 }

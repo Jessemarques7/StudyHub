@@ -42,11 +42,10 @@ export const Mention = createReactInlineContentSpec(
         <Link
           href={`/notes/${id}`}
           style={{
-            // backgroundColor: "#9124ff",
             textDecoration: "none",
             padding: "2px 4px",
             borderRadius: "4px",
-            color: "#9124ff",
+            color: "var(--brand-purple)",
             transition: "all 0.2s ease",
             fontWeight: "bold",
           }}

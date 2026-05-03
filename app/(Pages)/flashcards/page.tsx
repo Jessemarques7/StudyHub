@@ -1,4 +1,7 @@
 "use client";
+
+import "../../stars.css";
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -106,7 +109,7 @@ export default function Index() {
   };
 
   return (
-    <div className="relative mt-24 bg-background ">
+    <div className="relative bg-background ">
       {/* Background Elements */}
       <div className="stars"></div>
       <div className="nebula"></div>
