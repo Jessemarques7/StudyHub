@@ -73,8 +73,12 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
           .eq("user_id", user.id)
           .order("updated_at", { ascending: false });
 
-        if (foldersData) setFolders(foldersData.map(mapFolderFromSupabase));
-        if (diagramsData) setDiagrams(diagramsData.map(mapDiagramFromSupabase));
+        if (foldersData)
+          setFolders(
+            (foldersData as DiagramFolderRow[]).map(mapFolderFromSupabase),
+          );
+        if (diagramsData)
+          setDiagrams((diagramsData as DiagramRow[]).map(mapDiagramFromSupabase));
       } catch (error) {
         console.error("Erro ao carregar diagramas:", error);
       }
@@ -91,7 +95,10 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
       .select()
       .single();
     if (!error && data) {
-      setFolders((prev) => [...prev, mapFolderFromSupabase(data)]);
+      setFolders((prev) => [
+        ...prev,
+        mapFolderFromSupabase(data as DiagramFolderRow),
+      ]);
     }
   }, [supabase, userId]);
 
@@ -145,7 +152,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
 
-      const newDiagram = mapDiagramFromSupabase(data);
+      const newDiagram = mapDiagramFromSupabase(data as DiagramRow);
       setDiagrams((prev) => [newDiagram, ...prev]);
       return newDiagram;
     },

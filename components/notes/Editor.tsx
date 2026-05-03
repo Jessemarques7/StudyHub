@@ -25,8 +25,17 @@ export default function Editor() {
 
   // Sincroniza estado local do título apenas quando a nota muda de fato
   useEffect(() => {
-    if (currentNote) setTitle(currentNote.title);
-  }, [currentNote?.id, currentNote?.title]);
+    if (!currentNote) return;
+
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) setTitle(currentNote.title);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentNote]);
 
   // Debounce para o conteúdo (evita salvar a cada letra digitada)
   const debouncedUpdateContent = useMemo(

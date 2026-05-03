@@ -20,7 +20,10 @@ const passwordSchema = z
     path: ["confirmPassword"],
   });
 
-export async function updateProfileName(prevState: any, formData: FormData) {
+export async function updateProfileName(
+  _prevState: unknown,
+  formData: FormData,
+) {
   const supabase = await createClient();
 
   // Verifica se o usuário está autenticado
@@ -48,7 +51,7 @@ export async function updateProfileName(prevState: any, formData: FormData) {
   return { success: "Nome atualizado com sucesso!" };
 }
 
-export async function updatePassword(prevState: any, formData: FormData) {
+export async function updatePassword(_prevState: unknown, formData: FormData) {
   const supabase = await createClient();
 
   const password = formData.get("password") as string;

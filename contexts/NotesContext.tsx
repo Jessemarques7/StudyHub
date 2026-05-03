@@ -78,10 +78,10 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       ]);
 
       if (foldersRes.data) {
-        setFolders(foldersRes.data.map(mapFolder));
+        setFolders((foldersRes.data as FolderRow[]).map(mapFolder));
       }
       if (notesRes.data) {
-        setNotes(notesRes.data.map(mapNote));
+        setNotes((notesRes.data as NoteRow[]).map(mapNote));
       }
     }
     loadData();
@@ -171,7 +171,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 
         if (error) throw error;
 
-        const confirmedNote = mapNote(data);
+        const confirmedNote = mapNote(data as NoteRow);
         setNotes((prev) =>
           prev.map((n) => (n.id === tempId ? confirmedNote : n))
         );
@@ -233,7 +233,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
 
-      const createdFolder = mapFolder(data);
+      const createdFolder = mapFolder(data as FolderRow);
 
       setFolders((prev) =>
         prev.map((f) => (f.id === tempId ? createdFolder : f))

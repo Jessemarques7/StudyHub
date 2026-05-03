@@ -258,7 +258,7 @@ function HabitIconPicker({
         {tab === "emoji" && (
           <div className="mb-2 w-full rounded-lg overflow-hidden flex justify-center custom-emoji-picker-container">
             <EmojiPicker
-              theme="dark"
+              theme={"dark" as never}
               onEmojiClick={(emojiData) => {
                 onSelect(emojiData.emoji);
                 handleClose();
@@ -1127,16 +1127,12 @@ export default function App() {
         </section>
       </main>
 
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
+      <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
         main { animation: fade-in 0.8s ease-out; }
-      `,
-        }}
-      />
+      `}</style>
     </div>
   );
 }

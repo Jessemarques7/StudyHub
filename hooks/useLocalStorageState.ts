@@ -24,14 +24,24 @@ export function useLocalStorage<T>(
   const [storedValue, setStoredValue] = useState<T>(initialValue);
 
   useEffect(() => {
+    let cancelled = false;
     try {
       if (typeof window !== "undefined") {
         const item = window.localStorage.getItem(key);
-        if (item) setStoredValue(deserializer(item));
+        if (item) {
+          const nextValue = deserializer(item);
+          queueMicrotask(() => {
+            if (!cancelled) setStoredValue(nextValue);
+          });
+        }
       }
     } catch (error) {
       console.warn(`Erro localStorage "${key}":`, error);
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [key, deserializer]);
 
   const setValue: Dispatch<SetStateAction<T>> = useCallback(

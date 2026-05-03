@@ -5,6 +5,27 @@ import { createClient } from "@/utils/supabase/server";
 const GOOGLE_CALENDAR_URL =
   "https://www.googleapis.com/calendar/v3/calendars/primary/events";
 
+interface CalendarRequestBody {
+  title?: string;
+  description?: string;
+  start?: string;
+  end?: string;
+  timeZone?: string;
+  colorId?: string;
+  recurrence?: string[];
+  updateMode?: "this" | "all" | "following";
+  recurringEventId?: string;
+}
+
+interface GoogleCalendarEventPayload {
+  summary?: string;
+  description?: string;
+  start?: { dateTime?: string; timeZone: string };
+  end?: { dateTime?: string; timeZone: string };
+  colorId?: string;
+  recurrence?: string[];
+}
+
 // Helper simples para pegar o token que o frontend enviou
 function getTokenFromHeader(request: Request) {
   const authHeader = request.headers.get("Authorization");
@@ -90,12 +111,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = await request.json();
+    const body = (await request.json()) as CalendarRequestBody;
 
     // Fallback para um timezone padrão caso não venha no body
     const timeZone = body.timeZone || "America/Sao_Paulo";
 
-    const event: any = {
+    const event: GoogleCalendarEventPayload = {
       summary: body.title,
       description: body.description,
       // O Google exige o timeZone quando há recurrence!
@@ -141,13 +162,13 @@ export async function PATCH(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const eventId = searchParams.get("eventId");
-    const body = await request.json();
+    const body = (await request.json()) as CalendarRequestBody;
 
     if (!eventId)
       return NextResponse.json({ error: "Missing eventId" }, { status: 400 });
 
     const timeZone = body.timeZone || "America/Sao_Paulo";
-    const eventUpdates: any = {};
+    const eventUpdates: GoogleCalendarEventPayload = {};
 
     if (body.title) eventUpdates.summary = body.title;
     if (body.description) eventUpdates.description = body.description;

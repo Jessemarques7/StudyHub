@@ -50,7 +50,7 @@ function mapFlashcard(row: FlashcardRow): Flashcard {
     backImageUrl: row.back_image_url ?? undefined,
     backAudioUrl: row.back_audio_url ?? undefined,
     multipleChoiceOptions:
-      (row.multiple_choice_options as Flashcard["multipleChoiceOptions"]) ??
+      (row.multiple_choice_options as unknown as Flashcard["multipleChoiceOptions"]) ??
       undefined,
     tags: row.tags || [],
     easeFactor: row.ease_factor,
@@ -79,7 +79,7 @@ export async function getAllDecks(): Promise<Deck[]> {
 
   if (error) throw error;
 
-  return data.map(mapDeck);
+  return (data as DeckRow[]).map(mapDeck);
 }
 
 export async function saveDeck(deck: Deck): Promise<void> {
@@ -122,7 +122,7 @@ export async function getCardsByDeck(deckId: string): Promise<Flashcard[]> {
 
   if (error) throw error;
 
-  return data.map(mapFlashcard);
+  return (data as FlashcardRow[]).map(mapFlashcard);
 }
 
 export async function getCardCountsByDeck(

@@ -13,11 +13,12 @@ function normalizeCompletedDates(
     return {};
   }
 
-  return Object.fromEntries(
-    Object.entries(value).filter(
-      ([date, completed]) => typeof date === "string" && completed === true,
-    ),
+  const completedEntries = Object.entries(value).filter(
+    (entry): entry is [string, true] =>
+      typeof entry[0] === "string" && entry[1] === true,
   );
+
+  return Object.fromEntries(completedEntries);
 }
 
 function mapHabit(row: HabitRow): Habit {
@@ -64,7 +65,7 @@ export async function getAllHabits(): Promise<Habit[]> {
     throw error;
   }
 
-  return (data ?? []).map(mapHabit);
+  return ((data ?? []) as HabitRow[]).map(mapHabit);
 }
 
 export async function createHabit(input: CreateHabitInput): Promise<Habit> {
@@ -86,7 +87,7 @@ export async function createHabit(input: CreateHabitInput): Promise<Habit> {
     throw error;
   }
 
-  return mapHabit(data);
+  return mapHabit(data as HabitRow);
 }
 
 export async function createManyHabits(
@@ -116,7 +117,7 @@ export async function createManyHabits(
     throw error;
   }
 
-  return (data ?? []).map(mapHabit);
+  return ((data ?? []) as HabitRow[]).map(mapHabit);
 }
 
 export async function updateHabit(
@@ -159,7 +160,7 @@ export async function updateHabit(
     throw error;
   }
 
-  return mapHabit(data);
+  return mapHabit(data as HabitRow);
 }
 
 export async function deleteHabit(id: string): Promise<void> {

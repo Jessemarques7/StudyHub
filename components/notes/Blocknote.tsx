@@ -13,6 +13,7 @@ import { BlockNoteView } from "@blocknote/shadcn";
 import {
   Block,
   BlockNoteSchema,
+  PartialBlock,
   defaultInlineContentSpecs,
   filterSuggestionItems,
 } from "@blocknote/core";
@@ -92,7 +93,7 @@ export default function Blocknote({
     schema,
     initialContent:
       currentNote.content && currentNote.content.length > 0
-        ? (currentNote.content as any) // Cast initial content if needed
+        ? (currentNote.content as PartialBlock[])
         : undefined,
     uploadFile,
   });

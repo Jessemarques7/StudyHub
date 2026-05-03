@@ -181,7 +181,7 @@ export function NoteHeader({
                           "var(--color-slate-700)",
                       } as React.CSSProperties
                     }
-                    theme="dark"
+                    theme={"dark" as never}
                     onEmojiClick={handleEmojiSelect}
                   />
                 </div>

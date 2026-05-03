@@ -6,6 +6,7 @@ import {
   getBezierPath,
   type EdgeProps,
   useReactFlow,
+  MarkerType,
 } from "@xyflow/react";
 import {
   IconPalette,
@@ -41,10 +42,10 @@ function CustomEdge({ id, selected, style, markerEnd, ...props }: EdgeProps) {
 
           if (typeof newMarkerEnd === "string") {
             // If it's a string, convert to object
-            newMarkerEnd = { type: newMarkerEnd as any, color: color };
+            newMarkerEnd = { type: newMarkerEnd as MarkerType, color };
           } else if (newMarkerEnd && typeof newMarkerEnd === "object") {
             // If it's an object, we can safely spread it
-            newMarkerEnd = { ...newMarkerEnd, color: color };
+            newMarkerEnd = { ...newMarkerEnd, color };
           }
 
           return {

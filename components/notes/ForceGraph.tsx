@@ -12,16 +12,16 @@ const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
 
 // Define types for our data structure
 interface NodeObject {
-  id: string;
-  name: string;
+  id?: string | number;
+  name?: string;
   val?: number;
   x?: number;
   y?: number;
 }
 
 interface LinkObject {
-  source: string;
-  target: string;
+  source?: string | number | NodeObject;
+  target?: string | number | NodeObject;
 }
 
 interface GraphData {
@@ -33,17 +33,17 @@ interface ForceGraphProps {
   data: GraphData;
 }
 
+const getNodeId = (node: string | number | NodeObject | undefined): string | null => {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (node?.id !== undefined) return String(node.id);
+  return null;
+};
+
 function ForceGraphComponent({ data }: ForceGraphProps) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isClient, setIsClient] = useState(false);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-
-  // This effect runs only on the client, ensuring window is available
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   // Resize observer to track container dimensions
   useEffect(() => {
@@ -69,26 +69,20 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
     return () => {
       resizeObserver.disconnect();
     };
-  }, [isClient]);
+  }, []);
 
-  if (!isClient) {
-    // Render a placeholder or nothing on the server
-    return <div ref={containerRef} className="w-full h-full" />;
-  }
-
-  // Use 'any' to satisfy the library's strict type checking against its own internal types
-  function handleNodeClick(node: any) {
-    if (node && node.id) {
+  function handleNodeClick(node: NodeObject | null) {
+    if (node?.id !== undefined) {
       router.push(`/notes/${node.id}`);
     }
   }
 
-  function handleNodeHover(node: any) {
-    setHoveredNodeId(node ? node.id : null);
+  function handleNodeHover(node: NodeObject | null) {
+    setHoveredNodeId(getNodeId(node ?? undefined));
   }
 
   function drawNode(
-    node: any,
+    node: NodeObject,
     ctx: CanvasRenderingContext2D,
     globalScale: number,
   ) {
@@ -96,7 +90,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
     const x = node.x ?? 0;
     const y = node.y ?? 0;
 
-    const isHovered = node.id === hoveredNodeId;
+    const isHovered = getNodeId(node) === hoveredNodeId;
     const nodeRadius = Math.sqrt(node.val || 1) * (isHovered ? 1.5 : 1);
 
     // Draw the node circle
@@ -106,7 +100,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
     ctx.fill();
 
     // Draw the label below the node
-    const label = node.name;
+    const label = node.name ?? "";
     const fontSize = 10 / globalScale;
     ctx.font = `${fontSize}px Sans-Serif`;
     ctx.textAlign = "center";
@@ -122,7 +116,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
           graphData={data}
           nodeCanvasObject={drawNode}
           nodePointerAreaPaint={(
-            node: any,
+            node: NodeObject,
             color: string,
             ctx: CanvasRenderingContext2D,
             globalScale: number,
@@ -132,7 +126,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
             const nodeRadius = Math.sqrt(node.val || 1);
 
             // Measure text width for accurate hit detection
-            const label = node.name;
+            const label = node.name ?? "";
             const fontSize = 10 / globalScale;
             ctx.font = `${fontSize}px Sans-Serif`;
             const textWidth = ctx.measureText(label).width;
@@ -155,9 +149,9 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
           }}
           onNodeClick={handleNodeClick}
           onNodeHover={handleNodeHover}
-          linkWidth={(link: any) =>
-            link.source?.id === hoveredNodeId ||
-            link.target?.id === hoveredNodeId
+          linkWidth={(link: LinkObject) =>
+            getNodeId(link.source) === hoveredNodeId ||
+            getNodeId(link.target) === hoveredNodeId
               ? 1.5
               : 1
           }
@@ -169,9 +163,9 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
           width={dimensions.width}
           height={dimensions.height}
           backgroundColor="transparent"
-          linkColor={(link: any) =>
-            link.source?.id === hoveredNodeId ||
-            link.target?.id === hoveredNodeId
+          linkColor={(link: LinkObject) =>
+            getNodeId(link.source) === hoveredNodeId ||
+            getNodeId(link.target) === hoveredNodeId
               ? "#d88ef8bd"
               : "#ffffff33"
           }

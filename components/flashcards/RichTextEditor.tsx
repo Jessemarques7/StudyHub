@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Bold, Italic, Underline, Image, Mic, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,15 +26,15 @@ export function RichTextEditor({
   const editorRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const isInitializedRef = useRef(false);
 
   // Initialize content only once
   useEffect(() => {
-    if (editorRef.current && !isInitialized && value) {
+    if (editorRef.current && !isInitializedRef.current && value) {
       editorRef.current.innerHTML = value;
-      setIsInitialized(true);
+      isInitializedRef.current = true;
     }
-  }, [value, isInitialized]);
+  }, [value]);
 
   const applyFormat = (command: string, value?: string) => {
     document.execCommand(command, false, value);

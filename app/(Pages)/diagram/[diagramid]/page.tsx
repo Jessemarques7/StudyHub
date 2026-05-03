@@ -25,6 +25,7 @@ import {
   type OnEdgesChange,
   type OnConnect,
   type OnReconnect,
+  type OnConnectEnd,
   type NodeChange,
   type EdgeChange,
   type Connection,
@@ -35,7 +36,6 @@ import "@xyflow/react/dist/style.css";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useDiagrams } from "@/contexts/DiagramsContext";
-import NotesList from "@/components/notes/NotesList";
 import DiagramsList from "@/components/diagram/DiagramsList";
 
 // Configurações e Tipos
@@ -77,8 +77,15 @@ function Flow() {
     if (diagramid) {
       const diagram = getDiagram(diagramid);
       if (diagram && diagram.content) {
-        setNodes(diagram.content.nodes || []);
-        setEdges(diagram.content.edges || []);
+        let cancelled = false;
+        queueMicrotask(() => {
+          if (cancelled) return;
+          setNodes(diagram.content.nodes || []);
+          setEdges(diagram.content.edges || []);
+        });
+        return () => {
+          cancelled = true;
+        };
       }
     }
   }, [diagramid, getDiagram]);
@@ -125,13 +132,15 @@ function Flow() {
     [],
   );
 
-  const onReconnectEnd = useCallback((_: any, edge: Edge) => {
+  const onReconnectEnd = useCallback(() => {
     edgeReconnectSuccessful.current = true;
   }, []);
 
-  const onConnectEnd = useCallback(
-    (event: any, connectionState: any) => {
+  const onConnectEnd: OnConnectEnd = useCallback(
+    (event, connectionState) => {
       if (!connectionState.isValid) {
+        if (!connectionState.fromNode || !connectionState.fromHandle) return;
+
         const id = getId();
         const { clientX, clientY } =
           "changedTouches" in event ? event.changedTouches[0] : event;

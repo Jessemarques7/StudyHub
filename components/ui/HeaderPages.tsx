@@ -13,7 +13,6 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import Image from "next/image";
-import { FloatingNav } from "./floating-navbar";
 
 export default async function HeaderPages() {
   const supabase = await createClient();

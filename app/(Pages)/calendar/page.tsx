@@ -43,6 +43,70 @@ interface EventModalState {
   updateMode?: "this" | "all" | "following";
 }
 
+type CalendarUpdateMode = NonNullable<EventModalState["updateMode"]>;
+
+interface GoogleCalendarEvent {
+  id: string;
+  summary?: string;
+  description?: string;
+  colorId?: string;
+  recurringEventId?: string;
+  start: {
+    dateTime?: string;
+    date?: string;
+  };
+  end: {
+    dateTime?: string;
+    date?: string;
+  };
+}
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  start?: string;
+  end?: string;
+  allDay: boolean;
+  extendedProps: {
+    description?: string;
+    theme: { bg: string; border: string; text: string };
+    colorId: string;
+    recurringEventId?: string;
+  };
+}
+
+interface CalendarEventUpdate {
+  title?: string;
+  description?: string;
+  start?: string;
+  end?: string;
+  colorId?: string;
+  updateMode?: CalendarUpdateMode;
+}
+
+interface CalendarSelectInfo {
+  startStr: string;
+  endStr: string;
+}
+
+interface CalendarEventMoveInfo {
+  event: {
+    id: string;
+    startStr: string;
+    endStr?: string;
+  };
+}
+
+interface CalendarDatesSetInfo {
+  view: {
+    title: string;
+    activeStart?: Date;
+    activeEnd?: Date;
+  };
+  startStr: string;
+  endStr: string;
+}
+
 const DAYS_OF_WEEK = [
   { value: "SU", label: "Dom" },
   { value: "MO", label: "Seg" },
@@ -66,7 +130,7 @@ const formatDateTimeLocal = (dateStr: string) => {
 };
 
 export default function CalendarPage() {
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const calendarRef = useRef<FullCalendar>(null);
 
@@ -230,8 +294,8 @@ export default function CalendarPage() {
       const res = await fetch(`/api/calendar?${params.toString()}`, {
         headers: { Authorization: `Bearer ${providerToken}` },
       });
-      const rawData = await res.json();
-      return rawData.map((event: any) => ({
+      const rawData = (await res.json()) as GoogleCalendarEvent[];
+      return rawData.map((event) => ({
         id: event.id,
         title: event.summary || "Sem título",
         start: event.start.dateTime || event.start.date,
@@ -291,14 +355,14 @@ export default function CalendarPage() {
       toast({ title: "Evento criado com sucesso!" });
       setModal({ ...modal, isOpen: false });
       refreshCalendar();
-    } catch (error) {
+    } catch {
       toast({ title: "Erro ao criar", variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUpdateEvent = async (id: string, updates: any) => {
+  const handleUpdateEvent = async (id: string, updates: CalendarEventUpdate) => {
     try {
       setLoading(true);
       const token = await getProviderToken();
@@ -325,7 +389,7 @@ export default function CalendarPage() {
       toast({ title: "Evento atualizado!" });
       if (modal.isOpen) setModal({ ...modal, isOpen: false });
       refreshCalendar();
-    } catch (error) {
+    } catch {
       toast({ title: "Erro ao atualizar", variant: "destructive" });
       refreshCalendar();
     } finally {
@@ -347,14 +411,14 @@ export default function CalendarPage() {
       toast({ title: "Evento excluído!" });
       setModal({ ...modal, isOpen: false });
       refreshCalendar();
-    } catch (error) {
+    } catch {
       toast({ title: "Erro ao excluir", variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDateSelect = (selectInfo: any) => {
+  const handleDateSelect = (selectInfo: CalendarSelectInfo) => {
     setModal({
       isOpen: true,
       mode: "create",
@@ -368,7 +432,7 @@ export default function CalendarPage() {
     });
   };
 
-  const handleEventDrop = (info: any) => {
+  const handleEventDrop = (info: CalendarEventMoveInfo) => {
     handleUpdateEvent(info.event.id, {
       start: info.event.startStr,
       end: info.event.endStr || info.event.startStr,
@@ -376,7 +440,7 @@ export default function CalendarPage() {
     });
   };
 
-  const handleEventResize = (info: any) => {
+  const handleEventResize = (info: CalendarEventMoveInfo) => {
     handleUpdateEvent(info.event.id, {
       start: info.event.startStr,
       end: info.event.endStr || info.event.startStr,
@@ -395,7 +459,7 @@ export default function CalendarPage() {
     }
   };
 
-  const handleDatesSet = async (dateInfo: any) => {
+  const handleDatesSet = async (dateInfo: CalendarDatesSetInfo) => {
     setLoading(true);
     setCurrentDateTitle(dateInfo.view.title);
     const googleEvents = await fetchGoogleEvents(
@@ -821,7 +885,10 @@ export default function CalendarPage() {
                   <select
                     value={modal.updateMode}
                     onChange={(e) =>
-                      setModal({ ...modal, updateMode: e.target.value as any })
+                      setModal({
+                        ...modal,
+                        updateMode: e.target.value as CalendarUpdateMode,
+                      })
                     }
                     className="w-full bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 text-yellow-400 focus:ring-2 focus:ring-yellow-500 outline-none transition-all"
                   >

@@ -125,7 +125,7 @@ export default function DeckView() {
   }
 
   return (
-    <div className="mt-32 bg-background p-4">
+    <div className="bg-background p-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -256,7 +256,8 @@ export default function DeckView() {
             <Card className="glass">
               <CardContent className="p-12 text-center">
                 <p className="text-muted-foreground">
-                  No cards yet. Click "Add Card" to create your first one!
+                  No cards yet. Click &quot;Add Card&quot; to create your first
+                  one!
                 </p>
               </CardContent>
             </Card>
