@@ -326,7 +326,7 @@
 @theme {
   /* Colors */
   --color-background: rgb(2, 6, 23);
-  --color-background-secondary: rgba(2, 6, 23, 0.6);
+  --color-background-secondary: rgba(2, 6, 23, 0.8);
 
   --color-foreground: oklch(0.985 0 0);
 

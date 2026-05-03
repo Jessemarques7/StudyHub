@@ -99,7 +99,7 @@ const FloatingDockDesktop = ({
       onMouseLeave={() => mouseY.set(Infinity)}
       className={cn(
         // Vertical layout, fixed to the left, center Y, calendar glass vibe
-        "fixed left-4 top-1/2 -translate-y-1/2 hidden w-16 flex-col items-center gap-6 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md px-3 py-4 md:flex shadow-glow z-50 glass",
+        "fixed left-3 top-1/2 -translate-y-1/2 hidden w-16 flex-col items-center gap-6 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md px-3 py-4 md:flex shadow-glow z-50 glass",
         className,
       )}
     >

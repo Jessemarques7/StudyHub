@@ -244,43 +244,25 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
   }, [open]);
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 mr-8">
       {/* Header Principal */}
       <div className="">
-        <div className="flex items-center justify-between w-full text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-blue-900/30 rounded-md px-2 py-2 transition-colors group">
-          <button
-            onClick={() => setNotesOpen(!notesOpen)}
-            className="flex items-center gap-2 flex-1 min-w-0"
-          >
-            <motion.div
-              animate={{ rotate: notesOpen ? 0 : -90 }}
-              transition={{ duration: 0.2 }}
-            >
-              <IconChevronDown className="h-4 w-4" />
-            </motion.div>
-            <motion.span
-              animate={{ opacity: open ? 1 : 0, width: open ? "auto" : 0 }}
-              className="text-sm font-medium whitespace-nowrap overflow-hidden"
-            >
-              Notes
-            </motion.span>
-          </button>
-
+        <div className="flex items-center justify-between w-full text-neutral-700 dark:text-neutral-200  rounded-md px-2 py-2 transition-colors group">
           {/* Botões de Ação Global (Nova Nota / Nova Pasta) */}
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex gap-3 ">
             <motion.button
               onClick={handleCreateFolder}
-              className="p-1 hover:bg-neutral-600 rounded text-neutral-400 hover:text-white"
+              className="p-1 hover:bg-blue-900/20 rounded text-neutral-400 hover:text-white"
               title="New Folder"
             >
-              <IconFolderPlus className="h-4 w-4" />
+              <IconFolderPlus className="h-6 w-6" />
             </motion.button>
             <motion.button
               onClick={() => handleCreateNewNote()}
-              className="p-1 hover:bg-neutral-600 rounded text-neutral-400 hover:text-white"
+              className="p-1 hover:bg-blue-900/20 rounded text-neutral-400 hover:text-white"
               title="New Note"
             >
-              <IconPlus className="h-4 w-4" />
+              <IconPlus className="h-6 w-6" />
             </motion.button>
           </div>
         </div>
@@ -298,9 +280,9 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
           const folderNotes = notes.filter((n) => n.folderId === folder.id);
 
           return (
-            <div key={folder.id} className="relative">
+            <div key={folder.id} className="relative pt-4">
               <div
-                className="group flex items-center justify-between px-2 py-1.5 hover:bg-neutral-200 dark:hover:bg-blue-900/20 rounded-md cursor-pointer text-neutral-600 dark:text-neutral-300"
+                className="group flex items-center justify-between px-2 hover:bg-neutral-200 dark:hover:bg-blue-900/20 rounded-md cursor-pointer text-neutral-600 dark:text-neutral-300"
                 onMouseEnter={() => setHoveredItemId(folder.id)}
                 onMouseLeave={() => setHoveredItemId(null)}
                 onClick={() => toggleFolder(folder.id)}
@@ -325,7 +307,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
                         )}
                       />
                       <IconFolder className="h-3.5 w-3.5 text-blue-400" />
-                      <span className="text-sm truncate">{folder.name}</span>
+                      <span className=" truncate py-1.5 ">{folder.name}</span>
                     </div>
 
                     {/* Ações da Pasta */}

@@ -98,8 +98,8 @@ export default function WorkspacePage() {
   return (
     <div className="relative min-h-screen mt-14 text-foreground bg-background">
       {/* --- Efeitos de Fundo Globais --- */}
-      <div className="stars"></div>
-      <div className="nebula"></div>
+      {/* <div className="stars"></div>
+      <div className="nebula"></div> */}
 
       {/* --- Conteúdo Principal (z-10 para ficar acima do fundo) --- */}
       <div className="relative z-10 flex-1 flex flex-col p-4 md:p-8">
@@ -396,7 +396,7 @@ export default function WorkspacePage() {
               </div>
 
               {/* O componente Graph precisa ter um z-index maior */}
-              <div className="absolute inset-0 z-10">
+              <div className="absolute  inset-0 z-10">
                 <Graph classname="h-full w-full" />
               </div>
             </div>
