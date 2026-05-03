@@ -1,5 +1,6 @@
 // app/api/calendar/route.ts
 import { NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
 
 const GOOGLE_CALENDAR_URL =
   "https://www.googleapis.com/calendar/v3/calendars/primary/events";
@@ -13,8 +14,29 @@ function getTokenFromHeader(request: Request) {
   return null;
 }
 
+async function validateRequest(request: Request) {
+  const origin = request.headers.get("Origin");
+  if (origin && origin !== process.env.NEXT_PUBLIC_SITE_URL) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  return null;
+}
+
 // LISTAR EVENTOS (GET)
 export async function GET(request: Request) {
+  const validationError = await validateRequest(request);
+  if (validationError) return validationError;
+
   const token = getTokenFromHeader(request);
   if (!token) {
     return NextResponse.json(
@@ -42,7 +64,7 @@ export async function GET(request: Request) {
     });
 
     if (!response.ok) {
-      console.error("Google API Error (GET):", await response.text());
+      console.error("Google API Error", response.status);
       throw new Error("Failed to fetch from Google");
     }
 
@@ -59,6 +81,9 @@ export async function GET(request: Request) {
 
 // CRIAR EVENTO (POST)
 export async function POST(request: Request) {
+  const validationError = await validateRequest(request);
+  if (validationError) return validationError;
+
   const token = getTokenFromHeader(request);
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -91,7 +116,7 @@ export async function POST(request: Request) {
     });
 
     if (!response.ok) {
-      console.error("Google API Error (POST):", await response.text());
+      console.error("Google API Error", response.status);
       throw new Error("Failed to create event");
     }
 
@@ -105,6 +130,9 @@ export async function POST(request: Request) {
 
 // ATUALIZAR EVENTO (PATCH)
 export async function PATCH(request: Request) {
+  const validationError = await validateRequest(request);
+  if (validationError) return validationError;
+
   const token = getTokenFromHeader(request);
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -155,7 +183,7 @@ export async function PATCH(request: Request) {
     });
 
     if (!response.ok) {
-      console.error("Google API Error (PATCH):", await response.text());
+      console.error("Google API Error", response.status);
       throw new Error("Failed to update event");
     }
 
@@ -168,6 +196,9 @@ export async function PATCH(request: Request) {
 }
 // DELETAR EVENTO (DELETE)
 export async function DELETE(request: Request) {
+  const validationError = await validateRequest(request);
+  if (validationError) return validationError;
+
   const token = getTokenFromHeader(request);
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -186,7 +217,7 @@ export async function DELETE(request: Request) {
     });
 
     if (!response.ok) {
-      console.error("Google API Error (DELETE):", await response.text());
+      console.error("Google API Error", response.status);
       throw new Error("Failed to delete event");
     }
 

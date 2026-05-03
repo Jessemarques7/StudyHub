@@ -41,7 +41,9 @@ export async function updateSession(request: NextRequest) {
   if (
     (request.nextUrl.pathname.startsWith("/notes") ||
       request.nextUrl.pathname.startsWith("/flashcards") ||
-      request.nextUrl.pathname.startsWith("/diagram")) &&
+      request.nextUrl.pathname.startsWith("/diagram") ||
+      request.nextUrl.pathname.startsWith("/calendar") ||
+      request.nextUrl.pathname.startsWith("/account")) &&
     !user
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
