@@ -1,51 +1,26 @@
 // components/flashcards/DeckCard.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { Deck, Flashcard } from "@/types/flashcard";
+import { Deck } from "@/types/flashcard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Trash2 } from "lucide-react";
-import { getCardsByDeck } from "@/lib/storage";
-import { getDueCards } from "@/lib/spaced-repetition";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface DeckCardProps {
   deck: Deck;
+  totalCards: number;
+  dueCount: number;
   onStudy: (deckId: string) => void;
   onDelete: (deckId: string) => void;
 }
 
-export function DeckCard({ deck, onStudy, onDelete }: DeckCardProps) {
-  const [totalCards, setTotalCards] = useState<number>(0);
-  const [dueCount, setDueCount] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadStats = async () => {
-      try {
-        const cards = await getCardsByDeck(deck.id);
-        if (mounted) {
-          const due = getDueCards(cards);
-          setTotalCards(cards.length);
-          setDueCount(due.length);
-        }
-      } catch (error) {
-        console.error("Failed to load deck stats:", error);
-      } finally {
-        if (mounted) setIsLoading(false);
-      }
-    };
-
-    loadStats();
-
-    return () => {
-      mounted = false;
-    };
-  }, [deck.id]);
-
+export function DeckCard({
+  deck,
+  totalCards,
+  dueCount,
+  onStudy,
+  onDelete,
+}: DeckCardProps) {
   return (
     <Card className="glass hover:shadow-[var(--shadow-glow)] transition-all duration-300 group h-full">
       <CardContent className="p-6 flex flex-col h-full">
@@ -74,25 +49,14 @@ export function DeckCard({ deck, onStudy, onDelete }: DeckCardProps) {
         </div>
 
         <div className="flex gap-4 mb-6 text-sm mt-auto">
-          {isLoading ? (
-            <>
-              <Skeleton className="h-5 w-16" />
-              <Skeleton className="h-5 w-16" />
-            </>
-          ) : (
-            <>
-              <div>
-                <span className="text-muted-foreground">Total: </span>
-                <span className="text-foreground font-medium">
-                  {totalCards}
-                </span>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Due: </span>
-                <span className="text-primary font-medium">{dueCount}</span>
-              </div>
-            </>
-          )}
+          <div>
+            <span className="text-muted-foreground">Total: </span>
+            <span className="text-foreground font-medium">{totalCards}</span>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Due: </span>
+            <span className="text-primary font-medium">{dueCount}</span>
+          </div>
         </div>
 
         <Button
@@ -101,14 +65,10 @@ export function DeckCard({ deck, onStudy, onDelete }: DeckCardProps) {
             onStudy(deck.id);
           }}
           className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity"
-          disabled={isLoading || dueCount === 0}
+          disabled={dueCount === 0}
         >
           <BookOpen className="mr-2 h-4 w-4" />
-          {isLoading
-            ? "Loading..."
-            : dueCount > 0
-            ? `Study Now (${dueCount})`
-            : "No cards due"}
+          {dueCount > 0 ? `Study Now (${dueCount})` : "No cards due"}
         </Button>
       </CardContent>
     </Card>

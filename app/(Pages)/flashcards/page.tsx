@@ -14,7 +14,12 @@ import {
 } from "@/components/ui/dialog";
 import { DeckCard } from "@/components/flashcards/DeckCard";
 import { Deck } from "@/types/flashcard";
-import { getAllDecks, saveDeck, deleteDeck } from "@/lib/storage";
+import {
+  deleteDeck,
+  getAllDecks,
+  getCardCountsByDeck,
+  saveDeck,
+} from "@/lib/storage";
 import { Plus, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -38,11 +43,15 @@ export default function Index() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deckToDelete, setDeckToDelete] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [cardCounts, setCardCounts] = useState<
+    Record<string, { total: number; due: number }>
+  >({});
 
   const loadDecks = async () => {
     try {
       const data = await getAllDecks();
       setDecks(data);
+      setCardCounts(await getCardCountsByDeck(data.map((deck) => deck.id)));
     } catch (error) {
       console.error(error);
       toast.error("Failed to load decks");
@@ -146,6 +155,8 @@ export default function Index() {
               >
                 <DeckCard
                   deck={deck}
+                  totalCards={cardCounts[deck.id]?.total ?? 0}
+                  dueCount={cardCounts[deck.id]?.due ?? 0}
                   onStudy={handleStudy}
                   onDelete={handleDeleteDeck}
                 />
