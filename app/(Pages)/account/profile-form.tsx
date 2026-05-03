@@ -2,9 +2,9 @@
 
 import { useActionState } from "react"; // Atualizado: useActionState do 'react'
 import { useFormStatus } from "react-dom"; // Nota: Em RC recentes, useFormStatus também pode ter movido para 'react'. Se der erro, mude para 'react'.
-import { Button } from "@/components/flashcards/ui/button";
-import { Input } from "@/components/flashcards/ui/input";
-import { Label } from "@/components/flashcards/ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { updateProfileName } from "./actions";
 import { useEffect } from "react";

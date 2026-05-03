@@ -29,7 +29,7 @@ import {
   type EdgeChange,
   type Connection,
 } from "@xyflow/react";
-import { Button } from "@/components/notes/ui/button";
+import { Button } from "@/components/ui/button";
 
 import "@xyflow/react/dist/style.css";
 import { useCallback, useState, useRef, useEffect } from "react";

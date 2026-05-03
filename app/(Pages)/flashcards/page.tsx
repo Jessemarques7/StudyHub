@@ -1,14 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/flashcards/ui/button";
-import { Input } from "@/components/flashcards/ui/input";
-import { Label } from "@/components/flashcards/ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/flashcards/ui/dialog";
+} from "@/components/ui/dialog";
 import { DeckCard } from "@/components/flashcards/DeckCard";
 import { Deck } from "@/types/flashcard";
 import { getAllDecks, saveDeck, deleteDeck } from "@/lib/storage";
@@ -23,12 +23,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/flashcards/ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { at } from "lodash";
-import { px, rgba } from "motion/react";
-import image from "next/image";
-import z, { size } from "zod";
 
 export default function Index() {
   const router = useRouter();

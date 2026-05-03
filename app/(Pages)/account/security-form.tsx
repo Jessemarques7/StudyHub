@@ -2,9 +2,9 @@
 
 import { useActionState } from "react"; // Atualizado
 import { useFormStatus } from "react-dom";
-import { Button } from "@/components/flashcards/ui/button";
-import { Input } from "@/components/flashcards/ui/input";
-import { Label } from "@/components/flashcards/ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { updatePassword } from "./actions";
 import { useEffect, useRef } from "react";

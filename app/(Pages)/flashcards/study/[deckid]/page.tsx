@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Button } from "@/components/flashcards/ui/button";
-import { Card, CardContent } from "@/components/flashcards/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Flashcard, ReviewQuality } from "@/types/flashcard";
 import { getCardsByDeck } from "@/lib/storage";
 import { getDueCards, calculateNextReview } from "@/lib/spaced-repetition";

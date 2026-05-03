@@ -6,14 +6,14 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/flashcards/ui/card";
+} from "@/components/ui/card";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/flashcards/ui/tabs";
-import { Separator } from "@/components/flashcards/ui/separator";
+} from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import { ProfileForm } from "./profile-form";
 import { SecurityForm } from "./security-form";
 import { AvatarUpload } from "./avatar-upload";

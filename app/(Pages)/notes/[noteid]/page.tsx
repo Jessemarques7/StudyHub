@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import Editor from "@/components/notes/Editor";
 import Graph from "@/components/notes/Graph";
-import { Button } from "@/components/notes/ui/button";
+import { Button } from "@/components/ui/button";
 
 import {
   IconChartDots3,
@@ -21,7 +21,6 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { fa } from "zod/v4/locales";
 
 export default function NotePage() {
   const [isGraphVisible, setIsGraphVisible] = useState(false);

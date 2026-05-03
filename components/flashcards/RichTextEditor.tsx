@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/flashcards/ui/button";
+import { Button } from "@/components/ui/button";
 import { Bold, Italic, Underline, Image, Mic, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/flashcards/ui/popover";
+} from "@/components/ui/popover";
 
 interface RichTextEditorProps {
   value: string;

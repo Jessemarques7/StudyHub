@@ -5,8 +5,8 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@/components/flashcards/ui/avatar";
-import { Button } from "@/components/flashcards/ui/button";
+} from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Loader2, UploadCloud } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { uploadAvatar } from "./actions";

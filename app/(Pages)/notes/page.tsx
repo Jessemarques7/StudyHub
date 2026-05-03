@@ -27,14 +27,14 @@ import {
 import { IconSitemap } from "@tabler/icons-react";
 
 // Componentes UI
-import { Input } from "@/components/notes/ui/input";
-import { Button } from "@/components/notes/ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/flashcards/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import Graph from "@/components/notes/Graph";
 import { ShootingStars } from "@/components/ui/shooting-stars";
 import { StarsBackground } from "@/components/ui/stars-background";

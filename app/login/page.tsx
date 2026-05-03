@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/flashcards/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,15 +9,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/flashcards/ui/card";
-import { Input } from "@/components/flashcards/ui/input";
-import { Label } from "@/components/flashcards/ui/label";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/flashcards/ui/tabs";
+} from "@/components/ui/tabs";
 import { login, signInWithGoogle, signup } from "./actions";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
