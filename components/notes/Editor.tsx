@@ -9,6 +9,7 @@ import Blocknote from "./Blocknote";
 import { NoteHeader } from "./NoteHeader";
 import { NoteTitleInput } from "./NoteTitleInput";
 import { debounce } from "lodash";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export default function Editor() {
   const params = useParams<{ noteid: string }>();
@@ -94,12 +95,14 @@ export default function Editor() {
               onSave={handleTitleSave} // <--- CORREÇÃO: Usando onSave, não onBlur
             />
 
-            <Blocknote
-              key={currentNote.id}
-              onUpdateNote={handleUpdateContent}
-              currentNote={currentNote}
-              notes={notes}
-            />
+            <ErrorBoundary>
+              <Blocknote
+                key={currentNote.id}
+                onUpdateNote={handleUpdateContent}
+                currentNote={currentNote}
+                notes={notes}
+              />
+            </ErrorBoundary>
           </div>
         </div>
       </div>

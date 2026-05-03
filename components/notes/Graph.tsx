@@ -2,8 +2,7 @@ import { useMemo } from "react";
 import { useNotes } from "@/contexts/NotesContext";
 import ForceGraphComponent from "./ForceGraph";
 import { GraphData, GraphLink } from "@/types/notes";
-import { StarsBackground } from "../ui/stars-background";
-import { ShootingStars } from "../ui/shooting-stars";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface MentionContent {
   type: string;
@@ -116,7 +115,9 @@ export default function Graph({ classname }: { classname?: string }) {
   // Altere o final do componente Graph.tsx
   return (
     <div className={`relative  overflow-hidden  ${classname || ""}`}>
-      <ForceGraphComponent data={graphData} />
+      <ErrorBoundary>
+        <ForceGraphComponent data={graphData} />
+      </ErrorBoundary>
     </div>
   );
 }

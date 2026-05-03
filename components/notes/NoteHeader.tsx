@@ -1,11 +1,14 @@
 import { useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import { Note, MAX_ICON_FILE_SIZE } from "@/types/notes";
 import { cn } from "@/lib/utils";
 import { Smile, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-// FIX: Import Theme enum
-import EmojiPicker, { Theme } from "emoji-picker-react";
 import { CoverPicker } from "./NotePickers";
+
+const EmojiPicker = dynamic(() => import("emoji-picker-react"), {
+  ssr: false,
+});
 
 interface NoteHeaderProps {
   note: Note;
@@ -178,7 +181,7 @@ export function NoteHeader({
                           "var(--color-slate-700)",
                       } as React.CSSProperties
                     }
-                    theme={Theme.DARK} // FIX: Use Theme enum instead of string
+                    theme="dark"
                     onEmojiClick={handleEmojiSelect}
                   />
                 </div>

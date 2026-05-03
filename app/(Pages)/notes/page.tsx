@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -35,9 +36,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Graph from "@/components/notes/Graph";
 import { ShootingStars } from "@/components/ui/shooting-stars";
 import { StarsBackground } from "@/components/ui/stars-background";
+
+const Graph = dynamic(() => import("@/components/notes/Graph"), {
+  ssr: false,
+});
 
 // Enum para gerir a aba ativa
 type ViewMode = "notes" | "diagrams" | "graph";

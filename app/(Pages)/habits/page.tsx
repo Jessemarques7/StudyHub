@@ -3,6 +3,7 @@
 import "../../stars.css";
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { createPortal } from "react-dom";
 import {
   XAxis,
@@ -24,7 +25,6 @@ import {
   Loader2,
 } from "lucide-react";
 import { ProgressRing } from "@/components/ui/ProgressRing";
-import EmojiPicker, { Theme } from "emoji-picker-react";
 import { cn } from "@/lib/utils";
 import {
   createHabit as createHabitRecord,
@@ -35,6 +35,10 @@ import {
 } from "@/lib/habits";
 import type { CreateHabitInput, Habit } from "@/types/habits";
 import { toast } from "sonner";
+
+const EmojiPicker = dynamic(() => import("emoji-picker-react"), {
+  ssr: false,
+});
 
 type TabType = "emoji" | "upload" | "link";
 
@@ -254,7 +258,7 @@ function HabitIconPicker({
         {tab === "emoji" && (
           <div className="mb-2 w-full rounded-lg overflow-hidden flex justify-center custom-emoji-picker-container">
             <EmojiPicker
-              theme={Theme.DARK}
+              theme="dark"
               onEmojiClick={(emojiData) => {
                 onSelect(emojiData.emoji);
                 handleClose();
