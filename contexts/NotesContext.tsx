@@ -21,19 +21,27 @@ import {
   DEFAULT_NOTE_TITLE,
 } from "@/types/notes";
 import { toast } from "sonner";
+import type { FolderRow, NoteRow } from "@/types/database";
+import type { Json } from "@/types/supabase";
 
 const NotesContext = createContext<NotesContextValue | null>(null);
 
 // Mappers
-const mapNote = (data: any): Note => ({
+const mapNote = (data: NoteRow): Note => ({
   id: data.id,
   title: data.title,
   icon: data.icon,
   coverImage: data.cover_image,
-  content: data.content || [],
+  content: Array.isArray(data.content) ? (data.content as Note["content"]) : [],
   folderId: data.folder_id,
   createdAt: new Date(data.created_at),
   updatedAt: new Date(data.updated_at),
+});
+
+const mapFolder = (data: FolderRow): Folder => ({
+  id: data.id,
+  name: data.name,
+  createdAt: new Date(data.created_at),
 });
 
 export function NotesProvider({ children }: { children: ReactNode }) {
@@ -70,13 +78,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       ]);
 
       if (foldersRes.data) {
-        setFolders(
-          foldersRes.data.map((f) => ({
-            id: f.id,
-            name: f.name,
-            createdAt: new Date(f.created_at),
-          }))
-        );
+        setFolders(foldersRes.data.map(mapFolder));
       }
       if (notesRes.data) {
         setNotes(notesRes.data.map(mapNote));
@@ -97,10 +99,13 @@ export function NotesProvider({ children }: { children: ReactNode }) {
         )
       );
 
-      const dbUpdates: any = { updated_at: new Date().toISOString() };
+      const dbUpdates: Record<string, unknown> = {
+        updated_at: new Date().toISOString(),
+      };
       if (updates.title !== undefined) dbUpdates.title = updates.title;
       if (updates.icon !== undefined) dbUpdates.icon = updates.icon;
-      if (updates.content !== undefined) dbUpdates.content = updates.content;
+      if (updates.content !== undefined)
+        dbUpdates.content = updates.content as unknown as Json;
       if (updates.coverImage !== undefined)
         dbUpdates.cover_image = updates.coverImage;
       if (updates.folderId !== undefined)
@@ -157,7 +162,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
             title: newNoteOptimistic.title,
             icon: newNoteOptimistic.icon,
             cover_image: newNoteOptimistic.coverImage,
-            content: newNoteOptimistic.content,
+            content: newNoteOptimistic.content as unknown as Json,
             folder_id: newNoteOptimistic.folderId,
             user_id: user.id, // VINCULA AO USUÁRIO
           })
@@ -228,11 +233,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
 
-      const createdFolder = {
-        id: data.id,
-        name: data.name,
-        createdAt: new Date(data.created_at),
-      };
+      const createdFolder = mapFolder(data);
 
       setFolders((prev) =>
         prev.map((f) => (f.id === tempId ? createdFolder : f))
@@ -318,9 +319,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <NotesContext.Provider value={value as any}>
-      {children}
-    </NotesContext.Provider>
+    <NotesContext.Provider value={value}>{children}</NotesContext.Provider>
   );
 }
 

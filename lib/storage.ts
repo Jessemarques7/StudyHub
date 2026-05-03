@@ -1,6 +1,8 @@
 // lib/storage.ts
 import { createClient } from "@/utils/supabase/client";
 import { Deck, Flashcard } from "@/types/flashcard";
+import type { DeckRow, FlashcardRow } from "@/types/database";
+import type { Json } from "@/types/supabase";
 
 // Agora aceita um bucket opcional
 export async function uploadMedia(
@@ -26,6 +28,40 @@ export async function uploadMedia(
 
 // --- Decks ---
 
+function mapDeck(row: DeckRow): Deck {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description ?? undefined,
+    createdAt: new Date(row.created_at),
+    updatedAt: new Date(row.updated_at),
+  };
+}
+
+function mapFlashcard(row: FlashcardRow): Flashcard {
+  return {
+    id: row.id,
+    deckId: row.deck_id,
+    type: row.type as Flashcard["type"],
+    front: row.front,
+    back: row.back,
+    imageUrl: row.image_url ?? undefined,
+    audioUrl: row.audio_url ?? undefined,
+    backImageUrl: row.back_image_url ?? undefined,
+    backAudioUrl: row.back_audio_url ?? undefined,
+    multipleChoiceOptions:
+      (row.multiple_choice_options as Flashcard["multipleChoiceOptions"]) ??
+      undefined,
+    tags: row.tags || [],
+    easeFactor: row.ease_factor,
+    interval: row.interval_days,
+    repetitions: row.repetitions,
+    nextReview: new Date(row.next_review),
+    createdAt: new Date(row.created_at),
+    updatedAt: new Date(row.updated_at),
+  };
+}
+
 export async function getAllDecks(): Promise<Deck[]> {
   const supabase = createClient();
   // 1. Obter usuário
@@ -43,13 +79,7 @@ export async function getAllDecks(): Promise<Deck[]> {
 
   if (error) throw error;
 
-  return data.map((d: any) => ({
-    id: d.id,
-    name: d.name,
-    description: d.description,
-    createdAt: new Date(d.created_at),
-    updatedAt: new Date(d.updated_at),
-  }));
+  return data.map(mapDeck);
 }
 
 export async function saveDeck(deck: Deck): Promise<void> {
@@ -92,25 +122,7 @@ export async function getCardsByDeck(deckId: string): Promise<Flashcard[]> {
 
   if (error) throw error;
 
-  return data.map((c: any) => ({
-    id: c.id,
-    deckId: c.deck_id,
-    type: c.type,
-    front: c.front,
-    back: c.back,
-    imageUrl: c.image_url,
-    audioUrl: c.audio_url,
-    backImageUrl: c.back_image_url,
-    backAudioUrl: c.back_audio_url,
-    multipleChoiceOptions: c.multiple_choice_options,
-    tags: c.tags || [],
-    easeFactor: c.ease_factor,
-    interval: c.interval_days,
-    repetitions: c.repetitions,
-    nextReview: new Date(c.next_review),
-    createdAt: new Date(c.created_at),
-    updatedAt: new Date(c.updated_at),
-  }));
+  return data.map(mapFlashcard);
 }
 
 export async function getCardCountsByDeck(
@@ -152,7 +164,7 @@ export async function saveCard(card: Flashcard): Promise<void> {
     audio_url: card.audioUrl,
     back_image_url: card.backImageUrl,
     back_audio_url: card.backAudioUrl,
-    multiple_choice_options: card.multipleChoiceOptions,
+    multiple_choice_options: card.multipleChoiceOptions as unknown as Json,
     tags: card.tags,
     ease_factor: card.easeFactor,
     interval_days: card.interval,

@@ -1,17 +1,8 @@
 import { createClient } from "@/utils/supabase/client";
 import { CreateHabitInput, Habit, UpdateHabitInput } from "@/types/habits";
+import type { HabitRow } from "@/types/database";
 
 type SupabaseClient = ReturnType<typeof createClient>;
-
-type HabitRow = {
-  id: string;
-  user_id: string;
-  name: string;
-  icon: string | null;
-  completed_dates: Record<string, boolean> | null;
-  created_at: string;
-  updated_at: string;
-};
 
 const DEFAULT_HABIT_ICON = "🎯";
 
@@ -73,7 +64,7 @@ export async function getAllHabits(): Promise<Habit[]> {
     throw error;
   }
 
-  return (data ?? []).map((row) => mapHabit(row as HabitRow));
+  return (data ?? []).map(mapHabit);
 }
 
 export async function createHabit(input: CreateHabitInput): Promise<Habit> {
@@ -95,7 +86,7 @@ export async function createHabit(input: CreateHabitInput): Promise<Habit> {
     throw error;
   }
 
-  return mapHabit(data as HabitRow);
+  return mapHabit(data);
 }
 
 export async function createManyHabits(
@@ -125,7 +116,7 @@ export async function createManyHabits(
     throw error;
   }
 
-  return (data ?? []).map((row) => mapHabit(row as HabitRow));
+  return (data ?? []).map(mapHabit);
 }
 
 export async function updateHabit(
@@ -168,7 +159,7 @@ export async function updateHabit(
     throw error;
   }
 
-  return mapHabit(data as HabitRow);
+  return mapHabit(data);
 }
 
 export async function deleteHabit(id: string): Promise<void> {
