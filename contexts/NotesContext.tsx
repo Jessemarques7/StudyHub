@@ -10,7 +10,7 @@ import {
   useState,
   useEffect,
 } from "react";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/client";
 import {
   Note,
   Folder,
@@ -37,6 +37,7 @@ const mapNote = (data: any): Note => ({
 });
 
 export function NotesProvider({ children }: { children: ReactNode }) {
+  const supabase = useMemo(() => createClient(), []);
   const [notes, setNotes] = useState<Note[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
 
@@ -82,7 +83,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       }
     }
     loadData();
-  }, []);
+  }, [supabase]);
 
   // --- UPDATE NOTE ---
   const updateNote = useCallback(
@@ -118,7 +119,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
         toast.error("Falha ao salvar alterações");
       }
     },
-    [notes]
+    [notes, supabase]
   );
 
   // --- CREATE NOTE ---
@@ -176,7 +177,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     },
-    []
+    [supabase]
   );
 
   // --- DELETE NOTE ---
@@ -196,7 +197,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
         toast.error("Erro ao excluir nota.");
       }
     },
-    [notes]
+    [notes, supabase]
   );
 
   // --- ADD FOLDER ---
@@ -240,7 +241,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       setFolders((prev) => prev.filter((f) => f.id !== tempId));
       toast.error("Erro ao criar pasta");
     }
-  }, []);
+  }, [supabase]);
 
   // --- DELETE FOLDER ---
   const deleteFolder = useCallback(
@@ -263,7 +264,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
         toast.error("Erro ao excluir pasta");
       }
     },
-    [folders, notes]
+    [folders, notes, supabase]
   );
 
   // --- UPDATE FOLDER ---
@@ -283,7 +284,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
         toast.error("Erro ao renomear pasta");
       }
     },
-    [folders]
+    [folders, supabase]
   );
 
   const getNote = useCallback(

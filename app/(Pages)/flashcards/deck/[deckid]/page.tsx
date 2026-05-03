@@ -276,6 +276,7 @@ import { Flashcard, Deck } from "@/types/flashcard";
 import { getCardsByDeck, getAllDecks, deleteCard } from "@/lib/storage";
 import { CardEditorDialog } from "@/components/flashcards/CardEditorDialog";
 import { saveCard } from "@/lib/storage";
+import { sanitize } from "@/lib/sanitize";
 import { ArrowLeft, Plus, Trash2, Edit } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -457,7 +458,7 @@ export default function DeckView() {
                     </h4>
                     <div
                       className="prose prose-invert prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{ __html: card.front }}
+                      dangerouslySetInnerHTML={{ __html: sanitize(card.front) }}
                     />
                   </div>
 
@@ -468,7 +469,7 @@ export default function DeckView() {
                       </h4>
                       <div
                         className="prose prose-invert prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: card.back }}
+                        dangerouslySetInnerHTML={{ __html: sanitize(card.back) }}
                       />
                     </div>
                   )}

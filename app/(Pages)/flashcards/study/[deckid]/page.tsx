@@ -7,6 +7,7 @@ import { Flashcard, ReviewQuality } from "@/types/flashcard";
 import { getCardsByDeck } from "@/lib/storage";
 import { getDueCards, calculateNextReview } from "@/lib/spaced-repetition";
 import { saveCard } from "@/lib/storage";
+import { sanitize } from "@/lib/sanitize";
 import { ArrowLeft, Volume2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -193,7 +194,7 @@ export default function Study() {
 
                 <div
                   className="text-xl mb-6 prose prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: currentCard.front }}
+                  dangerouslySetInnerHTML={{ __html: sanitize(currentCard.front) }}
                 />
 
                 {currentCard.imageUrl && (
@@ -276,7 +277,7 @@ export default function Study() {
 
                   <div
                     className="text-lg mb-4 prose prose-invert max-w-none opacity-70"
-                    dangerouslySetInnerHTML={{ __html: currentCard.front }}
+                    dangerouslySetInnerHTML={{ __html: sanitize(currentCard.front) }}
                   />
 
                   {currentCard.imageUrl && (
@@ -311,7 +312,7 @@ export default function Study() {
 
                     <div
                       className="text-xl mb-6 prose prose-invert max-w-none"
-                      dangerouslySetInnerHTML={{ __html: currentCard.back }}
+                      dangerouslySetInnerHTML={{ __html: sanitize(currentCard.back) }}
                     />
 
                     {currentCard.backImageUrl && (

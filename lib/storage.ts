@@ -1,5 +1,5 @@
 // lib/storage.ts
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { Deck, Flashcard } from "@/types/flashcard";
 
 // Agora aceita um bucket opcional
@@ -7,6 +7,7 @@ export async function uploadMedia(
   file: File,
   bucket: string = "flashcard-media"
 ): Promise<string | null> {
+  const supabase = createClient();
   const fileExt = file.name.split(".").pop();
   const fileName = `${crypto.randomUUID()}.${fileExt}`;
   const filePath = `${fileName}`;
@@ -26,6 +27,7 @@ export async function uploadMedia(
 // --- Decks ---
 
 export async function getAllDecks(): Promise<Deck[]> {
+  const supabase = createClient();
   // 1. Obter usuário
   const {
     data: { user },
@@ -51,6 +53,7 @@ export async function getAllDecks(): Promise<Deck[]> {
 }
 
 export async function saveDeck(deck: Deck): Promise<void> {
+  const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -69,6 +72,7 @@ export async function saveDeck(deck: Deck): Promise<void> {
 }
 
 export async function deleteDeck(deckId: string): Promise<void> {
+  const supabase = createClient();
   // Opcional: Adicionar .eq('user_id', user.id) para segurança extra
   const { error } = await supabase.from("decks").delete().eq("id", deckId);
 
@@ -78,6 +82,7 @@ export async function deleteDeck(deckId: string): Promise<void> {
 // --- Cards ---
 
 export async function getCardsByDeck(deckId: string): Promise<Flashcard[]> {
+  const supabase = createClient();
   // Como os decks já são filtrados por usuário, quem tem o deckId tem acesso aos cards.
   // Se quiser segurança extra, verifique se o deck pertence ao usuário antes.
   const { data, error } = await supabase
@@ -109,6 +114,7 @@ export async function getCardsByDeck(deckId: string): Promise<Flashcard[]> {
 }
 
 export async function saveCard(card: Flashcard): Promise<void> {
+  const supabase = createClient();
   const payload = {
     id: card.id,
     deck_id: card.deckId,
@@ -134,6 +140,7 @@ export async function saveCard(card: Flashcard): Promise<void> {
 }
 
 export async function deleteCard(cardId: string): Promise<void> {
+  const supabase = createClient();
   const { error } = await supabase.from("flashcards").delete().eq("id", cardId);
 
   if (error) throw error;

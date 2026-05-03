@@ -1,5 +1,7 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { CreateHabitInput, Habit, UpdateHabitInput } from "@/types/habits";
+
+type SupabaseClient = ReturnType<typeof createClient>;
 
 type HabitRow = {
   id: string;
@@ -38,7 +40,9 @@ function mapHabit(row: HabitRow): Habit {
   };
 }
 
-async function getAuthenticatedUserId(): Promise<string> {
+async function getAuthenticatedUserId(
+  supabase: SupabaseClient,
+): Promise<string> {
   const {
     data: { user },
     error,
@@ -56,7 +60,8 @@ async function getAuthenticatedUserId(): Promise<string> {
 }
 
 export async function getAllHabits(): Promise<Habit[]> {
-  const userId = await getAuthenticatedUserId();
+  const supabase = createClient();
+  const userId = await getAuthenticatedUserId(supabase);
 
   const { data, error } = await supabase
     .from("habits")
@@ -72,7 +77,8 @@ export async function getAllHabits(): Promise<Habit[]> {
 }
 
 export async function createHabit(input: CreateHabitInput): Promise<Habit> {
-  const userId = await getAuthenticatedUserId();
+  const supabase = createClient();
+  const userId = await getAuthenticatedUserId(supabase);
 
   const { data, error } = await supabase
     .from("habits")
@@ -95,11 +101,13 @@ export async function createHabit(input: CreateHabitInput): Promise<Habit> {
 export async function createManyHabits(
   inputs: CreateHabitInput[],
 ): Promise<Habit[]> {
+  const supabase = createClient();
+
   if (inputs.length === 0) {
     return [];
   }
 
-  const userId = await getAuthenticatedUserId();
+  const userId = await getAuthenticatedUserId(supabase);
 
   const payload = inputs.map((input) => ({
     user_id: userId,
@@ -124,7 +132,8 @@ export async function updateHabit(
   id: string,
   updates: UpdateHabitInput,
 ): Promise<Habit> {
-  const userId = await getAuthenticatedUserId();
+  const supabase = createClient();
+  const userId = await getAuthenticatedUserId(supabase);
 
   const payload: {
     name?: string;
@@ -163,7 +172,8 @@ export async function updateHabit(
 }
 
 export async function deleteHabit(id: string): Promise<void> {
-  const userId = await getAuthenticatedUserId();
+  const supabase = createClient();
+  const userId = await getAuthenticatedUserId(supabase);
 
   const { error } = await supabase
     .from("habits")

@@ -10,7 +10,7 @@ import {
   useState,
   useEffect,
 } from "react";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/client";
 import {
   Diagram,
   DiagramFolder,
@@ -37,6 +37,7 @@ const mapFolderFromSupabase = (data: any): DiagramFolder => ({
 });
 
 export function DiagramsProvider({ children }: { children: ReactNode }) {
+  const supabase = useMemo(() => createClient(), []);
   const [diagrams, setDiagrams] = useState<Diagram[]>([]);
   const [folders, setFolders] = useState<DiagramFolder[]>([]);
 
@@ -60,7 +61,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
       }
     }
     fetchData();
-  }, []);
+  }, [supabase]);
 
   const addFolder = useCallback(async (name: string) => {
     const { data, error } = await supabase
@@ -71,7 +72,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
     if (!error && data) {
       setFolders((prev) => [...prev, mapFolderFromSupabase(data)]);
     }
-  }, []);
+  }, [supabase]);
 
   const deleteFolder = useCallback(async (id: string) => {
     const { error } = await supabase
@@ -84,7 +85,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
       );
       setFolders((prev) => prev.filter((f) => f.id !== id));
     }
-  }, []);
+  }, [supabase]);
 
   const updateFolder = useCallback(async (id: string, name: string) => {
     const { error } = await supabase
@@ -94,7 +95,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
     if (!error) {
       setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name } : f)));
     }
-  }, []);
+  }, [supabase]);
 
   const addDiagram = useCallback(
     async (input: CreateDiagramInput = {}): Promise<Diagram> => {
@@ -116,7 +117,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
       setDiagrams((prev) => [newDiagram, ...prev]);
       return newDiagram;
     },
-    []
+    [supabase]
   );
 
   const updateDiagram = useCallback(
@@ -142,7 +143,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
         );
       }
     },
-    []
+    [supabase]
   );
 
   const deleteDiagram = useCallback(async (id: string) => {
@@ -150,7 +151,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
     if (!error) {
       setDiagrams((prev) => prev.filter((d) => d.id !== id));
     }
-  }, []);
+  }, [supabase]);
 
   const getDiagram = useCallback(
     (id: string) => diagrams.find((d) => d.id === id),
