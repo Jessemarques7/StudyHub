@@ -25,10 +25,10 @@ export default async function HeaderPages() {
   }
 
   return (
-    <div className=" border-b-blue-950 bg-gradient-to-t from-[#020617] border-b-1  py-2 z-50 px-6 w-full absolute bg-background-secondary  flex 1items-center justify-between">
+    <div className="absolute z-50 flex w-full items-center justify-between border-b border-border bg-background-secondary px-6 py-2">
       <div className="h-8 w-8 ml-12 shrink-0 flex gap-4 items-center justify-center rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm ">
         <Image alt="logo" width={50} height={50} src={"/logo.png"} />
-        <span className="font-medium whitespace-pre text-black dark:text-white ">
+        <span className="font-medium whitespace-pre text-font">
           StudyHub
         </span>
       </div>
@@ -49,7 +49,7 @@ export default async function HeaderPages() {
           </Avatar>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" className="bg-slate-900">
+        <DropdownMenuContent align="end" className="border-border bg-secondary text-font">
           <DropdownMenuLabel>
             {user.user_metadata?.full_name || "User"}
           </DropdownMenuLabel>

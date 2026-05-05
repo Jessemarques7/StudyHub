@@ -42,11 +42,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen antialiased relative  text-foreground overflow-hidden selection:bg-primary/20 flex flex-col bg-[radial-gradient(at_7%_13%,hsl(206,74%,17%)_0,transparent_29%),radial-gradient(at_82%_65%,hsl(217,59%,21%)_0,transparent_45%)]">
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-background text-foreground antialiased selection:bg-primary/20">
       {/* Background Gradients Ambientais */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/5 blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/5 blur-[120px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] h-[50%] w-[50%] rounded-full bg-complement/5 blur-[120px]" />
       </div>
 
       {/* Navbar */}
@@ -93,7 +93,7 @@ export default function Home() {
 
             <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1]">
               Estude de forma mais <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-blue-500 animate-gradient bg-300%">
+              <span className="animate-gradient bg-300% bg-gradient-to-r from-primary via-complement to-font bg-clip-text text-transparent">
                 inteligente
               </span>
               , não mais difícil.
@@ -144,7 +144,7 @@ export default function Home() {
                 <FileText size={200} />
               </div>
 
-              <div className="h-14 w-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 mb-6 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-300">
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-complement/20 bg-complement/10 text-complement transition-all duration-300 group-hover:scale-110 group-hover:bg-complement/20">
                 <FileText size={28} />
               </div>
 

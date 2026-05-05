@@ -57,7 +57,7 @@ export function NoteHeader({
 
   const renderCover = () => {
     if (!note.coverImage) {
-      return <div className="w-full h-full bg-slate-800" />;
+      return <div className="h-full w-full bg-secondary" />;
     }
 
     const cover = note.coverImage;
@@ -81,7 +81,7 @@ export function NoteHeader({
 
   const renderIcon = () => {
     if (!note.icon) {
-      return <Smile className="w-16 h-16 text-slate-600 p-2" />;
+      return <Smile className="h-16 w-16 p-2 text-font/40" />;
     }
 
     if (note.icon.startsWith("data:")) {
@@ -127,7 +127,7 @@ export function NoteHeader({
             <div className="relative flex -ml-11 items-end gap-2">
               <button
                 onClick={() => setEmojiPickerVisible((prev) => !prev)}
-                className="cursor-pointer rounded-lg p-1 transition-colors hover:bg-black/20"
+                className="cursor-pointer rounded-lg p-1 transition-colors hover:bg-third/40"
                 aria-label="Change icon"
               >
                 {renderIcon()}
@@ -137,7 +137,7 @@ export function NoteHeader({
                 <Button
                   size="icon-sm"
                   variant="outline"
-                  className="bg-black/50 hover:bg-black/70 border-slate-700"
+                  className="border-border bg-third/50 hover:bg-third/70"
                   onClick={() => iconUploadRef.current?.click()}
                   aria-label="Upload icon"
                 >
@@ -148,7 +148,7 @@ export function NoteHeader({
                   <Button
                     size="icon-sm"
                     variant="outline"
-                    className="bg-black/50 hover:bg-black/70 border-slate-700 text-red-400 hover:text-red-400"
+                    className="border-border bg-third/50 text-red-400 hover:bg-third/70 hover:text-red-400"
                     onClick={handleIconRemove}
                     aria-label="Remove icon"
                   >
@@ -170,15 +170,15 @@ export function NoteHeader({
                   <EmojiPicker
                     style={
                       {
-                        "--epr-bg-color": "var(--color-slate-900)",
+                        "--epr-bg-color": "var(--color-third)",
                         "--epr-category-label-bg-color":
-                          "var(--color-slate-850)",
-                        "--epr-search-bg-color": "var(--color-slate-800)",
-                        "--epr-search-text-color": "var(--color-slate-100)",
-                        "--epr-emoji-hover-bg-color": "var(--color-slate-700)",
-                        "--epr-scrollbar-bg-color": "var(--color-slate-800)",
+                          "var(--color-secondary)",
+                        "--epr-search-bg-color": "var(--color-secondary)",
+                        "--epr-search-text-color": "var(--color-font)",
+                        "--epr-emoji-hover-bg-color": "var(--color-secondary)",
+                        "--epr-scrollbar-bg-color": "var(--color-secondary)",
                         "--epr-scrollbar-thumb-bg-color":
-                          "var(--color-slate-700)",
+                          "var(--color-complement)",
                       } as React.CSSProperties
                     }
                     theme={"dark" as never}

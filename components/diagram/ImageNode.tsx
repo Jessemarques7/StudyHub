@@ -39,7 +39,7 @@ export default function ImageNode({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isCustomColor = !!data.color;
-  const currentColor = data.color || "#9e86ed";
+  const currentColor = data.color || "var(--color-complement)";
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -102,15 +102,18 @@ export default function ImageNode({
   return (
     <div
       className={cn(
-        "flex w-full h-full flex-col border rounded-[12px] transition-all duration-300 overflow-hidden relative group bg-slate-900",
+        "group relative flex h-full w-full flex-col overflow-hidden rounded-[12px] border bg-third transition-all duration-300",
         selected ? "border-2" : "border"
       )}
       style={{
-        borderColor: selected || isCustomColor ? currentColor : "#334155",
+        borderColor:
+          selected || isCustomColor ? currentColor : "var(--color-secondary)",
         background: isCustomColor
-          ? `linear-gradient(to bottom right, ${currentColor}1A, ${currentColor}05), #0f172a`
-          : "#0f172a",
-        boxShadow: selected ? `0 0 20px ${currentColor}20` : "none",
+          ? `linear-gradient(to bottom right, color-mix(in srgb, ${currentColor} 10%, transparent), color-mix(in srgb, ${currentColor} 3%, transparent)), var(--color-third)`
+          : "var(--color-third)",
+        boxShadow: selected
+          ? `0 0 20px color-mix(in srgb, ${currentColor} 20%, transparent)`
+          : "none",
       }}
     >
       <input
@@ -130,7 +133,7 @@ export default function ImageNode({
           />
         ) : (
           <div
-            className="flex flex-col items-center justify-center text-slate-500 hover:text-slate-300 cursor-pointer p-4 transition-colors w-full h-full"
+            className="flex h-full w-full cursor-pointer flex-col items-center justify-center p-4 text-font/50 transition-colors hover:text-font/80"
             onClick={handleUploadClick}
           >
             <IconPhoto className="w-8 h-8 mb-2 opacity-50" />
@@ -156,13 +159,13 @@ export default function ImageNode({
         align="center"
         offset={10}
       >
-        <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center justify-center gap-3 border border-slate-700 shadow-2xl">
+        <div className="flex items-center justify-center gap-3 rounded-full border border-border bg-secondary/90 px-3 py-1.5 shadow-2xl backdrop-blur-md">
           {showColorPicker ? (
             <>
               <ColorPicker onColorSelect={onColorSelect} />
               <button
                 onClick={() => setShowColorPicker(false)}
-                className="ml-2 hover:text-white text-slate-400"
+                className="ml-2 text-font/60 hover:text-font"
               >
                 <IconX className="h-4 w-4" />
               </button>
@@ -170,19 +173,19 @@ export default function ImageNode({
           ) : (
             <>
               <button
-                className="hover:text-red-400 transition-colors text-slate-300"
+                className="text-font/80 transition-colors hover:text-red-400"
                 onClick={onDelete}
               >
                 <IconTrash className="h-4 w-4" />
               </button>
               <button
-                className="hover:text-purple-400 transition-colors text-slate-300"
+                className="text-font/80 transition-colors hover:text-complement"
                 onClick={() => setShowColorPicker(true)}
               >
                 <IconPalette className="h-4 w-4" />
               </button>
               <button
-                className="hover:text-blue-400 transition-colors text-slate-300"
+                className="text-font/80 transition-colors hover:text-complement"
                 onClick={handleUploadClick}
               >
                 <IconUpload className="h-4 w-4" />
@@ -196,25 +199,25 @@ export default function ImageNode({
         id="top"
         type="source"
         position={Position.Top}
-        className="w-3 h-3 border-2 border-slate-900"
+        className="h-3 w-3 border-2 border-third"
       />
       <Handle
         id="bottom"
         type="source"
         position={Position.Bottom}
-        className="w-3 h-3 border-2 border-slate-900"
+        className="h-3 w-3 border-2 border-third"
       />
       <Handle
         id="right"
         type="source" // Fixed: Added type
         position={Position.Right}
-        className="w-3 h-3 border-2 border-slate-900"
+        className="h-3 w-3 border-2 border-third"
       />
       <Handle
         id="left"
         type="source" // Fixed: Added type
         position={Position.Left}
-        className="w-3 h-3 border-2 border-slate-900"
+        className="h-3 w-3 border-2 border-third"
       />
     </div>
   );

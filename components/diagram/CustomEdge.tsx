@@ -65,13 +65,13 @@ function CustomEdge({ id, selected, style, markerEnd, ...props }: EdgeProps) {
       <BaseEdge id={id} path={edgePath} style={style} markerEnd={markerEnd} />
 
       <EdgeToolbar edgeId={id} x={centerX} y={centerY} isVisible={selected}>
-        <div className="bg-slate-900 px-4 py-2 mb-2 rounded-[8px] flex items-center justify-center gap-4 border border-slate-700 shadow-xl pointer-events-auto">
+        <div className="pointer-events-auto mb-2 flex items-center justify-center gap-4 rounded-[8px] border border-border bg-secondary px-4 py-2 shadow-xl">
           {showColorPicker ? (
             <>
               <ColorPicker onColorSelect={onColorSelect} />
               <button
                 onClick={() => setShowColorPicker(false)}
-                className="ml-2 hover:text-white text-slate-400"
+                className="ml-2 text-font/60 hover:text-font"
               >
                 <IconX className="h-4 w-4" />
               </button>
@@ -79,18 +79,18 @@ function CustomEdge({ id, selected, style, markerEnd, ...props }: EdgeProps) {
           ) : (
             <>
               <button
-                className="cursor-pointer hover:text-red-500 transition-colors text-slate-200"
+                className="cursor-pointer text-font/90 transition-colors hover:text-red-500"
                 onClick={onDelete}
               >
                 <IconTrash className="h-5 w-5" />
               </button>
               <button
-                className="cursor-pointer hover:text-purple-400 transition-colors text-slate-200"
+                className="cursor-pointer text-font/90 transition-colors hover:text-complement"
                 onClick={() => setShowColorPicker(true)}
               >
                 <IconPalette className="h-5 w-5" />
               </button>
-              <button className="cursor-pointer hover:text-blue-400 transition-colors text-slate-200">
+              <button className="cursor-pointer text-font/90 transition-colors hover:text-complement">
                 <IconTransform className="h-5 w-5" />
               </button>
             </>

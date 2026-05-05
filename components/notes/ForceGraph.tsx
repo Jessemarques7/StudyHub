@@ -4,6 +4,7 @@
 import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { DEFAULT_THEME_COLORS } from "@/lib/theme-colors";
 
 // Dynamically import the ForceGraph2D component with SSR disabled
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
@@ -33,7 +34,33 @@ interface ForceGraphProps {
   data: GraphData;
 }
 
-const getNodeId = (node: string | number | NodeObject | undefined): string | null => {
+const getThemeColor = (cssVariable: string, fallback: string) => {
+  if (typeof window === "undefined") return fallback;
+
+  return (
+    getComputedStyle(document.documentElement)
+      .getPropertyValue(cssVariable)
+      .trim() || fallback
+  );
+};
+
+const withAlpha = (color: string, alpha: number) => {
+  const normalizedColor = color.trim();
+
+  if (/^#[0-9a-fA-F]{6}$/.test(normalizedColor)) {
+    const red = parseInt(normalizedColor.slice(1, 3), 16);
+    const green = parseInt(normalizedColor.slice(3, 5), 16);
+    const blue = parseInt(normalizedColor.slice(5, 7), 16);
+
+    return `rgb(${red} ${green} ${blue} / ${alpha})`;
+  }
+
+  return normalizedColor;
+};
+
+const getNodeId = (
+  node: string | number | NodeObject | undefined,
+): string | null => {
   if (typeof node === "string" || typeof node === "number") return String(node);
   if (node?.id !== undefined) return String(node.id);
   return null;
@@ -92,11 +119,16 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
 
     const isHovered = getNodeId(node) === hoveredNodeId;
     const nodeRadius = Math.sqrt(node.val || 1) * (isHovered ? 1.5 : 1);
+    const complementColor = getThemeColor(
+      "--color-complement",
+      DEFAULT_THEME_COLORS.complement,
+    );
+    const fontColor = getThemeColor("--color-font", DEFAULT_THEME_COLORS.font);
 
     // Draw the node circle
     ctx.beginPath();
     ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
-    ctx.fillStyle = isHovered ? "#d88ef8be" : "#c5c2ccbe";
+    ctx.fillStyle = isHovered ? complementColor : withAlpha(fontColor, 0.74);
     ctx.fill();
 
     // Draw the label below the node
@@ -105,7 +137,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
     ctx.font = `${fontSize}px Sans-Serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = fontColor;
     ctx.fillText(label, x, y + nodeRadius + 2);
   }
 
@@ -166,8 +198,14 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
           linkColor={(link: LinkObject) =>
             getNodeId(link.source) === hoveredNodeId ||
             getNodeId(link.target) === hoveredNodeId
-              ? "#d88ef8bd"
-              : "#ffffff33"
+              ? getThemeColor(
+                  "--color-complement",
+                  DEFAULT_THEME_COLORS.complement,
+                )
+              : withAlpha(
+                  getThemeColor("--color-font", DEFAULT_THEME_COLORS.font),
+                  0.2,
+                )
           }
         />
       )}

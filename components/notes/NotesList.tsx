@@ -161,7 +161,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
   // --- Renderização de Itens ---
   const renderIcon = (note: Note) => {
     if (!note.icon) {
-      return <Smile className="w-16 h-16 text-slate-600 p-2" />;
+      return <Smile className="h-16 w-16 p-2 text-font/40" />;
     }
 
     if (note.icon.startsWith("data:")) {
@@ -188,7 +188,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
             if (e.key === "Escape") handleCancelEditing();
           }}
           autoFocus
-          className="w-full bg-transparent border-b border-blue-500 focus:outline-none text-sm px-2 py-1.5 text-neutral-200"
+          className="w-full border-b border-complement bg-transparent px-2 py-1.5 text-sm text-font focus:outline-none"
           onClick={(e) => e.stopPropagation()}
         />
       ) : (
@@ -197,8 +197,8 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
           className={cn(
             "flex items-center gap-2 px-2 py-1.5 rounded-md transition-all group/note",
             currentNoteId === note.id
-              ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
-              : "hover:bg-neutral-200 dark:hover:bg-blue-900/30 text-neutral-700 dark:text-neutral-200",
+              ? "bg-complement/15 text-complement"
+              : "text-neutral-700 hover:bg-neutral-200 dark:text-font/80 dark:hover:bg-complement/10",
           )}
         >
           <span className="h-4 w-4 text-xs flex items-center justify-center flex-shrink-0">
@@ -252,14 +252,14 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
           <div className="flex gap-3 ">
             <motion.button
               onClick={handleCreateFolder}
-              className="p-1 hover:bg-blue-900/20 rounded text-neutral-400 hover:text-white"
+              className="rounded p-1 text-font/60 hover:bg-complement/10 hover:text-font"
               title="New Folder"
             >
               <IconFolderPlus className="h-6 w-6" />
             </motion.button>
             <motion.button
               onClick={() => handleCreateNewNote()}
-              className="p-1 hover:bg-blue-900/20 rounded text-neutral-400 hover:text-white"
+              className="rounded p-1 text-font/60 hover:bg-complement/10 hover:text-font"
               title="New Note"
             >
               <IconPlus className="h-6 w-6" />
@@ -282,7 +282,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
           return (
             <div key={folder.id} className="relative pt-4">
               <div
-                className="group flex items-center justify-between px-2 hover:bg-neutral-200 dark:hover:bg-blue-900/20 rounded-md cursor-pointer text-neutral-600 dark:text-neutral-300"
+                className="group flex cursor-pointer items-center justify-between rounded-md px-2 text-neutral-600 hover:bg-neutral-200 dark:text-font/75 dark:hover:bg-complement/10"
                 onMouseEnter={() => setHoveredItemId(folder.id)}
                 onMouseLeave={() => setHoveredItemId(null)}
                 onClick={() => toggleFolder(folder.id)}
@@ -295,7 +295,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
                     onKeyDown={(e) => e.key === "Enter" && handleSaveRename()}
                     autoFocus
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full bg-transparent border-b border-blue-500 text-sm focus:outline-none"
+                    className="w-full border-b border-complement bg-transparent text-sm focus:outline-none"
                   />
                 ) : (
                   <>
@@ -306,7 +306,7 @@ export default function NotesList({ opensidebar }: { opensidebar: boolean }) {
                           !isFolderOpen && "-rotate-90",
                         )}
                       />
-                      <IconFolder className="h-3.5 w-3.5 text-blue-400" />
+                      <IconFolder className="h-3.5 w-3.5 text-complement" />
                       <span className=" truncate py-1.5 ">{folder.name}</span>
                     </div>
 

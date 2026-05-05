@@ -39,7 +39,7 @@ export default function TextUpdaterNode({
   const isCustomColor = !!data.color;
 
   // Define a cor ativa (se não houver cor salva, usa roxo apenas para seleção)
-  const currentColor = data.color || "#9e86ed";
+  const currentColor = data.color || "var(--color-complement)";
 
   const onChange = useCallback(
     (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -60,7 +60,7 @@ export default function TextUpdaterNode({
   return (
     <div
       className={cn(
-        // Removemos o bg-slate-900 fixo e controlaremos via style para transição suave
+        // O fundo usa tokens para acompanhar o tema customizado.
         "flex w-full h-full flex-col border rounded-[8px] transition-all duration-300",
         selected ? "border-2" : "border"
       )}
@@ -68,16 +68,19 @@ export default function TextUpdaterNode({
         // 2. Lógica de Estilo Atualizada:
 
         // Borda: Aparece se estiver selecionado OU se já tiver uma cor definida
-        borderColor: selected || isCustomColor ? currentColor : "#334155",
+        borderColor:
+          selected || isCustomColor ? currentColor : "var(--color-secondary)",
 
         // Fundo: Se tiver cor, aplica um gradiente suave (10% de opacidade) sobre o fundo escuro.
-        // Se não, usa apenas o fundo escuro padrão (#0f172a = slate-900).
+        // Se não, usa apenas o fundo escuro definido pelo tema.
         background: isCustomColor
-          ? `linear-gradient(to bottom right, ${currentColor}1A, ${currentColor}05), #0f172a`
-          : "#0f172a",
+          ? `linear-gradient(to bottom right, color-mix(in srgb, ${currentColor} 10%, transparent), color-mix(in srgb, ${currentColor} 3%, transparent)), var(--color-third)`
+          : "var(--color-third)",
 
         // Sombra: Apenas quando selecionado para dar destaque extra
-        boxShadow: selected ? `0 0 15px ${currentColor}30` : "none",
+        boxShadow: selected
+          ? `0 0 15px color-mix(in srgb, ${currentColor} 30%, transparent)`
+          : "none",
       }}
     >
       <textarea
@@ -86,7 +89,7 @@ export default function TextUpdaterNode({
         rows={1}
         defaultValue={data.text}
         onChange={onChange}
-        className="resize-none flex w-full h-full px-4 py-2 focus:outline-none focus:ring-0 bg-transparent text-white"
+        className="flex h-full w-full resize-none bg-transparent px-4 py-2 text-font focus:outline-none focus:ring-0"
       />
 
       <NodeResizer
@@ -103,13 +106,13 @@ export default function TextUpdaterNode({
         position={data.toolbarPosition || Position.Top}
         align="center"
       >
-        <div className="bg-slate-900 px-4 py-2 mb-2 rounded-[8px] flex items-center justify-center gap-4 border border-slate-700 shadow-xl">
+        <div className="mb-2 flex items-center justify-center gap-4 rounded-[8px] border border-border bg-secondary px-4 py-2 shadow-xl">
           {showColorPicker ? (
             <>
               <ColorPicker onColorSelect={onColorSelect} />
               <button
                 onClick={() => setShowColorPicker(false)}
-                className="ml-2 hover:text-white text-slate-400"
+                className="ml-2 text-font/60 hover:text-font"
               >
                 <IconX className="h-4 w-4" />
               </button>
@@ -117,18 +120,18 @@ export default function TextUpdaterNode({
           ) : (
             <>
               <button
-                className="cursor-pointer hover:text-red-500 transition-colors text-slate-200"
+                className="cursor-pointer text-font/90 transition-colors hover:text-red-500"
                 onClick={onDelete}
               >
                 <IconTrash className="h-5 w-5" />
               </button>
               <button
-                className="cursor-pointer hover:text-purple-400 transition-colors text-slate-200"
+                className="cursor-pointer text-font/90 transition-colors hover:text-complement"
                 onClick={() => setShowColorPicker(true)}
               >
                 <IconPalette className="h-5 w-5" />
               </button>
-              <button className="cursor-pointer hover:text-blue-400 transition-colors text-slate-200">
+              <button className="cursor-pointer text-font/90 transition-colors hover:text-complement">
                 <IconTransform className="h-5 w-5" />
               </button>
             </>

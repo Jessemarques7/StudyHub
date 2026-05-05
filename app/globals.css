@@ -5,6 +5,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-main: var(--theme-main);
+  --color-secondary: var(--theme-secondary);
+  --color-third: var(--theme-third);
+  --color-complement: var(--theme-complement);
+  --color-font: var(--theme-font);
   --color-background: var(--background);
   --color-background-secondary: var(--background-secondary);
   --color-foreground: var(--foreground);
@@ -15,7 +20,6 @@
   --color-primary: var(--brand-purple);
   --color-primary-glow: var(--brand-purple-glow);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);

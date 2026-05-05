@@ -1,10 +1,30 @@
 :root {
+  /* Theme palette */
+  --theme-main: #1e1e1e;
+  --theme-secondary: #242424;
+  --theme-third: #2a2a2a;
+  --theme-complement: #a882ff;
+  --theme-font: #dcddde;
+  --color-main: var(--theme-main);
+  --color-secondary: var(--theme-secondary);
+  --color-third: var(--theme-third);
+  --color-complement: var(--theme-complement);
+  --color-font: var(--theme-font);
+
   /* Brand */
-  --brand-purple: oklch(0.6 0.2 270);
-  --brand-purple-glow: oklch(0.65 0.25 280);
-  --brand-purple-hover: oklch(0.54 0.22 270);
-  --brand-purple-subtle: oklch(0.6 0.2 270 / 0.1);
-  --brand-purple-border: oklch(0.6 0.2 270 / 0.2);
+  --brand-purple: var(--theme-complement);
+  --brand-purple-glow: color-mix(in srgb, var(--theme-complement) 70%, white);
+  --brand-purple-hover: color-mix(in srgb, var(--theme-complement) 84%, black);
+  --brand-purple-subtle: color-mix(
+    in srgb,
+    var(--theme-complement) 12%,
+    transparent
+  );
+  --brand-purple-border: color-mix(
+    in srgb,
+    var(--theme-complement) 24%,
+    transparent
+  );
 
   /* Layout */
   --header-height: 56px;
@@ -14,31 +34,40 @@
   --radius: var(--radius-card);
 
   /* Shadows */
-  --shadow-glow: 0 0 40px oklch(0.6 0.2 270 / 0.3);
-  --shadow-card: 0 10px 30px -10px oklch(0.08 0.02 264 / 0.5);
+  --shadow-glow: 0 0 40px
+    color-mix(in srgb, var(--theme-complement) 30%, transparent);
+  --shadow-card: 0 10px 30px -10px rgb(0 0 0 / 0.5);
 
   /* Core surfaces */
-  --background: rgb(2 6 23);
-  --background-secondary: rgb(2 6 23 / 0.8);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.129 0.042 264.695);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.65 0.22 280);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.129 0.042 264.695);
-  --muted-foreground: oklch(0.6 0.01 264);
-  --accent: oklch(0.409 0.09 264.695);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: var(--theme-main);
+  --background-secondary: color-mix(
+    in srgb,
+    var(--theme-secondary) 88%,
+    transparent
+  );
+  --foreground: var(--theme-font);
+  --card: var(--theme-secondary);
+  --card-foreground: var(--theme-font);
+  --popover: var(--theme-third);
+  --popover-foreground: var(--theme-font);
+  --primary-foreground: var(--theme-font);
+  --secondary: var(--theme-secondary);
+  --secondary-foreground: var(--theme-font);
+  --muted: color-mix(in srgb, var(--theme-secondary) 78%, var(--theme-third));
+  --muted-foreground: color-mix(in srgb, var(--theme-font) 62%, transparent);
+  --accent: color-mix(
+    in srgb,
+    var(--theme-complement) 18%,
+    var(--theme-secondary)
+  );
+  --accent-foreground: var(--theme-font);
   --destructive: oklch(0.6 0.22 25);
-  --destructive-foreground: oklch(0.985 0 0);
+  --destructive-foreground: var(--theme-font);
   --success: oklch(0.45 0.15 145);
   --warning: oklch(0.65 0.2 60);
-  --border: oklch(0.235 0.045 265);
-  --input: oklch(0.18 0.04 265);
-  --ring: var(--brand-purple);
+  --border: color-mix(in srgb, var(--theme-font) 12%, transparent);
+  --input: color-mix(in srgb, var(--theme-third) 85%, var(--theme-secondary));
+  --ring: var(--theme-complement);
 
   /* Secondary systems */
   --chart-1: oklch(0.646 0.222 41.116);
@@ -46,29 +75,53 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: var(--brand-purple);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 0.1);
-  --sidebar-ring: var(--brand-purple);
+  --sidebar: var(--theme-third);
+  --sidebar-foreground: var(--theme-font);
+  --sidebar-primary: var(--theme-complement);
+  --sidebar-primary-foreground: var(--theme-font);
+  --sidebar-accent: var(--theme-secondary);
+  --sidebar-accent-foreground: var(--theme-font);
+  --sidebar-border: color-mix(in srgb, var(--theme-font) 10%, transparent);
+  --sidebar-ring: var(--theme-complement);
   --color-text-secondary: var(--muted-foreground);
-  --color-border-tertiary: oklch(1 0 0 / 0.15);
+  --color-border-tertiary: color-mix(
+    in srgb,
+    var(--theme-font) 15%,
+    transparent
+  );
 
   /* Scrollbars and editor surfaces */
-  --scrollbar-track: oklch(0.13 0.042 264.695);
-  --scrollbar-thumb: oklch(0.38 0.05 264);
-  --scrollbar-thumb-hover: oklch(0.48 0.06 264);
-  --blocknote-menu-bg: oklch(0.18 0.04 265);
-  --blocknote-surface: oklch(0.22 0.045 265);
-  --blocknote-input-bg: oklch(0.13 0.042 264.695);
-  --blocknote-hover-bg: oklch(0.34 0.05 264);
-  --blocknote-separator: oklch(0.42 0.045 264);
-  --blocknote-text: oklch(0.92 0.01 264);
-  --blocknote-text-strong: oklch(1 0 0);
-  --blocknote-placeholder: oklch(0.55 0.035 264);
+  --scrollbar-track: var(--theme-third);
+  --scrollbar-thumb: color-mix(
+    in srgb,
+    var(--theme-font) 20%,
+    var(--theme-secondary)
+  );
+  --scrollbar-thumb-hover: color-mix(
+    in srgb,
+    var(--theme-font) 30%,
+    var(--theme-secondary)
+  );
+  --blocknote-menu-bg: var(--theme-secondary);
+  --blocknote-surface: color-mix(
+    in srgb,
+    var(--theme-secondary) 84%,
+    var(--theme-font)
+  );
+  --blocknote-input-bg: var(--theme-third);
+  --blocknote-hover-bg: color-mix(
+    in srgb,
+    var(--theme-secondary) 72%,
+    var(--theme-complement)
+  );
+  --blocknote-separator: color-mix(in srgb, var(--theme-font) 22%, transparent);
+  --blocknote-text: var(--theme-font);
+  --blocknote-text-strong: var(--theme-font);
+  --blocknote-placeholder: color-mix(
+    in srgb,
+    var(--theme-font) 54%,
+    transparent
+  );
 
   /* Calendar */
   --calendar-color-1-bg: oklch(0.58 0.2 275 / 0.1);
@@ -111,4 +164,17 @@
   --calendar-today-blue: oklch(0.62 0.2 255);
   --calendar-today-blue-subtle: oklch(0.38 0.13 260 / 0.15);
   --calendar-today-blue-border: oklch(0.62 0.2 255 / 0.4);
+}
+
+.dark {
+  --theme-main: #191919;
+  --theme-secondary: #202020;
+  --theme-third: #0a0a0a;
+  --theme-complement: #2098d8;
+  --theme-font: #f0efed;
+  --color-main: var(--theme-main);
+  --color-secondary: var(--theme-secondary);
+  --color-third: var(--theme-third);
+  --color-complement: var(--theme-complement);
+  --color-font: var(--theme-font);
 }

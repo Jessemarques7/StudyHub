@@ -49,12 +49,12 @@ const edgeTypes = {
 };
 
 const defaultEdgeOptions = {
-  style: { strokeWidth: 1, stroke: "#b1b1b7" },
+  style: { strokeWidth: 1, stroke: "var(--color-font)" },
   markerEnd: {
     type: MarkerType.ArrowClosed,
     width: 16,
     height: 16,
-    color: "#b1b1b7",
+    color: "var(--color-font)",
   },
   type: "default",
 };
@@ -204,22 +204,22 @@ function Flow() {
           onClick={() => setIsSidebarVisible(!isSidebarVisible)}
           variant="ghost"
           size="icon"
-          className="absolute top-2 left-4 z-50 text-white hover:bg-slate-700 hover:text-white"
+          className="absolute left-4 top-2 z-50 text-font hover:bg-complement/20 hover:text-font"
         >
           <IconLayoutSidebar className="h-8 w-8" />
         </Button>
         {/* Container do Grafo com renderização condicional */}
         {isSidebarVisible && (
-          <div className=" w-fit h-full absolute z-10 px-4 py-10 flex-shrink-0 border   bg-slate-900 ">
+          <div className="absolute z-10 h-full w-fit flex-shrink-0 border border-border bg-secondary px-4 py-10">
             <DiagramsList opensidebar={isSidebarVisible} />
           </div>
         )}
         <Controls
           position={"center-right"}
-          className="bg-slate-900 border border-neutral-700 rounded-xl p-1"
+          className="rounded-xl border border-border bg-secondary p-1"
         />
         <Panel position="bottom-center">
-          <div className="bg-slate-900 px-8 py-3 mb-2 border border-neutral-700 rounded-[16px] flex items-center justify-center gap-6">
+          <div className="mb-2 flex items-center justify-center gap-6 rounded-[16px] border border-border bg-secondary px-8 py-3">
             <button
               onClick={() => {
                 setNodes((nds) =>
@@ -231,14 +231,14 @@ function Flow() {
                   }),
                 );
               }}
-              className="cursor-pointer hover:text-slate-300 transition-colors"
+              className="cursor-pointer transition-colors hover:text-complement"
             >
               <IconNote className="h-12 w-12" />
             </button>
-            <div className="w-px h-8 bg-slate-700" />
+            <div className="h-8 w-px bg-border" />
             <button
               onClick={addImageNode}
-              className="cursor-pointer hover:text-slate-300 transition-colors"
+              className="cursor-pointer transition-colors hover:text-complement"
             >
               <IconPhoto className="h-12 w-12" />
             </button>

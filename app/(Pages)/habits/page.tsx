@@ -203,7 +203,7 @@ function HabitIconPicker({
 
       {/* Positioned Popover Modal */}
       <div
-        className="absolute bg-background border border-slate-700 rounded-xl shadow-card p-4 w-full max-w-[340px] animate-in fade-in zoom-in-95 duration-200 custom-emoji-theme"
+        className="absolute w-full max-w-[340px] rounded-xl border border-border bg-background p-4 shadow-card animate-in fade-in zoom-in-95 duration-200 custom-emoji-theme"
         style={{
           top: topPos,
           left: rect ? rect.left : 0,
@@ -212,7 +212,7 @@ function HabitIconPicker({
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-gray-200">
+          <h3 className="text-sm font-semibold text-font">
             Escolher Ícone
           </h3>
           <div className="flex items-center gap-3">
@@ -229,7 +229,7 @@ function HabitIconPicker({
             )}
             <button
               onClick={handleClose}
-              className="text-gray-400 hover:text-gray-200 p-1 transition-colors"
+              className="p-1 text-font/60 transition-colors hover:text-font"
             >
               <X className="w-4 h-4" />
             </button>
@@ -237,7 +237,7 @@ function HabitIconPicker({
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-4 border-b border-slate-700">
+        <div className="mb-4 flex gap-2 border-b border-border">
           {(["emoji", "upload", "link"] as TabType[]).map((tabName) => (
             <button
               key={tabName}
@@ -245,8 +245,8 @@ function HabitIconPicker({
               className={cn(
                 "text-sm px-4 py-2 capitalize transition-colors",
                 tab === tabName
-                  ? "border-b-2 border-blue-500 text-gray-200 font-medium"
-                  : "text-gray-400 hover:text-gray-200",
+                  ? "border-b-2 border-complement font-medium text-font"
+                  : "text-font/60 hover:text-font",
               )}
             >
               {tabName}
@@ -271,7 +271,7 @@ function HabitIconPicker({
 
         {tab === "upload" && (
           <div className="p-2">
-            <label className="text-xs font-medium text-gray-400 mb-2 block">
+            <label className="mb-2 block text-xs font-medium text-font/60">
               Envie uma imagem (máx 5MB)
             </label>
             <input
@@ -279,14 +279,14 @@ function HabitIconPicker({
               type="file"
               accept="image/*"
               onChange={handleFileUpload}
-              className="text-sm text-gray-300 w-full file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-colors"
+              className="w-full text-sm text-font/80 transition-colors file:mr-3 file:rounded-md file:border-0 file:bg-complement file:px-4 file:py-2 file:text-xs file:font-semibold file:text-font hover:file:bg-complement/90"
             />
           </div>
         )}
 
         {tab === "link" && (
           <div className="mb-2">
-            <label className="text-xs font-medium text-gray-400 mb-2 block">
+            <label className="mb-2 block text-xs font-medium text-font/60">
               URL da Imagem
             </label>
             <div className="flex gap-2">
@@ -295,12 +295,12 @@ function HabitIconPicker({
                 value={customUrl}
                 onChange={(e) => setCustomUrl(e.target.value)}
                 placeholder="https://exemplo.com/icone.png"
-                className="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                className="flex-1 rounded-md border border-border bg-secondary px-3 py-2 text-sm text-font placeholder:text-muted-foreground transition-colors focus:border-complement focus:outline-none"
                 onKeyDown={(e) => e.key === "Enter" && handleCustomUrl()}
               />
               <button
                 onClick={handleCustomUrl}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm transition-colors font-medium"
+                className="rounded-md bg-complement px-4 py-2 text-sm font-medium text-font transition-colors hover:bg-complement/90"
               >
                 Salvar
               </button>
@@ -716,12 +716,12 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-zinc-100 font-sans selection:bg-blue-500/30 pb-20">
+    <div className="min-h-screen bg-background pb-20 font-sans text-font selection:bg-complement/30">
       {/* Global override to style the React Emoji Picker */}
       <style>{`
         .custom-emoji-theme .EmojiPickerReact {
-          --epr-bg-color: #0f172a !important; /* Tailwind slate-900 */
-          --epr-category-label-bg-color: #0f172a !important;
+          --epr-bg-color: var(--color-third) !important;
+          --epr-category-label-bg-color: var(--color-third) !important;
           border: none !important;
         }
       `}</style>
@@ -733,7 +733,7 @@ export default function App() {
             <h2 className="text-lg font-semibold">Progresso da Semana</h2>
           </div>
 
-          <div className="relative bg-zinc-900/30 rounded-2xl p-6 border border-zinc-800/50">
+          <div className="relative rounded-2xl border border-border bg-secondary/30 p-6">
             <div className="h-48 w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
@@ -748,41 +748,49 @@ export default function App() {
                       x2="0"
                       y2="1"
                     >
-                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+                      <stop
+                        offset="5%"
+                        stopColor="var(--color-complement)"
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="var(--color-complement)"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     vertical={false}
-                    stroke="#27272a"
+                    stroke="var(--border)"
                   />
                   <XAxis
                     dataKey="day"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: "#71717a", fontSize: 10 }}
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
                     dy={10}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: "#71717a", fontSize: 10 }}
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
                     tickFormatter={(val) => `${val}%`}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#18181b",
-                      borderColor: "#3f3f46",
-                      color: "#fff",
+                      backgroundColor: "var(--color-secondary)",
+                      borderColor: "var(--border)",
+                      color: "var(--color-font)",
                       borderRadius: "12px",
                     }}
-                    itemStyle={{ color: "#2563eb" }}
+                    itemStyle={{ color: "var(--color-complement)" }}
                   />
                   <Area
                     type="monotone"
                     dataKey="progress"
-                    stroke="#2563eb"
+                    stroke="var(--color-complement)"
                     strokeWidth={3}
                     fillOpacity={1}
                     fill="url(#colorProgress)"
@@ -802,26 +810,26 @@ export default function App() {
             </h2>
 
             {/* Pagination Controls */}
-            <div className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 rounded-full px-2 py-1">
+            <div className="flex items-center gap-3 rounded-full border border-border bg-secondary/50 px-2 py-1">
               <button
                 onClick={() => setWeekOffset((p) => p - 1)}
-                className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full transition-colors"
+                className="rounded-full p-1.5 text-font/60 transition-colors hover:bg-secondary hover:text-font"
               >
                 <ChevronLeft size={18} />
               </button>
-              <span className="text-xs font-semibold text-zinc-300 w-32 text-center capitalize">
+              <span className="w-32 text-center text-xs font-semibold capitalize text-font/80">
                 {weekLabel}
               </span>
               <button
                 onClick={() => setWeekOffset((p) => p + 1)}
-                className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full transition-colors"
+                className="rounded-full p-1.5 text-font/60 transition-colors hover:bg-secondary hover:text-font"
               >
                 <ChevronRight size={18} />
               </button>
               {weekOffset !== 0 && (
                 <button
                   onClick={() => setWeekOffset(0)}
-                  className="text-[10px] font-bold text-blue-500 hover:text-blue-400 ml-2 mr-2 transition-colors uppercase"
+                  className="ml-2 mr-2 text-[10px] font-bold uppercase text-complement transition-colors hover:text-complement/80"
                 >
                   Hoje
                 </button>
@@ -832,7 +840,7 @@ export default function App() {
               <button
                 onClick={() => setIsAdding(true)}
                 disabled={loading}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
+                className="flex items-center gap-2 rounded-full bg-complement px-5 py-2.5 text-xs font-bold text-font shadow-lg shadow-complement/20 transition-all active:scale-95 hover:bg-complement/90"
               >
                 <Plus size={16} /> Adicionar Hábito
               </button>
@@ -843,14 +851,14 @@ export default function App() {
           {isAdding && (
             <form
               onSubmit={handleAddHabit}
-              className="mb-6 flex items-center gap-3 bg-zinc-900/50 p-4 rounded-2xl border border-zinc-800/50"
+              className="mb-6 flex items-center gap-3 rounded-2xl border border-border bg-secondary/50 p-4"
             >
               <input
                 type="text"
                 autoFocus
                 disabled={loading}
                 placeholder="Qual novo hábito você quer construir?"
-                className="flex-1 bg-transparent border-none text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-0"
+                className="flex-1 border-none bg-transparent text-sm text-font placeholder:text-muted-foreground focus:outline-none focus:ring-0"
                 value={newHabitName}
                 onChange={(e) => setNewHabitName(e.target.value)}
               />
@@ -859,14 +867,14 @@ export default function App() {
                   type="button"
                   onClick={() => setIsAdding(false)}
                   disabled={loading}
-                  className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full transition-colors"
+                  className="rounded-full p-2 text-font/60 transition-colors hover:bg-secondary hover:text-font"
                 >
                   <X size={18} />
                 </button>
                 <button
                   type="submit"
                   disabled={loading || !newHabitName.trim()}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-full text-xs font-bold transition-all"
+                  className="rounded-full bg-complement px-4 py-2 text-xs font-bold text-font transition-all hover:bg-complement/90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Salvar
                 </button>
@@ -877,9 +885,9 @@ export default function App() {
           <div className="overflow-x-auto pb-4 scrollbar-hide">
             <table className="w-full border-collapse min-w-[800px]">
               <thead>
-                <tr className="text-zinc-500 text-[10px] uppercase tracking-widest">
+                <tr className="text-[10px] uppercase tracking-widest text-font/50">
                   <th className="text-left pb-4 font-medium w-72">Hábito</th>
-                  <th className="pb-4 px-2 font-medium border-l border-zinc-800/50 text-zinc-300">
+                  <th className="border-l border-border px-2 pb-4 font-medium text-font/80">
                     <div className="flex justify-between gap-1 px-1">
                       {calendarDays.map((dateObj, d) => {
                         const isToday =
@@ -894,7 +902,7 @@ export default function App() {
                           <div
                             key={d}
                             className={`w-10 flex flex-col items-center gap-1.5 ${
-                              isToday ? "text-blue-500 font-bold" : "opacity-60"
+                              isToday ? "font-bold text-complement" : "opacity-60"
                             }`}
                           >
                             <span className="text-[9px] uppercase tracking-widest">
@@ -902,7 +910,7 @@ export default function App() {
                             </span>
                             <span
                               className={`w-7 h-7 flex items-center justify-center text-sm ${
-                                isToday ? "bg-blue-500/10 rounded-full" : ""
+                                isToday ? "rounded-full bg-complement/10" : ""
                               }`}
                             >
                               {dateObj.getDate()}
@@ -917,11 +925,11 @@ export default function App() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/30">
+              <tbody className="divide-y divide-border">
                 {loading && (
                   <tr>
                     <td colSpan={3} className="py-12 text-center">
-                      <div className="flex items-center justify-center gap-3 text-zinc-500 text-sm">
+                      <div className="flex items-center justify-center gap-3 text-sm text-font/50">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Carregando habitos...
                       </div>
@@ -932,7 +940,7 @@ export default function App() {
                   <tr>
                     <td
                       colSpan={3}
-                      className="py-12 text-center text-zinc-500 text-sm"
+                      className="py-12 text-center text-sm text-font/50"
                     >
                       Nenhum hábito cadastrado. Comece adicionando um!
                     </td>
@@ -949,7 +957,7 @@ export default function App() {
                   return (
                     <tr
                       key={habit.id}
-                      className="group hover:bg-zinc-900/20 transition-colors"
+                      className="group transition-colors hover:bg-secondary/20"
                     >
                       <td className="py-4 pr-4">
                         <div className="flex items-center gap-3">
@@ -962,7 +970,7 @@ export default function App() {
                             onRemove={() => handleIconChange(habit.id, "🎯")}
                           >
                             <div
-                              className="w-10 h-10 flex items-center justify-center bg-zinc-800/50 rounded-xl hover:bg-blue-500/10 transition-colors overflow-hidden"
+                              className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-secondary/50 transition-colors hover:bg-complement/10"
                               title="Alterar Ícone"
                             >
                               {isImageUrl(currentIcon) ? (
@@ -989,7 +997,7 @@ export default function App() {
                                 if (e.key === "Enter") handleSaveEdit(habit.id);
                                 if (e.key === "Escape") setEditingId(null);
                               }}
-                              className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-sm text-white w-full focus:outline-none focus:border-blue-500"
+                              className="w-full rounded border border-border bg-secondary px-2 py-1 text-sm text-font focus:border-complement focus:outline-none"
                             />
                           ) : (
                             <span
@@ -997,7 +1005,7 @@ export default function App() {
                                 setEditingId(habit.id);
                                 setEditName(habit.name);
                               }}
-                              className="text-sm font-semibold group-hover:text-white transition-colors cursor-pointer select-none"
+                              className="cursor-pointer select-none text-sm font-semibold transition-colors group-hover:text-font"
                             >
                               {habit.name}
                             </span>
@@ -1010,7 +1018,7 @@ export default function App() {
                                 setEditingId(habit.id);
                                 setEditName(habit.name);
                               }}
-                              className="p-1.5 text-zinc-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-md transition-colors"
+                              className="rounded-md p-1.5 text-font/45 transition-colors hover:bg-complement/10 hover:text-complement"
                               title="Editar"
                             >
                               <Edit2 size={14} />
@@ -1026,7 +1034,7 @@ export default function App() {
                         </div>
                       </td>
 
-                      <td className="py-4 px-2 border-l border-zinc-800/50">
+                      <td className="border-l border-border px-2 py-4">
                         <div className="flex justify-between gap-1 px-1">
                           {calendarDays.map((dateObj, d) => {
                             const dateStr = toDateString(dateObj);
@@ -1039,8 +1047,8 @@ export default function App() {
                                   className={`w-14 h-10 rounded-xl flex items-center justify-center transition-all duration-300 transform active:scale-90
                                       ${
                                         isCompleted
-                                          ? "bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]"
-                                          : "border-2 border-zinc-800 hover:border-zinc-600 bg-zinc-900/50"
+                                           ? "bg-complement text-font shadow-glow"
+                                           : "border-2 border-border bg-secondary/50 hover:border-complement/40"
                                       }`}
                                 >
                                   {isCompleted && (
@@ -1057,18 +1065,18 @@ export default function App() {
                         <div className="flex items-center justify-end gap-6">
                           <div className="flex items-center gap-4 text-right">
                             <div className="flex flex-col">
-                              <span className="text-xl font-bold text-white leading-none">
+                              <span className="text-xl font-bold leading-none text-font">
                                 {current}
                               </span>
-                              <span className="text-[10px] uppercase text-zinc-500 font-bold tracking-wider">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-font/50">
                                 Atual
                               </span>
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-xl font-bold text-white leading-none">
+                              <span className="text-xl font-bold leading-none text-font">
                                 {max}
                               </span>
-                              <span className="text-[10px] uppercase text-zinc-500 font-bold tracking-wider">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-font/50">
                                 Recorde
                               </span>
                             </div>
@@ -1077,7 +1085,11 @@ export default function App() {
                           <div className="w-12 h-12 flex-shrink-0">
                             <ProgressRing
                               progress={progress}
-                              color={progress === 100 ? "#22c55e" : "#3b82f6"}
+                              color={
+                                progress === 100
+                                  ? "var(--success)"
+                                  : "var(--color-complement)"
+                              }
                               size={48}
                             />
                           </div>
@@ -1093,8 +1105,8 @@ export default function App() {
 
         {/* Weekly Footer Summary */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-zinc-900/40 p-6 rounded-3xl border border-zinc-800/50">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">
+          <div className="rounded-3xl border border-border bg-secondary/40 p-6">
+            <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-font/50">
               Eficiência da {weekLabel}
             </h3>
             <div className="flex items-center justify-between mb-2">
@@ -1103,23 +1115,23 @@ export default function App() {
                 {thisWeekProgress}%
               </span>
             </div>
-            <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
               <div
                 className="bg-green-500 h-full transition-all duration-1000 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
                 style={{ width: `${thisWeekProgress}%` }}
               />
             </div>
           </div>
-          <div className="bg-zinc-900/40 p-6 rounded-3xl border border-zinc-800/50 flex flex-col justify-center items-center text-center">
-            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-border bg-secondary/40 p-6 text-center">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-font/50">
               Total de Checkins (Geral)
             </p>
-            <div className="text-3xl font-black text-white flex items-baseline gap-1">
+            <div className="flex items-baseline gap-1 text-3xl font-black text-font">
               {habits.reduce(
                 (acc, h) => acc + Object.keys(h.completedDates || {}).length,
                 0,
               )}
-              <span className="text-xs text-zinc-600 font-bold uppercase tracking-widest">
+              <span className="text-xs font-bold uppercase tracking-widest text-font/40">
                 Feitos
               </span>
             </div>

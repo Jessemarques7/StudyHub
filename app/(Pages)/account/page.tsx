@@ -16,6 +16,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ProfileForm } from "./profile-form";
 import { SecurityForm } from "./security-form";
+import { AppearanceForm } from "./appearance-form";
 import { AvatarUpload } from "./avatar-upload";
 
 export default async function AccountPage() {
@@ -35,7 +36,7 @@ export default async function AccountPage() {
   const avatarUrl = user.user_metadata?.avatar_url || null;
 
   return (
-    <div className="container w-full py-16 px-32 bg-slate-950">
+    <div className="container min-h-screen w-full bg-main px-4 py-16 text-font md:px-12 lg:px-32">
       <div className="space-y-0.5 mb-8">
         <h2 className="text-2xl font-bold tracking-tight">
           Configurações da Conta
@@ -49,6 +50,7 @@ export default async function AccountPage() {
       <Tabs defaultValue="profile" className="space-y-8">
         <TabsList>
           <TabsTrigger value="profile">Perfil</TabsTrigger>
+          <TabsTrigger value="appearance">Aparência</TabsTrigger>
           <TabsTrigger value="security">Segurança</TabsTrigger>
         </TabsList>
 
@@ -90,6 +92,20 @@ export default async function AccountPage() {
             </CardHeader>
             <CardContent>
               <SecurityForm />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="appearance">
+          <Card>
+            <CardHeader>
+              <CardTitle>Aparência</CardTitle>
+              <CardDescription>
+                Ajuste as cores principais da interface.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AppearanceForm />
             </CardContent>
           </Card>
         </TabsContent>

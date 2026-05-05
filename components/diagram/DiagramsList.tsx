@@ -141,7 +141,7 @@ export default function DiagramsList({
           onBlur={handleSaveRename}
           onKeyDown={(e) => e.key === "Enter" && handleSaveRename()}
           autoFocus
-          className="w-full bg-transparent border-b border-blue-500 focus:outline-none text-sm px-2 py-1.5 text-neutral-200"
+          className="w-full border-b border-complement bg-transparent px-2 py-1.5 text-sm text-font focus:outline-none"
           onClick={(e) => e.stopPropagation()}
         />
       ) : (
@@ -150,8 +150,8 @@ export default function DiagramsList({
           className={cn(
             "flex items-center gap-2 px-2 py-1.5 rounded-md transition-all",
             currentDiagramId === diagram.id
-              ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
-              : "hover:bg-neutral-200 dark:hover:bg-blue-900/30 text-neutral-700 dark:text-neutral-200",
+              ? "bg-complement/15 text-complement"
+              : "text-neutral-700 hover:bg-neutral-200 dark:text-font/80 dark:hover:bg-complement/10",
           )}
         >
           <IconSitemap className="h-4 w-4 shrink-0" />
@@ -192,7 +192,7 @@ export default function DiagramsList({
   return (
     <div className="flex-1 ">
       <div className="">
-        <div className="flex items-center justify-between w-full text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-blue-900/30 rounded-md px-2 py-2 transition-colors group">
+        <div className="group flex w-full items-center justify-between rounded-md px-2 py-2 text-neutral-700 transition-colors hover:bg-neutral-200 dark:text-font/80 dark:hover:bg-complement/10">
           <button
             onClick={() => setListOpen(!listOpen)}
             className="flex items-center gap-2 flex-1 min-w-0"
@@ -241,7 +241,7 @@ export default function DiagramsList({
           return (
             <div key={folder.id} className="relative">
               <div
-                className="group flex items-center justify-between px-2 py-1.5 hover:bg-neutral-200 dark:hover:bg-blue-900/20 rounded-md cursor-pointer text-neutral-600 dark:text-neutral-300"
+                className="group flex cursor-pointer items-center justify-between rounded-md px-2 py-1.5 text-neutral-600 hover:bg-neutral-200 dark:text-font/75 dark:hover:bg-complement/10"
                 onMouseEnter={() => setHoveredItemId(folder.id)}
                 onMouseLeave={() => setHoveredItemId(null)}
                 onClick={() => toggleFolder(folder.id)}
@@ -254,7 +254,7 @@ export default function DiagramsList({
                     onKeyDown={(e) => e.key === "Enter" && handleSaveRename()}
                     autoFocus
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full bg-transparent border-b border-blue-500 text-sm focus:outline-none"
+                    className="w-full border-b border-complement bg-transparent text-sm focus:outline-none"
                   />
                 ) : (
                   <>
@@ -262,7 +262,7 @@ export default function DiagramsList({
                       <IconChevronDown
                         className={cn("h-3 w-3", !isFolderOpen && "-rotate-90")}
                       />
-                      <IconFolder className="h-3.5 w-3.5 text-blue-400" />
+                      <IconFolder className="h-3.5 w-3.5 text-complement" />
                       <span className="text-sm truncate">{folder.name}</span>
                     </div>
                     <div

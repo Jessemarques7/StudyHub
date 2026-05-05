@@ -145,7 +145,7 @@ export function CoverPicker({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-300 bg-black/50 hover:bg-black/70 rounded-md transition-colors"
+        className="flex items-center gap-2 rounded-md bg-third/50 px-3 py-1.5 text-sm text-font/80 transition-colors hover:bg-third/70"
       >
         <Image className="w-4 h-4" />
         <span>{currentCover ? "Change cover" : "Add cover"}</span>
@@ -155,10 +155,10 @@ export function CoverPicker({
         <>
           <div className="fixed inset-0 z-40" onClick={handleClose} />
 
-          <div className="absolute right-0 top-full mt-2 w-96 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 p-4 max-h-[500px] overflow-y-auto">
+          <div className="absolute right-0 top-full z-50 mt-2 max-h-[500px] w-96 overflow-y-auto rounded-lg border border-border bg-secondary p-4 shadow-xl">
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-gray-200">
+              <h3 className="text-sm font-semibold text-font">
                 Select Cover
               </h3>
               <div className="flex gap-2">
@@ -172,7 +172,7 @@ export function CoverPicker({
                 )}
                 <button
                   onClick={handleClose}
-                  className="text-gray-400 hover:text-gray-200"
+                  className="text-font/60 hover:text-font"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -180,7 +180,7 @@ export function CoverPicker({
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-4 border-b border-slate-700">
+            <div className="mb-4 flex gap-2 border-b border-border">
               {(["gallery", "upload", "link"] as TabType[]).map((tabName) => (
                 <button
                   key={tabName}
@@ -188,8 +188,8 @@ export function CoverPicker({
                   className={cn(
                     "text-sm px-4 py-2 capitalize",
                     tab === tabName
-                      ? "border-b-2 border-blue-500 text-gray-200"
-                      : "text-gray-400 hover:text-gray-200"
+                      ? "border-b-2 border-complement text-font"
+                      : "text-font/60 hover:text-font"
                   )}
                 >
                   {tabName}
@@ -200,7 +200,7 @@ export function CoverPicker({
             {/* Tab Content */}
             {tab === "gallery" && (
               <div className="mb-4">
-                <h4 className="text-xs font-medium text-gray-400 mb-2">
+                <h4 className="mb-2 text-xs font-medium text-font/60">
                   Gradients
                 </h4>
                 <div className="grid grid-cols-4 gap-2">
@@ -209,7 +209,7 @@ export function CoverPicker({
                       key={index}
                       onClick={() => handleGradientSelect(gradient)}
                       className={cn(
-                        "h-16 rounded-lg border-2 border-transparent hover:border-blue-500 transition-all",
+                        "h-16 rounded-lg border-2 border-transparent transition-all hover:border-complement",
                         gradient
                       )}
                     />
@@ -220,7 +220,7 @@ export function CoverPicker({
 
             {tab === "upload" && (
               <div className="p-2">
-                <label className="text-xs font-medium text-gray-400 mb-2 block">
+                <label className="mb-2 block text-xs font-medium text-font/60">
                   Upload an image (max {MAX_COVER_FILE_SIZE / (1024 * 1024)}MB)
                 </label>
                 <input
@@ -228,14 +228,14 @@ export function CoverPicker({
                   type="file"
                   accept="image/*"
                   onChange={handleCoverUpload}
-                  className="text-sm text-gray-300 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                  className="text-sm text-font/80 file:mr-2 file:rounded file:border-0 file:bg-complement file:px-2 file:py-1 file:text-xs file:font-semibold file:text-font hover:file:bg-complement/90"
                 />
               </div>
             )}
 
             {tab === "link" && (
               <div className="mb-4">
-                <label className="text-xs font-medium text-gray-400 mb-2 block">
+                <label className="mb-2 block text-xs font-medium text-font/60">
                   Image URL
                 </label>
                 <div className="flex gap-2">
@@ -244,12 +244,12 @@ export function CoverPicker({
                     value={customUrl}
                     onChange={(e) => setCustomUrl(e.target.value)}
                     placeholder="https://example.com/image.jpg"
-                    className="flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                    className="flex-1 rounded border border-border bg-third px-3 py-2 text-sm text-font placeholder:text-muted-foreground focus:border-complement focus:outline-none"
                     onKeyDown={(e) => e.key === "Enter" && handleCustomUrl()}
                   />
                   <button
                     onClick={handleCustomUrl}
-                    className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
+                    className="rounded bg-complement px-3 py-2 text-sm text-font transition-colors hover:bg-complement/90"
                   >
                     Add
                   </button>

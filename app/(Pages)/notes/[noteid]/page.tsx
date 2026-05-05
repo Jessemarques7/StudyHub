@@ -42,12 +42,21 @@ export default function NotePage() {
         {isGraphVisible && (
           <ResizablePanel
             defaultSize="30%"
-            className="flex border border-neutral-200   dark:border-neutral-700"
+            // 1. Adicionamos "relative" e "overflow-hidden" no className do painel
+            className="relative flex overflow-hidden border border-border"
           >
-            <Graph classname="h-full  w-full" />
+            {/* 2. Componentes de fundo */}
+            <StarsBackground className="absolute inset-0 z-0" />
+            <ShootingStars
+              className="absolute inset-0 z-0"
+              minDelay={2000}
+              maxDelay={5000}
+            />
 
-            <ShootingStars className="-z-10" minDelay={2000} maxDelay={5000} />
-            <StarsBackground className="-z-10" />
+            {/* 3. O Gráfico é envolvido para ficar acima das estrelas (z-10) */}
+            <div className="relative z-10 w-full h-full">
+              <Graph classname="h-full w-full" />
+            </div>
           </ResizablePanel>
         )}
 
@@ -60,7 +69,7 @@ export default function NotePage() {
           }}
           variant="ghost"
           size="icon"
-          className="absolute top-24 right-4 z-50 text-white bg-slate-900 hover:bg-slate-700 hover:text-white"
+          className="absolute right-4 top-24 z-50 bg-secondary text-font hover:bg-complement/20 hover:text-font"
         >
           <IconLayoutSidebarRight className="h-8 w-8" />
         </Button>
@@ -68,7 +77,7 @@ export default function NotePage() {
         {isSidebarVisible && (
           <ResizablePanel
             defaultSize="20%"
-            className=" px-4 py-4 flex-shrink-0 border   bg-slate-900 "
+            className="flex-shrink-0 border border-border bg-secondary px-4 py-4"
           >
             <NotesList opensidebar={isSidebarVisible} />
           </ResizablePanel>
@@ -82,7 +91,7 @@ export default function NotePage() {
           }}
           variant="ghost"
           size="icon"
-          className="absolute top-14 right-4 z-10 text-white bg-slate-900 hover:bg-slate-700 hover:text-white"
+          className="absolute right-4 top-14 z-10 bg-secondary text-font hover:bg-complement/20 hover:text-font"
         >
           {/* {isGraphVisible ? (
             <PanelRightClose className="h-5 w-5" />

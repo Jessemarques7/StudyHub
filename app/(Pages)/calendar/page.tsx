@@ -471,8 +471,8 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] mt-15 mx-32 flex flex-col rounded-2xl glass text-foreground border-white/10 shadow-glow border relative overflow-hidden bg-background/30">
-      <header className="flex flex-col md:flex-row items-center justify-between px-6 py-3 border-b border-white/10 gap-4 bg-black/20 backdrop-blur-md">
+    <div className="relative mx-32 mt-15 flex h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-2xl border border-border bg-background/30 text-foreground shadow-glow glass">
+      <header className="flex flex-col items-center justify-between gap-4 border-b border-border bg-third/40 px-6 py-3 backdrop-blur-md md:flex-row">
         <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-glow transition-transform hover:scale-110">
@@ -483,12 +483,12 @@ export default function CalendarPage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-1 ml-4 bg-background-secondary p-1 rounded-xl border border-white/5">
+          <div className="ml-4 flex items-center gap-1 rounded-xl border border-border bg-background-secondary p-1">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => calendarRef.current?.getApi().prev()}
-              className="h-9 w-9 hover:bg-white/10 text-white"
+              className="h-9 w-9 text-font hover:bg-font/10"
             >
               <ChevronLeft className="w-5 h-5" />
             </Button>
@@ -502,7 +502,7 @@ export default function CalendarPage() {
               variant="ghost"
               size="icon"
               onClick={() => calendarRef.current?.getApi().next()}
-              className="h-9 w-9 hover:bg-white/10 text-white"
+              className="h-9 w-9 text-font hover:bg-font/10"
             >
               <ChevronRight className="w-5 h-5" />
             </Button>
@@ -554,12 +554,12 @@ export default function CalendarPage() {
                 recurrenceDays: [],
               });
             }}
-            className="hidden md:flex gradient-primary hover:opacity-90 text-white h-10 px-6 rounded-xl shadow-lg font-bold border border-white/10"
+            className="hidden h-10 rounded-xl border border-border px-6 font-bold text-font shadow-lg gradient-primary hover:opacity-90 md:flex"
           >
             <Plus className="w-5 h-5 mr-1" /> Novo Evento
           </Button>
 
-          <div className="flex bg-background-secondary p-1.5 rounded-xl border border-white/10">
+          <div className="flex rounded-xl border border-border bg-background-secondary p-1.5">
             {["timeGridWeek", "dayGridMonth"].map((view) => (
               <button
                 key={view}
@@ -570,8 +570,8 @@ export default function CalendarPage() {
                 className={cn(
                   "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300",
                   currentView === view
-                    ? "gradient-primary text-white shadow-md scale-105"
-                    : "text-gray-400 hover:text-white hover:bg-white/5",
+                    ? "scale-105 text-font shadow-md gradient-primary"
+                    : "text-font/55 hover:bg-font/5 hover:text-font",
                 )}
               >
                 {view === "timeGridWeek" && "Semana"}
@@ -595,12 +595,12 @@ export default function CalendarPage() {
         )}
 
         {currentView === "timeGridWeek" && (
-          <div className="hidden md:flex flex-col w-20 shrink-0 mr-1 border-r border-white/5 relative z-10">
+          <div className="relative z-10 mr-1 hidden w-20 shrink-0 flex-col border-r border-border md:flex">
             <div
               style={{
                 height: headerHeight > 0 ? `${headerHeight}px` : "50px",
               }}
-              className="w-full border-b border-white/5 shrink-0 transition-all duration-200"
+              className="w-full shrink-0 border-b border-border transition-all duration-200"
             />
             <div
               ref={sidebarScrollRef}
@@ -614,7 +614,7 @@ export default function CalendarPage() {
                 {heights.manha > 0 && (
                   <div
                     style={{ height: `${heights.manha}%` }}
-                    className="w-full flex flex-col items-center justify-center text-slate-500 gap-2 border-b border-white/5"
+                    className="flex w-full flex-col items-center justify-center gap-2 border-b border-border text-font/45"
                   >
                     <Sunrise className="w-5 h-5 text-slate-400" />
                     <span className="text-[10px] font-bold tracking-widest uppercase">
@@ -625,7 +625,7 @@ export default function CalendarPage() {
                 {heights.tarde > 0 && (
                   <div
                     style={{ height: `${heights.tarde}%` }}
-                    className="w-full flex flex-col items-center justify-center text-slate-500 gap-2 border-b border-white/5"
+                    className="flex w-full flex-col items-center justify-center gap-2 border-b border-border text-font/45"
                   >
                     <Sun className="w-5 h-5 text-slate-400" />
                     <span className="text-[10px] font-bold tracking-widest uppercase">
@@ -636,7 +636,7 @@ export default function CalendarPage() {
                 {heights.noite > 0 && (
                   <div
                     style={{ height: `${heights.noite}%` }}
-                    className="w-full flex flex-col items-center justify-center text-slate-500 gap-2 border-b border-white/5"
+                    className="flex w-full flex-col items-center justify-center gap-2 border-b border-border text-font/45"
                   >
                     <Moon className="w-5 h-5 text-slate-400" />
                     <span className="text-[10px] font-bold tracking-widest uppercase">
@@ -672,7 +672,7 @@ export default function CalendarPage() {
                     className={cn(
                       "text-lg font-bold w-7 h-7 flex items-center justify-center rounded-sm transition-all",
                       args.isToday
-                        ? "bg-primary text-white shadow-glow"
+                        ? "bg-primary text-font shadow-glow"
                         : "text-slate-300",
                     )}
                   >
@@ -726,7 +726,7 @@ export default function CalendarPage() {
                     ".fc-event-title",
                   ) as HTMLElement;
                   if (titleEl) {
-                    titleEl.style.color = "#cbd5e1";
+                    titleEl.style.color = "var(--color-font)";
                     titleEl.style.fontWeight = "500";
                   }
                 } else {
@@ -777,8 +777,8 @@ export default function CalendarPage() {
       </div>
 
       {modal.isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in zoom-in duration-300">
-          <div className="bg-background-secondary border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-8 glass overflow-y-auto max-h-screen">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-third/80 p-4 backdrop-blur-md animate-in fade-in zoom-in duration-300">
+          <div className="max-h-screen w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-background-secondary p-8 shadow-2xl glass">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gradient">
                 {modal.mode === "create" ? "Novo Evento" : "Editar Evento"}
@@ -787,7 +787,7 @@ export default function CalendarPage() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setModal({ ...modal, isOpen: false })}
-                className="text-gray-400 hover:text-white rounded-full"
+                className="rounded-full text-font/55 hover:text-font"
               >
                 <X className="w-6 h-6" />
               </Button>
@@ -804,7 +804,7 @@ export default function CalendarPage() {
                   onChange={(e) =>
                     setModal({ ...modal, title: e.target.value })
                   }
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner placeholder:text-gray-600"
+                  className="w-full rounded-xl border border-border bg-third/60 px-4 py-3 text-font shadow-inner outline-none transition-all placeholder:text-muted-foreground focus:ring-2 focus:ring-primary"
                   placeholder="Nome do compromisso..."
                   autoFocus
                 />
@@ -826,7 +826,7 @@ export default function CalendarPage() {
                           start: new Date(e.target.value).toISOString(),
                         });
                     }}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner [color-scheme:dark]"
+                    className="w-full rounded-xl border border-border bg-third/60 px-4 py-3 text-font shadow-inner outline-none transition-all focus:ring-2 focus:ring-primary [color-scheme:dark]"
                   />
                 </div>
                 <div className="space-y-1 flex-1">
@@ -843,7 +843,7 @@ export default function CalendarPage() {
                           end: new Date(e.target.value).toISOString(),
                         });
                     }}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner [color-scheme:dark]"
+                    className="w-full rounded-xl border border-border bg-third/60 px-4 py-3 text-font shadow-inner outline-none transition-all focus:ring-2 focus:ring-primary [color-scheme:dark]"
                   />
                 </div>
               </div>
@@ -858,7 +858,7 @@ export default function CalendarPage() {
                       key={id}
                       type="button"
                       onClick={() => setModal({ ...modal, colorId: id })}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${modal.colorId === id ? "ring-2 ring-offset-2 ring-offset-slate-900 scale-110" : "hover:scale-105"}`}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full transition-all ${modal.colorId === id ? "scale-110 ring-2 ring-offset-2 ring-offset-third" : "hover:scale-105"}`}
                       style={{
                         backgroundColor: theme.bg,
                         borderColor: theme.border,
@@ -892,16 +892,16 @@ export default function CalendarPage() {
                     }
                     className="w-full bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 text-yellow-400 focus:ring-2 focus:ring-yellow-500 outline-none transition-all"
                   >
-                    <option value="this" className="bg-background text-white">
+                    <option value="this" className="bg-background text-font">
                       Apenas este evento
                     </option>
                     <option
                       value="following"
-                      className="bg-background text-white"
+                      className="bg-background text-font"
                     >
                       Este e os seguintes
                     </option>
-                    <option value="all" className="bg-background text-white">
+                    <option value="all" className="bg-background text-font">
                       Todos os eventos
                     </option>
                   </select>
@@ -919,7 +919,7 @@ export default function CalendarPage() {
                       onChange={(e) =>
                         setModal({ ...modal, recurrenceRule: e.target.value })
                       }
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner"
+                      className="w-full rounded-xl border border-border bg-third/60 px-4 py-3 text-font shadow-inner outline-none transition-all focus:ring-2 focus:ring-primary"
                     >
                       <option value="NONE" className="bg-background">
                         Não se repete
@@ -953,8 +953,8 @@ export default function CalendarPage() {
                             }}
                             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                               (modal.recurrenceDays || []).includes(day.value)
-                                ? "bg-primary text-white border border-primary shadow-glow"
-                                : "bg-black/40 text-gray-400 border border-white/10 hover:bg-white/5"
+                                ? "border border-primary bg-primary text-font shadow-glow"
+                                : "border border-border bg-third/60 text-font/55 hover:bg-font/5"
                             }`}
                           >
                             {day.label}
@@ -975,7 +975,7 @@ export default function CalendarPage() {
                   onChange={(e) =>
                     setModal({ ...modal, description: e.target.value })
                   }
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-primary outline-none h-32 resize-none shadow-inner placeholder:text-gray-600"
+                  className="h-32 w-full resize-none rounded-xl border border-border bg-third/60 px-4 py-3 text-font shadow-inner outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-primary"
                   placeholder="Detalhes adicionais..."
                 />
               </div>
@@ -994,7 +994,7 @@ export default function CalendarPage() {
                 <Button
                   variant="ghost"
                   onClick={() => setModal({ ...modal, isOpen: false })}
-                  className="text-gray-400 hover:text-white"
+                  className="text-font/55 hover:text-font"
                 >
                   Cancelar
                 </Button>
@@ -1011,7 +1011,7 @@ export default function CalendarPage() {
                             colorId: modal.colorId,
                           })
                   }
-                  className="gradient-primary rounded-xl px-8 shadow-glow font-bold text-white"
+                  className="rounded-xl px-8 font-bold text-font shadow-glow gradient-primary"
                 >
                   {modal.mode === "create" ? "Criar" : "Salvar"}
                 </Button>

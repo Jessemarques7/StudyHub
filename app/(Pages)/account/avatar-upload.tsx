@@ -83,8 +83,8 @@ export function AvatarUpload({
           className="object-cover"
         />
         <AvatarFallback className="text-lg">{initials}</AvatarFallback>
-        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-          <UploadCloud className="text-white h-8 w-8" />
+        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-third/70 opacity-0 transition-opacity group-hover:opacity-100">
+          <UploadCloud className="h-8 w-8 text-font" />
         </div>
       </Avatar>
 

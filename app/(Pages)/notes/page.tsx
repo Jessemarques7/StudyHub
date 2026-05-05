@@ -93,7 +93,7 @@ export default function WorkspacePage() {
 
   // Renderização de Ícones de Notas
   const renderNoteIcon = (note: Note) => {
-    if (!note.icon) return <Smile className="w-16 h-16 text-slate-600 p-2" />;
+    if (!note.icon) return <Smile className="w-16 h-16 p-2 text-font/40" />;
     if (note.icon.startsWith("data:"))
       return <img src={note.icon} alt="Note icon" className="h-8" />;
     return <span className="text-md">{note.icon}</span>;
@@ -132,7 +132,7 @@ export default function WorkspacePage() {
               {activeView === "diagrams" && (
                 <Button
                   onClick={handleCreateDiagram}
-                  className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-900/20 text-white"
+                  className="gap-2 bg-complement text-font shadow-lg shadow-complement/20 hover:bg-complement/90"
                 >
                   <Plus className="h-4 w-4" /> Novo Diagrama
                 </Button>
@@ -141,13 +141,13 @@ export default function WorkspacePage() {
           </div>
 
           {/* Navegação de Abas (Tabs) elegantes */}
-          <div className="flex items-center gap-2 p-1 bg-slate-950/50 border border-slate-800 rounded-xl w-fit backdrop-blur-sm">
+          <div className="flex w-fit items-center gap-2 rounded-xl border border-secondary bg-third/50 p-1 backdrop-blur-sm">
             <button
               onClick={() => setActiveView("notes")}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 activeView === "notes"
-                  ? "bg-slate-800 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                  ? "bg-secondary text-font shadow-sm"
+                  : "text-font/60 hover:bg-secondary/50 hover:text-font"
               }`}
             >
               <FileText className="h-4 w-4" />
@@ -157,8 +157,8 @@ export default function WorkspacePage() {
               onClick={() => setActiveView("diagrams")}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 activeView === "diagrams"
-                  ? "bg-slate-800 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                  ? "bg-secondary text-font shadow-sm"
+                  : "text-font/60 hover:bg-secondary/50 hover:text-font"
               }`}
             >
               <IconSitemap className="h-4 w-4" />
@@ -168,8 +168,8 @@ export default function WorkspacePage() {
               onClick={() => setActiveView("graph")}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 activeView === "graph"
-                  ? "bg-slate-800 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                  ? "bg-secondary text-font shadow-sm"
+                  : "text-font/60 hover:bg-secondary/50 hover:text-font"
               }`}
             >
               <Network className="h-4 w-4" />
@@ -183,7 +183,7 @@ export default function WorkspacePage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={`Buscar ${activeView === "notes" ? "notas" : "diagramas"} pelo título...`}
-                className="pl-11 h-12 bg-slate-950/50 border-slate-800 focus-visible:ring-slate-700 text-md rounded-xl"
+                className="h-12 rounded-xl border-secondary bg-third/50 pl-11 text-md focus-visible:ring-complement/40"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -198,14 +198,14 @@ export default function WorkspacePage() {
                   {filteredNotes.map((note) => (
                     <div
                       key={note.id}
-                      className="group relative border border-slate-800 bg-slate-950/50 backdrop-blur-sm rounded-2xl p-5 hover:bg-slate-900 transition-all hover:border-slate-700 hover:shadow-xl"
+                      className="group relative rounded-2xl border border-secondary bg-third/50 p-5 backdrop-blur-sm transition-all hover:border-complement/30 hover:bg-secondary hover:shadow-xl"
                     >
                       <Link
                         href={`/notes/${note.id}`}
                         className="block h-full flex flex-col"
                       >
                         <div className="flex items-start justify-between mb-3">
-                          <div className="bg-slate-800/50 p-3 rounded-xl flex items-center justify-center">
+                          <div className="flex items-center justify-center rounded-xl bg-secondary/50 p-3">
                             <span className="text-2xl leading-none">
                               {renderNoteIcon(note) || "📄"}
                             </span>
@@ -218,14 +218,14 @@ export default function WorkspacePage() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="h-8 w-8 text-font/60 opacity-0 transition-opacity group-hover:opacity-100"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align="end"
-                              className="bg-slate-900 border-slate-800"
+                              className="border-secondary bg-secondary"
                             >
                               <DropdownMenuItem
                                 className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-2 cursor-pointer"
@@ -239,10 +239,10 @@ export default function WorkspacePage() {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
-                        <h3 className="font-semibold text-lg line-clamp-1 mb-3 text-slate-200 group-hover:text-white transition-colors">
+                        <h3 className="mb-3 line-clamp-1 text-lg font-semibold text-font/90 transition-colors group-hover:text-font">
                           {note.title || "Sem título"}
                         </h3>
-                        <div className="mt-auto space-y-2 text-sm text-slate-500">
+                        <div className="mt-auto space-y-2 text-sm text-font/50">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-3.5 w-3.5" />
                             <span>
@@ -267,14 +267,14 @@ export default function WorkspacePage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-24 px-4 border-2 border-dashed border-slate-800 rounded-3xl bg-slate-950/30 backdrop-blur-sm">
-                  <div className="bg-slate-900 p-4 rounded-full mb-4">
-                    <FileText className="h-8 w-8 text-slate-400" />
+                <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-secondary bg-third/30 px-4 py-24 backdrop-blur-sm">
+                  <div className="mb-4 rounded-full bg-secondary p-4">
+                    <FileText className="h-8 w-8 text-font/60" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">
                     Nenhuma nota encontrada
                   </h3>
-                  <p className="text-slate-500 text-center max-w-sm">
+                  <p className="max-w-sm text-center text-font/50">
                     {searchQuery
                       ? "Tente ajustar os termos da sua busca."
                       : "O seu espaço está vazio. Comece a capturar as suas ideias criando uma nota!"}
@@ -297,14 +297,14 @@ export default function WorkspacePage() {
                   {filteredDiagrams.map((diagram) => (
                     <div
                       key={diagram.id}
-                      className="group relative border border-slate-800 bg-slate-950/50 backdrop-blur-sm rounded-2xl p-5 hover:bg-slate-900 transition-all hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-900/10"
+                      className="group relative rounded-2xl border border-secondary bg-third/50 p-5 backdrop-blur-sm transition-all hover:border-complement/30 hover:bg-secondary hover:shadow-xl hover:shadow-complement/10"
                     >
                       <Link
                         href={`/diagram/${diagram.id}`}
                         className="block h-full flex flex-col"
                       >
                         <div className="flex items-start justify-between mb-3">
-                          <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-blue-400">
+                          <div className="rounded-xl border border-complement/20 bg-complement/10 p-3 text-complement">
                             <IconSitemap className="h-6 w-6" />
                           </div>
                           <DropdownMenu>
@@ -315,14 +315,14 @@ export default function WorkspacePage() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="h-8 w-8 text-font/60 opacity-0 transition-opacity group-hover:opacity-100"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align="end"
-                              className="bg-slate-900 border-slate-800"
+                              className="border-secondary bg-secondary"
                             >
                               <DropdownMenuItem
                                 className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-2 cursor-pointer"
@@ -336,10 +336,10 @@ export default function WorkspacePage() {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
-                        <h3 className="font-semibold text-lg line-clamp-1 mb-3 text-slate-200 group-hover:text-blue-400 transition-colors">
+                        <h3 className="mb-3 line-clamp-1 text-lg font-semibold text-font/90 transition-colors group-hover:text-complement">
                           {diagram.title || "Sem título"}
                         </h3>
-                        <div className="mt-auto space-y-2 text-sm text-slate-500">
+                        <div className="mt-auto space-y-2 text-sm text-font/50">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-3.5 w-3.5" />
                             <span>
@@ -364,14 +364,14 @@ export default function WorkspacePage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-24 px-4 border-2 border-dashed border-slate-800 rounded-3xl bg-slate-950/30 backdrop-blur-sm">
-                  <div className="bg-blue-500/10 p-4 rounded-full mb-4 border border-blue-500/20">
-                    <LayoutDashboard className="h-8 w-8 text-blue-400" />
+                <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-secondary bg-third/30 px-4 py-24 backdrop-blur-sm">
+                  <div className="mb-4 rounded-full border border-complement/20 bg-complement/10 p-4">
+                    <LayoutDashboard className="h-8 w-8 text-complement" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">
                     Nenhum diagrama
                   </h3>
-                  <p className="text-slate-500 text-center max-w-sm">
+                  <p className="max-w-sm text-center text-font/50">
                     {searchQuery
                       ? "Nenhum diagrama corresponde à sua busca."
                       : "Mapeie os seus pensamentos visualmente criando o seu primeiro diagrama."}
@@ -380,7 +380,7 @@ export default function WorkspacePage() {
                     <Button
                       variant="outline"
                       onClick={handleCreateDiagram}
-                      className="mt-6 border-slate-700 hover:bg-slate-800"
+                      className="mt-6 border-secondary hover:bg-secondary"
                     >
                       Criar Diagrama
                     </Button>
@@ -392,7 +392,7 @@ export default function WorkspacePage() {
 
           {/* --- CONTEÚDO: GRAFO --- */}
           {activeView === "graph" && (
-            <div className="flex-1 h-[70vh] min-h-[500px] w-full rounded-3xl border border-slate-800 bg-slate-950 overflow-hidden shadow-2xl relative">
+            <div className="relative h-[70vh] min-h-[500px] w-full flex-1 overflow-hidden rounded-3xl border border-secondary bg-third shadow-2xl">
               {/* Efeitos Especiais de Fundo (Atrás do Grafo) */}
               <div className="absolute inset-0 pointer-events-none z-0">
                 <StarsBackground />

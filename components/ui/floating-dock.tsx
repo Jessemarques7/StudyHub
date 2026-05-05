@@ -66,9 +66,9 @@ const FloatingDockMobile = ({
                 <a
                   href={item.href}
                   key={item.title}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-background-secondary backdrop-blur-md border border-white/10 shadow-glow"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background-secondary shadow-glow backdrop-blur-md"
                 >
-                  <div className="h-4 w-4 text-white">{item.icon}</div>
+                  <div className="h-4 w-4 text-font">{item.icon}</div>
                 </a>
               </motion.div>
             ))}
@@ -77,9 +77,9 @@ const FloatingDockMobile = ({
       </AnimatePresence>
       <button
         onClick={() => setOpen(!open)}
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-background-secondary backdrop-blur-md border border-white/10 shadow-glow"
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background-secondary shadow-glow backdrop-blur-md"
       >
-        <IconLayoutNavbarCollapse className="h-5 w-5 text-white" />
+        <IconLayoutNavbarCollapse className="h-5 w-5 text-font" />
       </button>
     </div>
   );
@@ -99,7 +99,7 @@ const FloatingDockDesktop = ({
       onMouseLeave={() => mouseY.set(Infinity)}
       className={cn(
         // Vertical layout, fixed to the left, center Y, calendar glass vibe
-        "fixed left-3 top-1/2 -translate-y-1/2 hidden w-16 flex-col items-center gap-6 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md px-3 py-4 md:flex shadow-glow z-50 glass",
+        "fixed left-3 top-1/2 z-50 hidden w-16 -translate-y-1/2 flex-col items-center gap-6 rounded-2xl border border-border bg-third/60 px-3 py-4 shadow-glow backdrop-blur-md md:flex glass",
         className,
       )}
     >
@@ -174,7 +174,7 @@ function IconContainer({
         style={{ width, height }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="relative flex aspect-square items-center justify-center rounded-full bg-slate-900/50 border border-white/5 transition-colors hover:bg-slate-800/80"
+        className="relative flex aspect-square items-center justify-center rounded-full border border-border bg-secondary/50 transition-colors hover:bg-secondary"
       >
         <AnimatePresence>
           {hovered && (
@@ -183,7 +183,7 @@ function IconContainer({
               animate={{ opacity: 1, x: 0, y: "-50%" }}
               exit={{ opacity: 0, x: -10, y: "-50%" }}
               // Tooltip is now on the right side of the icon
-              className="absolute left-full top-1/2 ml-4 w-fit -translate-y-1/2 rounded-md border border-white/10 glass bg-slate-900/90 px-3 py-1.5 text-sm whitespace-pre text-white shadow-glow"
+              className="absolute left-full top-1/2 ml-4 w-fit -translate-y-1/2 whitespace-pre rounded-md border border-border bg-secondary/90 px-3 py-1.5 text-sm text-font shadow-glow glass"
             >
               {title}
             </motion.div>
@@ -191,7 +191,7 @@ function IconContainer({
         </AnimatePresence>
         <motion.div
           style={{ width: widthIcon, height: heightIcon }}
-          className="flex items-center justify-center text-white"
+          className="flex items-center justify-center text-font"
         >
           {icon}
         </motion.div>

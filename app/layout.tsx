@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { NotesProvider } from "@/contexts/NotesContext";
 import { DiagramsProvider } from "@/contexts/DiagramsContext";
+import { ThemeManager } from "@/components/theme/theme-manager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,10 +24,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
+        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
+        <ThemeManager />
         <NotesProvider>
           <DiagramsProvider>{children}</DiagramsProvider>
         </NotesProvider>
