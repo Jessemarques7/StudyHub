@@ -32,7 +32,7 @@ export default function NotePage() {
 
       <ResizablePanelGroup
         orientation="horizontal"
-        className="flex flex-row pt-12 h-screen relative"
+        className="flex flex-row pt-8 md:pt-12 h-screen relative"
       >
         <ResizablePanel>
           <Editor />
