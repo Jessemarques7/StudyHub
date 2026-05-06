@@ -26,12 +26,13 @@ export default async function HeaderPages() {
 
   return (
     <div className="absolute z-50 flex w-full items-center justify-between border-b border-border bg-background-secondary px-6 py-2">
-      <div className="h-8 w-8 ml-12 shrink-0 flex gap-4 items-center justify-center rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm ">
+      <a
+        href="/ "
+        className="h-8 w-8 ml-12 shrink-0 flex gap-4 items-center justify-center rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm "
+      >
         <Image alt="logo" width={50} height={50} src={"/logo.png"} />
-        <span className="font-medium whitespace-pre text-font">
-          StudyHub
-        </span>
-      </div>
+        <span className="font-medium whitespace-pre text-font">StudyHub</span>
+      </a>
 
       <DropdownMenu>
         <DropdownMenuTrigger className="">
@@ -49,7 +50,10 @@ export default async function HeaderPages() {
           </Avatar>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" className="border-border bg-secondary text-font">
+        <DropdownMenuContent
+          align="end"
+          className="border-border bg-secondary text-font"
+        >
           <DropdownMenuLabel>
             {user.user_metadata?.full_name || "User"}
           </DropdownMenuLabel>

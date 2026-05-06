@@ -14,7 +14,7 @@ const links = [
   {
     title: "Home",
     icon: <IconHome className="h-full w-full" />,
-    href: "/",
+    href: "/home",
   },
   {
     title: "Notes",
