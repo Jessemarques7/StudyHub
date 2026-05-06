@@ -4,6 +4,7 @@
 
 :global(.calendar-wrapper .fc) {
   --fc-border-color: oklch(1 0 0 / 0.03);
+  --fc-page-bg-color: transparent;
   --fc-today-bg-color: var(--calendar-today-bg);
   --fc-neutral-bg-color: transparent !important;
   background: transparent;
@@ -11,6 +12,15 @@
 
 :global(.fc-theme-standard .fc-scrollgrid) {
   border: none !important;
+}
+
+:global(.calendar-wrapper .fc-scrollgrid-section-header),
+:global(.calendar-wrapper .fc-scrollgrid-section-header > th),
+:global(.calendar-wrapper .fc-scrollgrid-section-sticky > *),
+:global(.calendar-wrapper .fc-col-header),
+:global(.calendar-wrapper .fc-col-header-cell) {
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 :global(.fc-event),
@@ -135,7 +145,7 @@
 }
 
 :global(.fc-daygrid-day-frame) {
-  background-color: var(--calendar-card-bg);
+  background-color: oklch(0.18 0 0 / 0.86);
   border-radius: var(--radius-card);
   margin: 6px !important;
   padding: 8px !important;
@@ -144,7 +154,7 @@
 }
 
 :global(.fc-daygrid-day-frame:hover) {
-  background-color: var(--calendar-card-bg-hover);
+  background-color: oklch(0.23 0 0 / 0.92);
 }
 
 :global(.fc-daygrid-day-top) {
@@ -162,7 +172,7 @@
 
 :global(.fc-day-today .fc-daygrid-day-frame) {
   border: 1px solid var(--calendar-today-blue-border) !important;
-  background-color: var(--calendar-today-blue-subtle) !important;
+  background-color: oklch(0.2 0 0 / 0.9) !important;
 }
 
 :global(.fc-day-today .fc-daygrid-day-number) {
@@ -187,7 +197,7 @@
 }
 
 :global(.fc-day-other .fc-daygrid-day-frame) {
-  background-color: var(--calendar-card-bg) !important;
+  background-color: oklch(0.16 0 0 / 0.74) !important;
   opacity: 0.5;
   border-radius: var(--radius-card);
   margin: 6px !important;
@@ -199,4 +209,221 @@
   font-weight: 400 !important;
   font-size: 0.65rem !important;
   letter-spacing: 0.02em;
+}
+
+:global(.calendar-wrapper .fc-scroller) {
+  -webkit-overflow-scrolling: touch;
+}
+
+:global(.calendar-wrapper .fc-list) {
+  border: none !important;
+  background: transparent !important;
+}
+
+:global(.calendar-wrapper .fc-list-table) {
+  border-collapse: separate !important;
+  border-spacing: 0 8px !important;
+}
+
+:global(.calendar-wrapper .fc-list-day-cushion) {
+  background: transparent !important;
+  color: var(--blocknote-placeholder) !important;
+  padding: 8px 12px !important;
+  text-transform: capitalize;
+}
+
+:global(.calendar-wrapper .fc-list-event td) {
+  border: none !important;
+  background: var(--calendar-card-bg) !important;
+  padding: 12px !important;
+}
+
+:global(.calendar-wrapper .fc-list-event:hover td) {
+  background: var(--calendar-card-bg-hover) !important;
+}
+
+:global(.calendar-wrapper .fc-list-event-time) {
+  color: var(--blocknote-placeholder) !important;
+  font-size: 0.72rem !important;
+  width: 74px;
+}
+
+:global(.calendar-wrapper .fc-list-event-title) {
+  color: var(--color-font) !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+}
+
+:global(.calendar-wrapper .fc-list-event-dot) {
+  border-width: 5px !important;
+}
+
+:global(.calendar-wrapper .fc-list-empty) {
+  background: transparent !important;
+}
+
+:global(.calendar-wrapper .fc-list-empty-cushion) {
+  color: var(--blocknote-placeholder) !important;
+}
+
+@media (max-width: 767px) {
+  .calendarWrapper {
+    touch-action: pan-y;
+  }
+
+  :global(.calendar-wrapper .fc) {
+    font-size: 0.82rem;
+  }
+
+  :global(.calendar-wrapper .fc-scrollgrid) {
+    min-width: 0 !important;
+  }
+
+  :global(.calendar-wrapper .fc-timegrid-axis) {
+    width: 40px !important;
+  }
+
+  :global(.calendar-wrapper .fc-timegrid-slot-label) {
+    width: 40px !important;
+  }
+
+  :global(.calendar-wrapper .fc-timegrid-slot-label-cushion) {
+    font-size: 0.62rem;
+    padding: 0 3px !important;
+  }
+
+  :global(.calendar-wrapper .fc-timegrid-slot) {
+    height: 2.75rem;
+  }
+
+  :global(.calendar-wrapper .fc-timegrid-now-indicator-arrow) {
+    border-width: 4px 0 4px 5px !important;
+  }
+
+  :global(.calendar-wrapper .fc-event),
+  :global(.calendar-wrapper .fc-timegrid-event) {
+    margin: 1px 2px !important;
+    padding: 3px 5px !important;
+    border-radius: 8px !important;
+  }
+
+  :global(.calendar-wrapper .fc-timeGridWeek-view .fc-timegrid-axis),
+  :global(.calendar-wrapper .fc-timeGridWeek-view .fc-timegrid-slot-label) {
+    width: 34px !important;
+  }
+
+  :global(.calendar-wrapper .fc-timeGridWeek-view .fc-timegrid-event) {
+    padding: 2px 3px !important;
+  }
+
+  :global(.calendar-wrapper .fc-timegrid-event:hover),
+  :global(.calendar-wrapper .fc-event:hover) {
+    transform: none !important;
+  }
+
+  :global(.calendar-wrapper .fc-v-event .fc-event-main),
+  :global(.calendar-wrapper .fc-event-title),
+  :global(.calendar-wrapper .fc-event-time) {
+    font-size: 0.67rem !important;
+    line-height: 1.15 !important;
+  }
+
+  :global(.calendar-wrapper .fc-timeGridWeek-view .fc-event-time) {
+    display: none;
+  }
+
+  :global(.calendar-wrapper .fc-col-header-cell) {
+    padding-top: 2px !important;
+  }
+
+  :global(.calendar-wrapper .fc-daygrid-day-frame) {
+    min-height: 62px !important;
+    margin: 2px !important;
+    padding: 2px !important;
+    border-radius: 8px;
+  }
+
+  :global(.calendar-wrapper .fc-day-other .fc-daygrid-day-frame) {
+    min-height: 62px !important;
+    margin: 2px !important;
+  }
+
+  :global(.calendar-wrapper .fc-daygrid-day-top) {
+    margin-bottom: 1px;
+  }
+
+  :global(.calendar-wrapper .fc-daygrid-day-number) {
+    height: 24px;
+    min-width: 24px;
+    padding: 0 !important;
+    justify-content: center;
+    font-size: 0.72rem !important;
+  }
+
+  :global(.calendar-wrapper .fc-day-today .fc-daygrid-day-number) {
+    width: 24px;
+    height: 24px;
+    margin-left: 0;
+  }
+
+  :global(.calendar-wrapper .fc-daygrid-event) {
+    align-items: center;
+    margin: 0 1px 1px !important;
+    padding: 1px 2px !important;
+    min-height: 10px;
+  }
+
+  :global(.calendar-wrapper .fc-daygrid-event-dot) {
+    border-width: 3px !important;
+    margin-right: 3px !important;
+  }
+
+  :global(.calendar-wrapper .fc-daygrid-event .fc-event-title),
+  :global(.calendar-wrapper .fc-daygrid-event .fc-event-time) {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.55rem !important;
+    letter-spacing: 0;
+  }
+
+  :global(.calendar-wrapper .fc-daygrid-more-link) {
+    margin-top: 0;
+    padding-left: 2px;
+    font-size: 0.58rem;
+  }
+
+  :global(.calendar-wrapper .fc-theme-standard .fc-popover),
+  :global(.calendar-wrapper .fc-popover) {
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    max-width: calc(100vw - 16px);
+  }
+
+  :global(.calendar-wrapper .fc-theme-standard .fc-popover-header) {
+    padding: 10px 12px !important;
+  }
+
+  :global(.calendar-wrapper .fc-theme-standard .fc-popover-body) {
+    padding: 8px !important;
+  }
+
+  :global(.calendar-wrapper .fc-list-table) {
+    border-spacing: 0 6px !important;
+  }
+
+  :global(.calendar-wrapper .fc-list-event td) {
+    padding: 10px 8px !important;
+  }
+
+  :global(.calendar-wrapper .fc-list-event-time) {
+    width: 58px;
+    font-size: 0.65rem !important;
+  }
+
+  :global(.calendar-wrapper .fc-list-event-title) {
+    font-size: 0.78rem !important;
+  }
 }

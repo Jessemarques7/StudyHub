@@ -5,7 +5,6 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import listPlugin from "@fullcalendar/list";
 import { createClient } from "@/utils/supabase/client";
 import {
   Loader2,
@@ -117,6 +116,21 @@ const DAYS_OF_WEEK = [
   { value: "SA", label: "Sáb" },
 ];
 
+const MOBILE_BREAKPOINT_QUERY = "(max-width: 767px)";
+const DESKTOP_VIEW_OPTIONS = [
+  { value: "timeGridWeek", label: "Semana" },
+  { value: "dayGridMonth", label: "Mês" },
+] as const;
+const MOBILE_VIEW_OPTIONS = [
+  { value: "timeGridDay", label: "Dia" },
+  { value: "timeGridWeek", label: "Semana" },
+  { value: "dayGridMonth", label: "Mês" },
+] as const;
+
+type CalendarView =
+  | (typeof DESKTOP_VIEW_OPTIONS)[number]["value"]
+  | (typeof MOBILE_VIEW_OPTIONS)[number]["value"];
+
 // Helper para formatar a data ISO para o input type="datetime-local"
 const formatDateTimeLocal = (dateStr: string) => {
   if (!dateStr) return "";
@@ -134,12 +148,57 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(false);
   const calendarRef = useRef<FullCalendar>(null);
 
-  const [currentView, setCurrentView] = useState("timeGridWeek");
+  const [currentView, setCurrentView] =
+    useState<CalendarView>("timeGridWeek");
+  const [isMobile, setIsMobile] = useState(false);
   const [value, setValue] = useState([6, 22]);
 
   const sidebarScrollRef = useRef<HTMLDivElement>(null);
   const [gridHeight, setGridHeight] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
+
+  const viewOptions = isMobile ? MOBILE_VIEW_OPTIONS : DESKTOP_VIEW_OPTIONS;
+  const showTimeRangeControl = currentView.startsWith("timeGrid");
+
+  const changeCalendarView = (view: CalendarView, date?: string | Date) => {
+    const calendarApi = calendarRef.current?.getApi();
+    if (date) {
+      calendarApi?.changeView(view, date);
+    } else {
+      calendarApi?.changeView(view);
+    }
+    setCurrentView(view);
+  };
+
+  useEffect(() => {
+    const query = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
+
+    const syncCalendarLayout = () => {
+      const nextIsMobile = query.matches;
+      setIsMobile(nextIsMobile);
+
+      setCurrentView((view) => {
+        const allowedViews = nextIsMobile
+          ? MOBILE_VIEW_OPTIONS
+          : DESKTOP_VIEW_OPTIONS;
+        const isAllowed = allowedViews.some((option) => option.value === view);
+        if (isAllowed) return view;
+
+        const nextView: CalendarView = nextIsMobile
+          ? "timeGridDay"
+          : "timeGridWeek";
+        requestAnimationFrame(() => {
+          calendarRef.current?.getApi().changeView(nextView);
+        });
+        return nextView;
+      });
+    };
+
+    syncCalendarLayout();
+    query.addEventListener("change", syncCalendarLayout);
+
+    return () => query.removeEventListener("change", syncCalendarLayout);
+  }, []);
 
   useEffect(() => {
     if (currentView !== "timeGridWeek") return;
@@ -418,18 +477,33 @@ export default function CalendarPage() {
     }
   };
 
-  const handleDateSelect = (selectInfo: CalendarSelectInfo) => {
+  const openCreateEventModal = (start: string, end: string) => {
     setModal({
       isOpen: true,
       mode: "create",
       title: "",
       description: "",
-      start: selectInfo.startStr,
-      end: selectInfo.endStr,
+      start,
+      end,
       colorId: "11",
       recurrenceRule: "NONE",
       recurrenceDays: [],
     });
+  };
+
+  const handleQuickCreateEvent = () => {
+    const now = new Date();
+    const end = new Date(now.getTime() + 60 * 60 * 1000);
+    openCreateEventModal(now.toISOString(), end.toISOString());
+  };
+
+  const handleDateSelect = (selectInfo: CalendarSelectInfo) => {
+    if (isMobile && currentView === "dayGridMonth") {
+      changeCalendarView("timeGridDay", selectInfo.startStr);
+      return;
+    }
+
+    openCreateEventModal(selectInfo.startStr, selectInfo.endStr);
   };
 
   const handleEventDrop = (info: CalendarEventMoveInfo) => {
@@ -471,111 +545,98 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="relative mx-32 mt-15 flex h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-2xl border border-border bg-background/30 text-foreground shadow-glow glass">
-      <header className="flex flex-col items-center justify-between gap-4 border-b border-border bg-third/40 px-6 py-3 backdrop-blur-md md:flex-row">
-        <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-glow transition-transform hover:scale-110">
-              <CalendarIcon size={24} />
+    <div className="relative mx-2 mt-2 flex h-[calc(100dvh-7rem)] flex-col overflow-hidden rounded-xl border border-border bg-background/30 text-foreground shadow-glow glass sm:mx-4 md:mx-32 md:mt-15 md:h-[calc(100vh-4rem)] md:rounded-2xl">
+      <header className="flex shrink-0 flex-col items-stretch justify-between gap-3 border-b border-border bg-third/40 px-3 py-3 backdrop-blur-md sm:px-4 md:flex-row md:items-center md:px-6">
+        <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
+          <div className="flex min-w-0 items-center justify-between gap-3 md:justify-start">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary shadow-glow transition-transform hover:scale-110 md:h-12 md:w-12 md:rounded-2xl">
+                <CalendarIcon className="h-5 w-5 md:h-6 md:w-6" />
+              </div>
+              <span className="truncate text-lg font-bold tracking-tight text-gradient capitalize sm:text-xl md:text-2xl">
+                {currentDateTitle}
+              </span>
             </div>
-            <span className="text-2xl font-bold tracking-tight text-gradient capitalize">
-              {currentDateTitle}
-            </span>
-          </div>
 
-          <div className="ml-4 flex items-center gap-1 rounded-xl border border-border bg-background-secondary p-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => calendarRef.current?.getApi().prev()}
-              className="h-9 w-9 text-font hover:bg-font/10"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </Button>
-            <Button
-              onClick={() => calendarRef.current?.getApi().today()}
-              className="h-9 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 px-4 font-semibold transition-all"
-            >
-              Hoje
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => calendarRef.current?.getApi().next()}
-              className="h-9 w-9 text-font hover:bg-font/10"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </Button>
+            <div className="flex shrink-0 items-center gap-1 rounded-xl border border-border bg-background-secondary p-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => calendarRef.current?.getApi().prev()}
+                className="h-9 w-9 text-font hover:bg-font/10"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <Button
+                onClick={() => calendarRef.current?.getApi().today()}
+                className="h-9 border border-primary/20 bg-primary/10 px-3 font-semibold text-primary transition-all hover:bg-primary/20 sm:px-4"
+              >
+                Hoje
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => calendarRef.current?.getApi().next()}
+                className="h-9 w-9 text-font hover:bg-font/10"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div>
-            <div className="mx-auto grid w-full max-w-xs gap-2">
-              <div className="flex items-center justify-center mr-6 gap-2">
-                <Label htmlFor="slider-demo-temperature text-center">
-                  <IconSun className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
-                  Time
-                </Label>
-              </div>
-              <div className="flex w-42 items-center space-x-2">
-                <span className="text-muted-foreground text-sm">
-                  {value[0]}:00
-                </span>
-                <Slider
-                  id="slider-demo-temperature"
-                  value={value}
-                  onValueChange={setValue}
-                  min={0}
-                  max={24}
-                  step={1}
-                />
-                <span className="text-muted-foreground text-sm">
-                  {value[1]}:00
-                </span>
+        <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
+          {showTimeRangeControl && (
+            <div className="order-3 w-full md:order-none md:w-auto">
+              <div className="mx-auto grid w-full gap-2 md:max-w-xs">
+                <div className="flex items-center justify-center gap-2 md:mr-6">
+                  <Label htmlFor="slider-demo-temperature">
+                    <IconSun className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+                    Time
+                  </Label>
+                </div>
+                <div className="flex w-full items-center space-x-2 md:w-44">
+                  <span className="w-10 text-right text-sm text-muted-foreground">
+                    {value[0]}:00
+                  </span>
+                  <Slider
+                    id="slider-demo-temperature"
+                    value={value}
+                    onValueChange={setValue}
+                    min={0}
+                    max={24}
+                    step={1}
+                  />
+                  <span className="w-10 text-sm text-muted-foreground">
+                    {value[1]}:00
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <Button
-            onClick={() => {
-              // Quando clica no botão externo, inicializa a data/hora agora até +1h
-              const now = new Date();
-              const end = new Date(now.getTime() + 60 * 60 * 1000);
-              setModal({
-                isOpen: true,
-                mode: "create",
-                title: "",
-                description: "",
-                start: now.toISOString(),
-                end: end.toISOString(),
-                colorId: "11",
-                recurrenceRule: "NONE",
-                recurrenceDays: [],
-              });
-            }}
+            onClick={handleQuickCreateEvent}
             className="hidden h-10 rounded-xl border border-border px-6 font-bold text-font shadow-lg gradient-primary hover:opacity-90 md:flex"
           >
-            <Plus className="w-5 h-5 mr-1" /> Novo Evento
+            <Plus className="mr-1 h-5 w-5" /> Novo Evento
           </Button>
 
-          <div className="flex rounded-xl border border-border bg-background-secondary p-1.5">
-            {["timeGridWeek", "dayGridMonth"].map((view) => (
+          <div className="order-2 grid w-full grid-cols-3 rounded-xl border border-border bg-background-secondary p-1.5 md:order-none md:flex md:w-auto">
+            {viewOptions.map((option) => (
               <button
-                key={view}
+                key={option.value}
                 onClick={() => {
-                  calendarRef.current?.getApi().changeView(view);
-                  setCurrentView(view);
+                  changeCalendarView(option.value);
                 }}
                 className={cn(
-                  "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300",
-                  currentView === view
+                  "rounded-lg px-3 py-2 text-xs font-bold transition-all duration-300 sm:px-4",
+                  currentView === option.value
                     ? "scale-105 text-font shadow-md gradient-primary"
                     : "text-font/55 hover:bg-font/5 hover:text-font",
                 )}
               >
-                {view === "timeGridWeek" && "Semana"}
-                {view === "dayGridMonth" && "Mês"}
+                {option.label}
               </button>
             ))}
           </div>
@@ -584,7 +645,7 @@ export default function CalendarPage() {
 
       <div
         className={cn(
-          "flex-1 relative p-4 calendar-wrapper overflow-hidden flex flex-row",
+          "calendar-wrapper relative flex min-h-0 flex-1 flex-row overflow-hidden p-2 sm:p-3 md:p-4",
           styles.calendarWrapper,
         )}
       >
@@ -655,7 +716,6 @@ export default function CalendarPage() {
               dayGridPlugin,
               timeGridPlugin,
               interactionPlugin,
-              listPlugin,
             ]}
             dayHeaderContent={(args) => {
               const dayName = args.date.toLocaleDateString("pt-BR", {
@@ -664,13 +724,13 @@ export default function CalendarPage() {
               const shortDay =
                 dayName.charAt(0).toUpperCase() + dayName.slice(1, 3);
               return (
-                <div className="flex items-center gap-1 pb-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+                <div className="flex flex-col items-center justify-center gap-0 pb-1 md:flex-row md:justify-start md:gap-1 md:pb-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500 md:text-[11px]">
                     {shortDay}
                   </span>
                   <span
                     className={cn(
-                      "text-lg font-bold w-7 h-7 flex items-center justify-center rounded-sm transition-all",
+                      "flex h-6 w-6 items-center justify-center rounded-sm text-base font-bold transition-all md:h-7 md:w-7 md:text-lg",
                       args.isToday
                         ? "bg-primary text-font shadow-glow"
                         : "text-slate-300",
@@ -690,21 +750,37 @@ export default function CalendarPage() {
             nowIndicator={true}
             locale="pt-br"
             height="100%"
+            handleWindowResize={true}
+            stickyHeaderDates={true}
             showNonCurrentDates={false}
             fixedWeekCount={false}
             expandRows={true}
             allDaySlot={false}
-            dayMaxEvents={true}
+            dayMaxEvents={isMobile ? 2 : true}
+            eventMinHeight={isMobile ? 28 : undefined}
+            longPressDelay={isMobile ? 250 : undefined}
+            selectLongPressDelay={isMobile ? 250 : undefined}
+            eventLongPressDelay={isMobile ? 250 : undefined}
             moreLinkContent={(args) => `+${args.num}`}
+            moreLinkClick="popover"
             select={handleDateSelect}
             eventDrop={handleEventDrop}
             eventResize={handleEventResize}
             slotMinTime={`${value[0]}:00:00`}
             slotMaxTime={`${value[1]}:00:00`}
+            slotLabelFormat={{
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }}
             eventDidMount={(info) => {
               const theme = info.event.extendedProps.theme;
               if (theme) {
                 const el = info.el;
+                const listDot = el.querySelector(
+                  ".fc-list-event-dot",
+                ) as HTMLElement;
+                if (listDot) listDot.style.borderColor = theme.text;
                 if (info.view.type === "dayGridMonth") {
                   el.style.setProperty(
                     "background-color",
@@ -776,11 +852,21 @@ export default function CalendarPage() {
         </div>
       </div>
 
+      <Button
+        type="button"
+        size="icon"
+        aria-label="Novo Evento"
+        onClick={handleQuickCreateEvent}
+        className="fixed bottom-[calc(8vh+1rem)] right-4 z-[60] h-14 w-14 rounded-full border border-border text-font shadow-2xl gradient-primary md:hidden"
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
+
       {modal.isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-third/80 p-4 backdrop-blur-md animate-in fade-in zoom-in duration-300">
-          <div className="max-h-screen w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-background-secondary p-8 shadow-2xl glass">
+        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-third/80 p-0 backdrop-blur-md animate-in fade-in zoom-in duration-300 md:items-center md:p-4">
+          <div className="max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-border bg-background-secondary p-5 shadow-2xl glass md:rounded-2xl md:p-8">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gradient">
+              <h2 className="text-xl font-bold text-gradient md:text-2xl">
                 {modal.mode === "create" ? "Novo Evento" : "Editar Evento"}
               </h2>
               <Button
@@ -811,7 +897,7 @@ export default function CalendarPage() {
               </div>
 
               {/* CAMPOS DE DATA E HORA INSERIDOS AQUI */}
-              <div className="flex gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-1 flex-1">
                   <label className="text-xs font-bold text-gray-400 ml-1 uppercase">
                     Início
@@ -980,13 +1066,13 @@ export default function CalendarPage() {
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
                 {modal.mode === "edit" && modal.id && (
                   <Button
                     variant="destructive"
                     type="button"
                     onClick={() => handleDeleteEvent(modal.id!)}
-                    className="mr-auto rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20"
+                    className="rounded-xl border border-red-500/20 bg-red-500/10 text-red-500 hover:bg-red-500/20 sm:mr-auto"
                   >
                     <Trash2 className="w-4 h-4 mr-2" /> Excluir
                   </Button>
