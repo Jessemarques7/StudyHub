@@ -42,7 +42,7 @@ const FloatingDockMobile = ({
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-50 flex h-[10vh] items-center justify-center gap-4 bg-third/60 px-4 dark:bg-third/60 md:hidden",
+        "fixed inset-x-0 bottom-0 z-50 flex h-[8vh] items-center justify-center gap-4 bg-third/80 px-4 dark:bg-third/80 md:hidden",
         className,
       )}
     >
