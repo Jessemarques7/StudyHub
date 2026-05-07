@@ -8,8 +8,6 @@ import { Button } from "@/components/ui/button";
 
 import {
   IconChartDots3,
-  IconLayoutSidebar,
-  IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarRight,
 } from "@tabler/icons-react";
 import NotesList from "@/components/notes/NotesList";
@@ -17,7 +15,6 @@ import { StarsBackground } from "@/components/ui/stars-background";
 import { ShootingStars } from "@/components/ui/shooting-stars";
 
 import {
-  ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";

@@ -1,11 +1,12 @@
 // types/diagrams.ts
 import { Edge, Node } from "@xyflow/react";
+import type {
+  CreateFolderInput,
+  Folder,
+  UpdateFolderInput,
+} from "@/types/notes";
 
-export interface DiagramFolder {
-  id: string;
-  name: string;
-  createdAt: Date;
-}
+export type DiagramFolder = Folder;
 
 export interface DiagramContent {
   nodes: Node[];
@@ -40,7 +41,7 @@ export interface DiagramsContextValue {
   updateDiagram: (id: string, updates: UpdateDiagramInput) => Promise<void>;
   deleteDiagram: (id: string) => Promise<void>;
   getDiagram: (id: string) => Diagram | undefined;
-  addFolder: (name: string) => Promise<void>;
+  addFolder: (input?: string | CreateFolderInput) => Promise<Folder | null>;
   deleteFolder: (id: string) => Promise<void>;
-  updateFolder: (id: string, name: string) => Promise<void>;
+  updateFolder: (id: string, updates: string | UpdateFolderInput) => Promise<void>;
 }

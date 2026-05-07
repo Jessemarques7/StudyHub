@@ -14,8 +14,10 @@ const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
 // Define types for our data structure
 interface NodeObject {
   id?: string | number;
+  rawId?: string;
   name?: string;
   val?: number;
+  kind?: "note" | "diagram";
   x?: number;
   y?: number;
 }
@@ -99,8 +101,16 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
   }, []);
 
   function handleNodeClick(node: NodeObject | null) {
+    if (node?.rawId) {
+      router.push(
+        node.kind === "diagram" ? `/diagram/${node.rawId}` : `/notes/${node.rawId}`,
+      );
+      return;
+    }
+
     if (node?.id !== undefined) {
-      router.push(`/notes/${node.id}`);
+      const id = String(node.id);
+      router.push(id.startsWith("diagram:") ? `/diagram/${id.slice(8)}` : `/notes/${id.replace(/^note:/, "")}`);
     }
   }
 
@@ -125,11 +135,23 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
     );
     const fontColor = getThemeColor("--color-font", DEFAULT_THEME_COLORS.font);
 
-    // Draw the node circle
-    ctx.beginPath();
-    ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
-    ctx.fillStyle = isHovered ? complementColor : withAlpha(fontColor, 0.74);
-    ctx.fill();
+    ctx.fillStyle =
+      node.kind === "diagram"
+        ? isHovered
+          ? complementColor
+          : withAlpha(complementColor, 0.78)
+        : isHovered
+          ? complementColor
+          : withAlpha(fontColor, 0.74);
+
+    if (node.kind === "diagram") {
+      const size = nodeRadius * 2.4;
+      ctx.fillRect(x - size / 2, y - size / 2, size, size);
+    } else {
+      ctx.beginPath();
+      ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
+      ctx.fill();
+    }
 
     // Draw the label below the node
     const label = node.name ?? "";

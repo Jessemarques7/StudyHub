@@ -6,6 +6,8 @@ import { Block } from "@blocknote/core";
 export interface Folder {
   id: string;
   name: string;
+  icon: string | null;
+  parentId: string | null;
   createdAt: Date;
 }
 
@@ -23,8 +25,8 @@ export interface Note {
 export interface CreateNoteInput {
   title?: string;
   content?: Block[];
-  icon?: string;
-  coverImage?: string;
+  icon?: string | null;
+  coverImage?: string | null;
   folderId?: string | null;
 }
 
@@ -41,20 +43,34 @@ export interface NotesContextValue {
   folders: Folder[]; // Novo estado exposto
   // addNote: (input?: CreateNoteInput) => Note;
   addNote: (input?: CreateNoteInput) => Promise<Note>; // Mudar para Promise
-  updateNote: (id: string, updates: UpdateNoteInput) => void;
-  deleteNote: (id: string) => void;
+  updateNote: (id: string, updates: UpdateNoteInput) => Promise<void>;
+  deleteNote: (id: string) => Promise<void>;
   getNote: (id: string) => Note | undefined;
   // Novas funções para pastas
-  addFolder: (name: string) => void;
-  deleteFolder: (id: string) => void;
-  updateFolder: (id: string, name: string) => void;
+  addFolder: (input?: string | CreateFolderInput) => Promise<Folder | null>;
+  deleteFolder: (id: string) => Promise<void>;
+  updateFolder: (id: string, updates: string | UpdateFolderInput) => Promise<void>;
+}
+
+export interface CreateFolderInput {
+  name?: string;
+  icon?: string | null;
+  parentId?: string | null;
+}
+
+export interface UpdateFolderInput {
+  name?: string;
+  icon?: string | null;
+  parentId?: string | null;
 }
 
 // ... resto do arquivo (Graph types, etc) mantenha igual
 export interface GraphNode {
   id: string;
+  rawId: string;
   name: string;
   val: number;
+  kind: "note" | "diagram";
 }
 
 export interface GraphLink {

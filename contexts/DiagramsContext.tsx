@@ -14,12 +14,13 @@ import { createClient } from "@/utils/supabase/client";
 import {
   Diagram,
   DiagramContent,
-  DiagramFolder,
   DiagramsContextValue,
   CreateDiagramInput,
   UpdateDiagramInput,
 } from "@/types/diagrams";
-import type { DiagramFolderRow, DiagramRow } from "@/types/database";
+import { useNotes } from "@/contexts/NotesContext";
+import { toast } from "sonner";
+import type { DiagramRow } from "@/types/database";
 import type { Json } from "@/types/supabase";
 
 const DiagramsContext = createContext<DiagramsContextValue | null>(null);
@@ -33,17 +34,11 @@ const mapDiagramFromSupabase = (data: DiagramRow): Diagram => ({
   updatedAt: new Date(data.updated_at),
 });
 
-const mapFolderFromSupabase = (data: DiagramFolderRow): DiagramFolder => ({
-  id: data.id,
-  name: data.name,
-  createdAt: new Date(data.created_at),
-});
-
 export function DiagramsProvider({ children }: { children: ReactNode }) {
   const supabase = useMemo(() => createClient(), []);
   const [diagrams, setDiagrams] = useState<Diagram[]>([]);
-  const [folders, setFolders] = useState<DiagramFolder[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const { folders, addFolder, deleteFolder, updateFolder } = useNotes();
 
   useEffect(() => {
     async function fetchData() {
@@ -54,82 +49,30 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
 
         if (!user) {
           setUserId(null);
-          setFolders([]);
           setDiagrams([]);
           return;
         }
 
         setUserId(user.id);
 
-        const { data: foldersData } = await supabase
-          .from("diagram_folders") // Certifique-se de criar esta tabela ou usar 'folders' com um tipo
-          .select("*")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: true });
-
         const { data: diagramsData } = await supabase
-          .from("diagrams") // Certifique-se de criar esta tabela
+          .from("diagrams")
           .select("*")
           .eq("user_id", user.id)
           .order("updated_at", { ascending: false });
 
-        if (foldersData)
-          setFolders(
-            (foldersData as DiagramFolderRow[]).map(mapFolderFromSupabase),
+        if (diagramsData) {
+          setDiagrams(
+            (diagramsData as DiagramRow[]).map(mapDiagramFromSupabase),
           );
-        if (diagramsData)
-          setDiagrams((diagramsData as DiagramRow[]).map(mapDiagramFromSupabase));
+        }
       } catch (error) {
         console.error("Erro ao carregar diagramas:", error);
       }
     }
+
     fetchData();
   }, [supabase]);
-
-  const addFolder = useCallback(async (name: string) => {
-    if (!userId) return;
-
-    const { data, error } = await supabase
-      .from("diagram_folders")
-      .insert({ name, user_id: userId })
-      .select()
-      .single();
-    if (!error && data) {
-      setFolders((prev) => [
-        ...prev,
-        mapFolderFromSupabase(data as DiagramFolderRow),
-      ]);
-    }
-  }, [supabase, userId]);
-
-  const deleteFolder = useCallback(async (id: string) => {
-    if (!userId) return;
-
-    const { error } = await supabase
-      .from("diagram_folders")
-      .delete()
-      .eq("id", id)
-      .eq("user_id", userId);
-    if (!error) {
-      setDiagrams((prev) =>
-        prev.map((d) => (d.folderId === id ? { ...d, folderId: null } : d))
-      );
-      setFolders((prev) => prev.filter((f) => f.id !== id));
-    }
-  }, [supabase, userId]);
-
-  const updateFolder = useCallback(async (id: string, name: string) => {
-    if (!userId) return;
-
-    const { error } = await supabase
-      .from("diagram_folders")
-      .update({ name })
-      .eq("id", id)
-      .eq("user_id", userId);
-    if (!error) {
-      setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name } : f)));
-    }
-  }, [supabase, userId]);
 
   const addDiagram = useCallback(
     async (input: CreateDiagramInput = {}): Promise<Diagram> => {
@@ -150,13 +93,17 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro ao criar diagrama:", error);
+        toast.error("Erro ao criar diagrama");
+        throw error;
+      }
 
       const newDiagram = mapDiagramFromSupabase(data as DiagramRow);
       setDiagrams((prev) => [newDiagram, ...prev]);
       return newDiagram;
     },
-    [supabase, userId]
+    [supabase, userId],
   );
 
   const updateDiagram = useCallback(
@@ -167,10 +114,10 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
         updated_at: new Date().toISOString(),
       };
       if (updates.title !== undefined) dbUpdates.title = updates.title;
-      if (updates.content !== undefined)
+      if (updates.content !== undefined) {
         dbUpdates.content = updates.content as unknown as Json;
-      if (updates.folderId !== undefined)
-        dbUpdates.folder_id = updates.folderId;
+      }
+      if (updates.folderId !== undefined) dbUpdates.folder_id = updates.folderId;
 
       const { error } = await supabase
         .from("diagrams")
@@ -178,33 +125,43 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
         .eq("id", id)
         .eq("user_id", userId);
 
-      if (!error) {
-        setDiagrams((prev) =>
-          prev.map((d) =>
-            d.id === id ? { ...d, ...updates, updatedAt: new Date() } : d
-          )
-        );
+      if (error) {
+        console.error("Erro ao atualizar diagrama:", error);
+        toast.error("Erro ao salvar diagrama");
+        return;
       }
+
+      setDiagrams((prev) =>
+        prev.map((diagram) =>
+          diagram.id === id
+            ? { ...diagram, ...updates, updatedAt: new Date() }
+            : diagram,
+        ),
+      );
     },
-    [supabase, userId]
+    [supabase, userId],
   );
 
-  const deleteDiagram = useCallback(async (id: string) => {
-    if (!userId) return;
+  const deleteDiagram = useCallback(
+    async (id: string) => {
+      if (!userId) return;
 
-    const { error } = await supabase
-      .from("diagrams")
-      .delete()
-      .eq("id", id)
-      .eq("user_id", userId);
-    if (!error) {
-      setDiagrams((prev) => prev.filter((d) => d.id !== id));
-    }
-  }, [supabase, userId]);
+      const { error } = await supabase
+        .from("diagrams")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", userId);
+
+      if (!error) {
+        setDiagrams((prev) => prev.filter((diagram) => diagram.id !== id));
+      }
+    },
+    [supabase, userId],
+  );
 
   const getDiagram = useCallback(
-    (id: string) => diagrams.find((d) => d.id === id),
-    [diagrams]
+    (id: string) => diagrams.find((diagram) => diagram.id === id),
+    [diagrams],
   );
 
   const value = useMemo(
@@ -229,7 +186,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
       addFolder,
       deleteFolder,
       updateFolder,
-    ]
+    ],
   );
 
   return (

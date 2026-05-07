@@ -36,7 +36,7 @@ import "@xyflow/react/dist/style.css";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useDiagrams } from "@/contexts/DiagramsContext";
-import DiagramsList from "@/components/diagram/DiagramsList";
+import NotesList from "@/components/notes/NotesList";
 
 // Configurações e Tipos
 const nodeTypes = {
@@ -211,7 +211,7 @@ function Flow() {
         {/* Container do Grafo com renderização condicional */}
         {isSidebarVisible && (
           <div className="absolute z-10 h-full w-fit flex-shrink-0 border border-border bg-secondary px-4 py-10">
-            <DiagramsList opensidebar={isSidebarVisible} />
+            <NotesList opensidebar={isSidebarVisible} />
           </div>
         )}
         <Controls

@@ -15,15 +15,15 @@ import {
   IconSitemap,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { useSidebar } from "@/components/ui/aceternity-sidebar";
 import { useDiagrams } from "@/contexts/DiagramsContext";
 import { Diagram } from "@/types/diagrams";
 
 export default function DiagramsList({
-  opensidebar,
+  opensidebar: _opensidebar,
 }: {
   opensidebar: boolean;
 }) {
+  void _opensidebar;
   const router = useRouter();
   const pathname = usePathname();
   const {

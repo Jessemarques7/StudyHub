@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useNotes } from "@/contexts/NotesContext";
+import { useDiagrams } from "@/contexts/DiagramsContext";
 import ForceGraphComponent from "./ForceGraph";
 import { GraphData, GraphLink } from "@/types/notes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -19,12 +20,10 @@ function extractMentionId(contentItem: MentionContent): string | null {
     return null;
   }
 
-  // 1. Check new flat structure
   if (contentItem.props.id) {
     return contentItem.props.id;
   }
 
-  // 2. Check old nested structure (backward compatibility)
   if (contentItem.props.note?.id) {
     return contentItem.props.note.id;
   }
@@ -34,33 +33,27 @@ function extractMentionId(contentItem: MentionContent): string | null {
 
 export default function Graph({ classname }: { classname?: string }) {
   const { notes } = useNotes();
+  const { diagrams } = useDiagrams();
 
-  // Extrai os links das menções nas notas
   const links = useMemo((): GraphLink[] => {
     const extractedLinks: GraphLink[] = [];
-    const validNoteIds = new Set(notes.map((n) => n.id));
+    const validNoteIds = new Set(notes.map((note) => note.id));
 
     notes.forEach((note) => {
-      // Safety check for note content
       if (!Array.isArray(note.content)) return;
 
       note.content.forEach((block) => {
-        // Explicitly check if content is an array before iterating
-        // This avoids TypeScript errors with TableContent (which is an object)
         if (block.type === "paragraph" && Array.isArray(block.content)) {
-          // Cast to unknown first, then to our expected array type to safely iterate
           const contentItems = block.content as unknown as MentionContent[];
 
           contentItems.forEach((contentItem) => {
             const targetId = extractMentionId(contentItem);
 
-            if (targetId && validNoteIds.has(targetId)) {
-              if (note.id !== targetId) {
-                extractedLinks.push({
-                  source: note.id,
-                  target: targetId,
-                });
-              }
+            if (targetId && validNoteIds.has(targetId) && note.id !== targetId) {
+              extractedLinks.push({
+                source: `note:${note.id}`,
+                target: `note:${targetId}`,
+              });
             }
           });
         }
@@ -70,16 +63,17 @@ export default function Graph({ classname }: { classname?: string }) {
     return extractedLinks;
   }, [notes]);
 
-  // Calcula o tamanho dos nós baseado nas conexões
   const graphData: GraphData = useMemo(() => {
     const connectionCount = new Map<string, number>();
 
-    // Inicializa contador
     notes.forEach((note) => {
-      connectionCount.set(note.id, 0);
+      connectionCount.set(`note:${note.id}`, 0);
     });
 
-    // Conta conexões
+    diagrams.forEach((diagram) => {
+      connectionCount.set(`diagram:${diagram.id}`, 0);
+    });
+
     links.forEach((link) => {
       connectionCount.set(
         link.source,
@@ -92,29 +86,47 @@ export default function Graph({ classname }: { classname?: string }) {
     });
 
     return {
-      nodes: notes.map((note) => ({
-        id: note.id,
-        name: note.title || "Untitled",
-        // Tamanho baseado em conexões (1-5 range)
-        val: Math.min(Math.max((connectionCount.get(note.id) || 0) + 1, 1), 5),
-      })),
+      nodes: [
+        ...notes.map((note) => ({
+          id: `note:${note.id}`,
+          rawId: note.id,
+          name: note.title || "Untitled",
+          val: Math.min(
+            Math.max((connectionCount.get(`note:${note.id}`) || 0) + 1, 1),
+            5,
+          ),
+          kind: "note" as const,
+        })),
+        ...diagrams.map((diagram) => ({
+          id: `diagram:${diagram.id}`,
+          rawId: diagram.id,
+          name: diagram.title || "Untitled Diagram",
+          val: Math.min(
+            Math.max(
+              (connectionCount.get(`diagram:${diagram.id}`) || 0) + 1,
+              1,
+            ),
+            5,
+          ),
+          kind: "diagram" as const,
+        })),
+      ],
       links,
     };
-  }, [notes, links]);
+  }, [notes, diagrams, links]);
 
-  if (notes.length === 0) {
+  if (notes.length === 0 && diagrams.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full p-8">
-        <p className="text-muted-foreground text-center">
-          Create some notes to see the graph
+      <div className="flex h-full items-center justify-center p-8">
+        <p className="text-center text-muted-foreground">
+          Create notes or diagrams to see the graph
         </p>
       </div>
     );
   }
 
-  // Altere o final do componente Graph.tsx
   return (
-    <div className={`relative  overflow-hidden  ${classname || ""}`}>
+    <div className={`relative overflow-hidden ${classname || ""}`}>
       <ErrorBoundary>
         <ForceGraphComponent data={graphData} />
       </ErrorBoundary>

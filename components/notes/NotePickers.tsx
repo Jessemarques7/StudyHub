@@ -114,7 +114,7 @@ export function CoverPicker({
       alert(
         `File is too large. Maximum size is ${
           MAX_COVER_FILE_SIZE / (1024 * 1024)
-        }MB.`
+        }MB.`,
       );
       return;
     }
@@ -145,7 +145,7 @@ export function CoverPicker({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-md bg-third/50 px-3 py-1.5 text-sm text-font/80 transition-colors hover:bg-third/70"
+        className="flex items-center gap-2 rounded-md  px-3 py-1.5 text-sm text-font/80 transition-colors hover:bg-third/70"
       >
         <Image className="w-4 h-4" />
         <span>{currentCover ? "Change cover" : "Add cover"}</span>
@@ -158,9 +158,7 @@ export function CoverPicker({
           <div className="absolute right-0 top-full z-50 mt-2 max-h-[500px] w-96 overflow-y-auto rounded-lg border border-border bg-secondary p-4 shadow-xl">
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-font">
-                Select Cover
-              </h3>
+              <h3 className="text-sm font-semibold text-font">Select Cover</h3>
               <div className="flex gap-2">
                 {currentCover && (
                   <button
@@ -189,7 +187,7 @@ export function CoverPicker({
                     "text-sm px-4 py-2 capitalize",
                     tab === tabName
                       ? "border-b-2 border-complement text-font"
-                      : "text-font/60 hover:text-font"
+                      : "text-font/60 hover:text-font",
                   )}
                 >
                   {tabName}
@@ -210,7 +208,7 @@ export function CoverPicker({
                       onClick={() => handleGradientSelect(gradient)}
                       className={cn(
                         "h-16 rounded-lg border-2 border-transparent transition-all hover:border-complement",
-                        gradient
+                        gradient,
                       )}
                     />
                   ))}

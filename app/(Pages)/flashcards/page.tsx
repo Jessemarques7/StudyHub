@@ -119,10 +119,6 @@ export default function Index() {
 
   return (
     <div className="relative bg-background ">
-      {/* Background Elements */}
-      <div className="stars"></div>
-      <div className="nebula"></div>
-
       {/* Main Content wrapped in relative z-10 so it sits above the background */}
       <div className="relative z-10 max-w-7xl mx-auto p-6 md:p-8">
         <header className="mb-12 text-center">
