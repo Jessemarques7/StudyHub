@@ -212,9 +212,7 @@ function HabitIconPicker({
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-font">
-            Escolher Ícone
-          </h3>
+          <h3 className="text-sm font-semibold text-font">Escolher Ícone</h3>
           <div className="flex items-center gap-3">
             {currentIcon !== "🎯" && (
               <button
@@ -716,7 +714,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20 font-sans text-font selection:bg-complement/30">
+    <div className="min-h-screen mt-16 bg-background pb-20 font-sans text-font selection:bg-complement/30">
       {/* Global override to style the React Emoji Picker */}
       <style>{`
         .custom-emoji-theme .EmojiPickerReact {
@@ -902,7 +900,9 @@ export default function App() {
                           <div
                             key={d}
                             className={`w-10 flex flex-col items-center gap-1.5 ${
-                              isToday ? "font-bold text-complement" : "opacity-60"
+                              isToday
+                                ? "font-bold text-complement"
+                                : "opacity-60"
                             }`}
                           >
                             <span className="text-[9px] uppercase tracking-widest">
@@ -1047,8 +1047,8 @@ export default function App() {
                                   className={`w-14 h-10 rounded-xl flex items-center justify-center transition-all duration-300 transform active:scale-90
                                       ${
                                         isCompleted
-                                           ? "bg-complement text-font shadow-glow"
-                                           : "border-2 border-border bg-secondary/50 hover:border-complement/40"
+                                          ? "bg-complement text-font shadow-glow"
+                                          : "border-2 border-border bg-secondary/50 hover:border-complement/40"
                                       }`}
                                 >
                                   {isCompleted && (

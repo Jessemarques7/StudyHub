@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { getCardsByDeck, getAllDecks, deleteCard } from "@/lib/storage";
 import { CardEditorDialog } from "@/components/flashcards/CardEditorDialog";
 import { saveCard } from "@/lib/storage";
 import { sanitize } from "@/lib/sanitize";
-import { ArrowLeft, Plus, Trash2, Edit } from "lucide-react";
+import { ArrowLeft, Circle, CircleCheck, Edit, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -35,7 +35,7 @@ export default function DeckView() {
   const [cardToDelete, setCardToDelete] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!deckId) return;
     setIsLoading(true);
     try {
@@ -54,11 +54,11 @@ export default function DeckView() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [deckId]);
 
   useEffect(() => {
     loadData();
-  }, [deckId]);
+  }, [loadData]);
 
   const handleSaveCard = async (cardData: Partial<Flashcard>) => {
     try {
@@ -108,7 +108,7 @@ export default function DeckView() {
         await deleteCard(cardToDelete);
         toast.success("Card deleted");
         await loadData();
-      } catch (error) {
+      } catch {
         toast.error("Failed to delete card");
       }
     }
@@ -125,7 +125,7 @@ export default function DeckView() {
   }
 
   return (
-    <div className="bg-background p-4">
+    <div className="bg-background p-4 mt-16">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -202,7 +202,9 @@ export default function DeckView() {
                       </h4>
                       <div
                         className="prose prose-invert prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: sanitize(card.back) }}
+                        dangerouslySetInnerHTML={{
+                          __html: sanitize(card.back),
+                        }}
                       />
                     </div>
                   )}
@@ -219,15 +221,11 @@ export default function DeckView() {
                               key={option.id}
                               className="flex items-center gap-2 text-sm"
                             >
-                              <span
-                                className={
-                                  option.isCorrect
-                                    ? "text-success"
-                                    : "text-muted-foreground"
-                                }
-                              >
-                                {option.isCorrect ? "✓" : "○"}
-                              </span>
+                              {option.isCorrect ? (
+                                <CircleCheck className="h-4 w-4 text-success" />
+                              ) : (
+                                <Circle className="h-4 w-4 text-muted-foreground" />
+                              )}
                               <span>{option.text}</span>
                             </div>
                           ))}

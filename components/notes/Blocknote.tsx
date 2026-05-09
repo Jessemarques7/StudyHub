@@ -114,6 +114,7 @@ export default function Blocknote({
       style={
         {
           "--bn-colors-editor-background": "transparent",
+          "--bn-colors-editor-text": "var(--color-font)",
         } as React.CSSProperties
       }
     >

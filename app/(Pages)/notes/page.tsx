@@ -49,7 +49,7 @@ export default function WorkspacePage() {
 
   return (
     <div className="flex h-full bg-background text-foreground">
-      <div className="relative flex min-h-full flex-1 overflow-hidden rounded-full bg-main">
+      <div className="relative flex min-h-full flex-3 overflow-hidden rounded-full bg-main">
         <div className="pointer-events-none absolute inset-0 z-0">
           <StarsBackground />
           <ShootingStars />

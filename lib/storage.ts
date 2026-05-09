@@ -127,7 +127,12 @@ export async function getCardsByDeck(deckId: string): Promise<Flashcard[]> {
 
 export async function getCardCountsByDeck(
   deckIds: string[],
-): Promise<Record<string, { total: number; due: number }>> {
+): Promise<
+  Record<
+    string,
+    { total: number; new: number; learning: number; review: number; due: number }
+  >
+> {
   if (deckIds.length === 0) {
     return {};
   }
@@ -135,7 +140,7 @@ export async function getCardCountsByDeck(
   const supabase = createClient();
   const { data, error } = await supabase
     .from("flashcards")
-    .select("deck_id, next_review")
+    .select("deck_id, next_review, repetitions, interval_days")
     .in("deck_id", deckIds);
 
   if (error) throw error;
@@ -143,12 +148,36 @@ export async function getCardCountsByDeck(
   const now = new Date();
   return (data ?? []).reduce(
     (acc, card) => {
-      if (!acc[card.deck_id]) acc[card.deck_id] = { total: 0, due: 0 };
+      if (!acc[card.deck_id]) {
+        acc[card.deck_id] = {
+          total: 0,
+          new: 0,
+          learning: 0,
+          review: 0,
+          due: 0,
+        };
+      }
       acc[card.deck_id].total++;
+      if (card.repetitions === 0) {
+        acc[card.deck_id].new++;
+      } else if (card.interval_days < 21) {
+        acc[card.deck_id].learning++;
+      } else {
+        acc[card.deck_id].review++;
+      }
       if (new Date(card.next_review) <= now) acc[card.deck_id].due++;
       return acc;
     },
-    {} as Record<string, { total: number; due: number }>,
+    {} as Record<
+      string,
+      {
+        total: number;
+        new: number;
+        learning: number;
+        review: number;
+        due: number;
+      }
+    >,
   );
 }
 

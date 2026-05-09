@@ -3,14 +3,13 @@ import { Flashcard, ReviewQuality } from "@/types/flashcard";
 // SM-2 Algorithm (Anki-like)
 export function calculateNextReview(
   card: Flashcard,
-  quality: ReviewQuality
+  quality: ReviewQuality,
 ): Pick<Flashcard, "easeFactor" | "interval" | "repetitions" | "nextReview"> {
   let { easeFactor, interval, repetitions } = card;
 
   if (quality < 3) {
-    // Failed card - reset
     repetitions = 0;
-    interval = 1;
+    interval = 0;
   } else {
     if (repetitions === 0) {
       interval = 1;
@@ -25,11 +24,13 @@ export function calculateNextReview(
   // Update ease factor
   easeFactor = Math.max(
     1.3,
-    easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
+    easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)),
   );
 
   const nextReview = new Date();
-  nextReview.setDate(nextReview.getDate() + interval);
+  if (interval > 0) {
+    nextReview.setDate(nextReview.getDate() + interval);
+  }
 
   return {
     easeFactor,
@@ -42,18 +43,12 @@ export function calculateNextReview(
 export function isCardDueForReview(card: Flashcard): boolean {
   const cardDate = new Date(card.nextReview);
   const now = new Date();
-  const isDue = cardDate <= now;
-  console.log('Card due check:', {
-    cardNextReview: cardDate,
-    now: now,
-    isDue: isDue,
-    difference: now.getTime() - cardDate.getTime()
-  });
-  return isDue;
+  return cardDate <= now;
 }
 
 export function getDueCards(cards: Flashcard[]): Flashcard[] {
-  return cards.filter(isCardDueForReview).sort((a, b) => 
-    new Date(a.nextReview).getTime() - new Date(b.nextReview).getTime()
+  return cards.filter(isCardDueForReview).sort(
+    (a, b) =>
+      new Date(a.nextReview).getTime() - new Date(b.nextReview).getTime(),
   );
 }

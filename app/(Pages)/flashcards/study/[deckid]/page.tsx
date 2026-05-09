@@ -7,6 +7,7 @@ import { Flashcard, ReviewQuality } from "@/types/flashcard";
 import { getCardsByDeck } from "@/lib/storage";
 import { getDueCards, calculateNextReview } from "@/lib/spaced-repetition";
 import { saveCard } from "@/lib/storage";
+import { recordReviewActivity } from "@/lib/review-activity";
 import { sanitize } from "@/lib/sanitize";
 import { ArrowLeft, Volume2 } from "lucide-react";
 import { toast } from "sonner";
@@ -37,9 +38,7 @@ export default function Study() {
       setIsLoading(true);
       try {
         const allCards = await getCardsByDeck(deckId);
-        console.log("Study page - all cards:", allCards.length, allCards);
         const dueCards = getDueCards(allCards);
-        console.log("Study page - due cards:", dueCards.length, dueCards);
         setCards(dueCards);
       } catch (error) {
         console.error(error);
@@ -104,6 +103,7 @@ export default function Study() {
 
     try {
       await saveCard(updatedCard);
+      recordReviewActivity();
       setStudiedCount(studiedCount + 1);
 
       if (currentIndex < cards.length - 1) {
@@ -158,7 +158,7 @@ export default function Study() {
   }
 
   return (
-    <div className="bg-background p-4">
+    <div className="bg-background p-4 mt-16">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={() => router.push("/flashcards")}>
@@ -194,7 +194,9 @@ export default function Study() {
 
                 <div
                   className="text-xl mb-6 prose prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: sanitize(currentCard.front) }}
+                  dangerouslySetInnerHTML={{
+                    __html: sanitize(currentCard.front),
+                  }}
                 />
 
                 {currentCard.imageUrl && (
@@ -247,7 +249,7 @@ export default function Study() {
                           )}
                         >
                           <p className="font-semibold">
-                            {isCorrect ? "✓ Correct!" : "✗ Incorrect"}
+                            {isCorrect ? "Correct!" : "Incorrect"}
                           </p>
                         </div>
                       )}
@@ -277,7 +279,9 @@ export default function Study() {
 
                   <div
                     className="text-lg mb-4 prose prose-invert max-w-none opacity-70"
-                    dangerouslySetInnerHTML={{ __html: sanitize(currentCard.front) }}
+                    dangerouslySetInnerHTML={{
+                      __html: sanitize(currentCard.front),
+                    }}
                   />
 
                   {currentCard.imageUrl && (
@@ -312,7 +316,9 @@ export default function Study() {
 
                     <div
                       className="text-xl mb-6 prose prose-invert max-w-none"
-                      dangerouslySetInnerHTML={{ __html: sanitize(currentCard.back) }}
+                      dangerouslySetInnerHTML={{
+                        __html: sanitize(currentCard.back),
+                      }}
                     />
 
                     {currentCard.backImageUrl && (
@@ -359,7 +365,7 @@ export default function Study() {
                     className="border-destructive text-destructive hover:bg-destructive/10"
                   >
                     Again
-                    <span className="text-xs ml-2 opacity-70">&lt;1min</span>
+                    <span className="text-xs ml-2 opacity-70">Today</span>
                   </Button>
                   <Button
                     onClick={() => handleRate(3)}
@@ -367,7 +373,7 @@ export default function Study() {
                     className="border-warning text-warning hover:bg-warning/10"
                   >
                     Hard
-                    <span className="text-xs ml-2 opacity-70">~10min</span>
+                    <span className="text-xs ml-2 opacity-70">1 day</span>
                   </Button>
                   <Button
                     onClick={() => handleRate(4)}
@@ -375,7 +381,18 @@ export default function Study() {
                     className="border-primary text-primary hover:bg-primary/10"
                   >
                     Good
-                    <span className="text-xs ml-2 opacity-70">~4 days</span>
+                    <span className="text-xs ml-2 opacity-70">
+                      {currentCard.repetitions === 0
+                        ? "1 day"
+                        : currentCard.repetitions === 1
+                          ? "6 days"
+                          : `${Math.max(
+                              1,
+                              Math.round(
+                                currentCard.interval * currentCard.easeFactor,
+                              ),
+                            )} days`}
+                    </span>
                   </Button>
                   <Button
                     onClick={() => handleRate(5)}
@@ -383,7 +400,16 @@ export default function Study() {
                     className="border-success text-success hover:bg-success/10"
                   >
                     Easy
-                    <span className="text-xs ml-2 opacity-70">~7 days</span>
+                    <span className="text-xs ml-2 opacity-70">
+                      {currentCard.repetitions < 2
+                        ? "6 days"
+                        : `${Math.max(
+                            1,
+                            Math.round(
+                              currentCard.interval * currentCard.easeFactor,
+                            ),
+                          )} days`}
+                    </span>
                   </Button>
                 </div>
               </div>

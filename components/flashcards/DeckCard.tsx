@@ -22,11 +22,11 @@ export function DeckCard({
   onDelete,
 }: DeckCardProps) {
   return (
-    <Card className="glass hover:shadow-[var(--shadow-glow)] transition-all duration-300 group h-full">
-      <CardContent className="p-6 flex flex-col h-full">
-        <div className="flex justify-between items-start mb-4">
+    <Card className="glass  hover:shadow-[var(--shadow-glow)] transition-all duration-300 group h-full">
+      <CardContent className="px-8 py-2 flex  h-full">
+        <div className="flex justify-center items-center ">
           <div>
-            <h3 className="text-xl font-semibold text-foreground mb-1 line-clamp-1">
+            <h3 className="text-xl font-semibold text-foreground  line-clamp-1">
               {deck.name}
             </h3>
             {deck.description && (
@@ -64,7 +64,7 @@ export function DeckCard({
             e.stopPropagation();
             onStudy(deck.id);
           }}
-          className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity"
+          className=" bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity"
           disabled={dueCount === 0}
         >
           <BookOpen className="mr-2 h-4 w-4" />

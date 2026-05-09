@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNotes } from "@/contexts/NotesContext";
 import { Block } from "@blocknote/core";
 import Blocknote from "./Blocknote";
-import { NoteHeader } from "./NoteHeader";
+import { NoteCover, NoteHeader } from "./NoteHeader";
 import { NoteTitleInput } from "./NoteTitleInput";
 import { debounce } from "lodash";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -90,14 +90,16 @@ export default function Editor() {
       {/* <div className="stars"></div>
       <div className="nebula"></div> */}
       <div className="flex-1 overflow-y-auto relative scrollbar-hide">
-        <NoteHeader
-          note={currentNote}
-          onIconUpdate={handleIconUpdate}
-          onCoverUpdate={handleCoverUpdate}
-        />
+        <NoteCover note={currentNote} />
 
-        <div className="w-full flex justify-center p-2 md:px-10 md:py-6">
-          <div className="w-full min-h-[70vh] max-w-[770px]">
+        <div className="w-full flex justify-center px-4 pb-8 pt-6 md:px-8 md:pb-12">
+          <div className="w-full min-h-[70vh] max-w-[828px]">
+            <NoteHeader
+              note={currentNote}
+              onIconUpdate={handleIconUpdate}
+              onCoverUpdate={handleCoverUpdate}
+            />
+
             <NoteTitleInput
               value={title}
               onChange={handleTitleChange}

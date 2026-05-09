@@ -1,8 +1,9 @@
 "use client";
 import { useState, useRef } from "react";
-import { X, Image } from "lucide-react";
+import { ImageIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MAX_COVER_FILE_SIZE } from "@/types/notes";
+import { Button } from "@/components/ui/button";
 
 interface CoverPickerProps {
   currentCover: string | null;
@@ -143,19 +144,22 @@ export function CoverPicker({
 
   return (
     <div className="relative">
-      <button
+      <Button
+        type="button"
+        variant="ghost"
+        size="xs"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-md  px-3 py-1.5 text-sm text-font/80 transition-colors hover:bg-third/70"
+        className="h-7 px-2 text-font/60 hover:bg-third/60 hover:text-font"
       >
-        <Image className="w-4 h-4" />
+        <ImageIcon className="h-4 w-4" />
         <span>{currentCover ? "Change cover" : "Add cover"}</span>
-      </button>
+      </Button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={handleClose} />
 
-          <div className="absolute right-0 top-full z-50 mt-2 max-h-[500px] w-96 overflow-y-auto rounded-lg border border-border bg-secondary p-4 shadow-xl">
+          <div className="fixed left-4 right-4 top-20 z-50 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-lg border border-border bg-secondary p-4 shadow-xl sm:absolute sm:left-0 sm:right-auto sm:top-full sm:mt-2 sm:max-h-[500px] sm:w-96">
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold text-font">Select Cover</h3>
@@ -163,14 +167,15 @@ export function CoverPicker({
                 {currentCover && (
                   <button
                     onClick={handleRemove}
-                    className="text-xs text-red-400 hover:text-red-300"
+                    className="rounded px-2 py-1 text-xs text-red-400 hover:bg-third/60 hover:text-red-300"
                   >
                     Remove
                   </button>
                 )}
                 <button
                   onClick={handleClose}
-                  className="text-font/60 hover:text-font"
+                  className="rounded p-1 text-font/60 hover:bg-third/60 hover:text-font"
+                  aria-label="Close cover picker"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -184,7 +189,7 @@ export function CoverPicker({
                   key={tabName}
                   onClick={() => setTab(tabName)}
                   className={cn(
-                    "text-sm px-4 py-2 capitalize",
+                    "min-w-0 flex-1 px-2 py-2 text-sm capitalize sm:px-4",
                     tab === tabName
                       ? "border-b-2 border-complement text-font"
                       : "text-font/60 hover:text-font",
@@ -207,9 +212,10 @@ export function CoverPicker({
                       key={index}
                       onClick={() => handleGradientSelect(gradient)}
                       className={cn(
-                        "h-16 rounded-lg border-2 border-transparent transition-all hover:border-complement",
+                        "h-12 rounded-lg border-2 border-transparent transition-all hover:border-complement sm:h-16",
                         gradient,
                       )}
+                      aria-label={`Select cover gradient ${index + 1}`}
                     />
                   ))}
                 </div>
@@ -226,7 +232,7 @@ export function CoverPicker({
                   type="file"
                   accept="image/*"
                   onChange={handleCoverUpload}
-                  className="text-sm text-font/80 file:mr-2 file:rounded file:border-0 file:bg-complement file:px-2 file:py-1 file:text-xs file:font-semibold file:text-font hover:file:bg-complement/90"
+                  className="w-full text-sm text-font/80 file:mr-2 file:rounded file:border-0 file:bg-complement file:px-2 file:py-1 file:text-xs file:font-semibold file:text-font hover:file:bg-complement/90"
                 />
               </div>
             )}
@@ -236,13 +242,13 @@ export function CoverPicker({
                 <label className="mb-2 block text-xs font-medium text-font/60">
                   Image URL
                 </label>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <input
                     type="text"
                     value={customUrl}
                     onChange={(e) => setCustomUrl(e.target.value)}
                     placeholder="https://example.com/image.jpg"
-                    className="flex-1 rounded border border-border bg-third px-3 py-2 text-sm text-font placeholder:text-muted-foreground focus:border-complement focus:outline-none"
+                    className="min-w-0 flex-1 rounded border border-border bg-third px-3 py-2 text-sm text-font placeholder:text-muted-foreground focus:border-complement focus:outline-none"
                     onKeyDown={(e) => e.key === "Enter" && handleCustomUrl()}
                   />
                   <button
