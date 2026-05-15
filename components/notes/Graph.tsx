@@ -31,12 +31,17 @@ function extractMentionId(contentItem: MentionContent): string | null {
   return null;
 }
 
+function getNodeValue(connectionCount: number): number {
+  return connectionCount + 1;
+}
+
 export default function Graph({ classname }: { classname?: string }) {
   const { notes } = useNotes();
   const { diagrams } = useDiagrams();
 
   const links = useMemo((): GraphLink[] => {
     const extractedLinks: GraphLink[] = [];
+    const extractedLinkKeys = new Set<string>();
     const validNoteIds = new Set(notes.map((note) => note.id));
 
     notes.forEach((note) => {
@@ -50,9 +55,16 @@ export default function Graph({ classname }: { classname?: string }) {
             const targetId = extractMentionId(contentItem);
 
             if (targetId && validNoteIds.has(targetId) && note.id !== targetId) {
+              const source = `note:${note.id}`;
+              const target = `note:${targetId}`;
+              const linkKey = `${source}->${target}`;
+
+              if (extractedLinkKeys.has(linkKey)) return;
+
+              extractedLinkKeys.add(linkKey);
               extractedLinks.push({
-                source: `note:${note.id}`,
-                target: `note:${targetId}`,
+                source,
+                target,
               });
             }
           });
@@ -91,23 +103,14 @@ export default function Graph({ classname }: { classname?: string }) {
           id: `note:${note.id}`,
           rawId: note.id,
           name: note.title || "Untitled",
-          val: Math.min(
-            Math.max((connectionCount.get(`note:${note.id}`) || 0) + 1, 1),
-            5,
-          ),
+          val: getNodeValue(connectionCount.get(`note:${note.id}`) || 0),
           kind: "note" as const,
         })),
         ...diagrams.map((diagram) => ({
           id: `diagram:${diagram.id}`,
           rawId: diagram.id,
           name: diagram.title || "Untitled Diagram",
-          val: Math.min(
-            Math.max(
-              (connectionCount.get(`diagram:${diagram.id}`) || 0) + 1,
-              1,
-            ),
-            5,
-          ),
+          val: getNodeValue(connectionCount.get(`diagram:${diagram.id}`) || 0),
           kind: "diagram" as const,
         })),
       ],
