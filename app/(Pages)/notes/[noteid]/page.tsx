@@ -29,7 +29,7 @@ export default function NotePage() {
 
       <ResizablePanelGroup
         orientation="horizontal"
-        className="flex flex-row pt-8 md:pt-12 h-screen relative"
+        className="relative flex h-[100dvh] flex-row pt-8 md:h-screen md:pt-12"
       >
         <ResizablePanel>
           <Editor />
@@ -40,7 +40,7 @@ export default function NotePage() {
           <ResizablePanel
             defaultSize="30%"
             // 1. Adicionamos "relative" e "overflow-hidden" no className do painel
-            className="relative flex overflow-hidden border border-border"
+            className="relative hidden overflow-hidden border border-border md:flex"
           >
             {/* 2. Componentes de fundo */}
             <StarsBackground className="absolute inset-0 z-0" />
@@ -66,7 +66,7 @@ export default function NotePage() {
           }}
           variant="ghost"
           size="icon"
-          className="absolute right-4 top-24 z-50 bg-secondary text-font hover:bg-complement/20 hover:text-font"
+          className="absolute right-4 top-24 z-50 hidden bg-secondary text-font hover:bg-complement/20 hover:text-font md:inline-flex"
         >
           <IconLayoutSidebarRight className="h-8 w-8" />
         </Button>
@@ -74,7 +74,7 @@ export default function NotePage() {
         {isSidebarVisible && (
           <ResizablePanel
             defaultSize="20%"
-            className="flex-shrink-0 border border-border bg-secondary px-4 py-4"
+            className="hidden flex-shrink-0 border border-border bg-secondary px-4 py-4 md:block"
           >
             <NotesList opensidebar={isSidebarVisible} />
           </ResizablePanel>
@@ -88,7 +88,7 @@ export default function NotePage() {
           }}
           variant="ghost"
           size="icon"
-          className="absolute right-4 top-14 z-10 bg-secondary text-font hover:bg-complement/20 hover:text-font"
+          className="absolute right-4 top-14 z-10 hidden bg-secondary text-font hover:bg-complement/20 hover:text-font md:inline-flex"
         >
           {/* {isGraphVisible ? (
             <PanelRightClose className="h-5 w-5" />

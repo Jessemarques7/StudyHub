@@ -4,9 +4,10 @@ import "@blocknote/core/fonts/inter.css";
 import "@blocknote/shadcn/style.css";
 
 import { useCallback, useMemo } from "react";
+import { offset, shift } from "@floating-ui/react";
 import {
   DefaultReactSuggestionItem,
-  ExperimentalMobileFormattingToolbarController,
+  FormattingToolbarController,
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
@@ -93,6 +94,15 @@ export default function Blocknote({
     [onUpdateNote]
   );
 
+  const mobileFormattingToolbarOptions = useMemo(
+    () => ({
+      middleware: [offset(6), shift({ padding: 8 })],
+      placement: "bottom-start" as const,
+      strategy: "fixed" as const,
+    }),
+    []
+  );
+
   const editor = useCreateBlockNote(
     {
       schema,
@@ -121,11 +131,7 @@ export default function Blocknote({
       onChange={handleChange}
       editor={editor}
       theme="dark"
-      className={
-        isMobile
-          ? "studyhub-note-blocknote flex min-h-0 w-full flex-col-reverse"
-          : "studyhub-note-blocknote w-full"
-      }
+      className="studyhub-note-blocknote w-full"
       sideMenu={!isMobile}
       formattingToolbar={!isMobile}
       shadCNComponents={{}}
@@ -142,7 +148,11 @@ export default function Blocknote({
           filterSuggestionItems(getMentionMenuItems(editor), query)
         }
       />
-      {isMobile && <ExperimentalMobileFormattingToolbarController />}
+      {isMobile && (
+        <FormattingToolbarController
+          floatingOptions={mobileFormattingToolbarOptions}
+        />
+      )}
     </BlockNoteView>
   );
 }
