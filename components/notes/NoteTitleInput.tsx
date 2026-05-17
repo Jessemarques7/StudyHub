@@ -81,7 +81,7 @@ export function NoteTitleInput({
       onFocus={handleFocus}
       placeholder="Untitled"
       aria-label="Note title"
-      className="block min-h-[2.9rem] w-full resize-none overflow-hidden border-none bg-transparent px-13 mb-4 py-0.5 text-[2rem] font-bold leading-[1.18] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-0 focus:placeholder:text-gray-500 md:min-h-[3.2rem] md:text-[2.5rem]"
+      className="mb-4 block min-h-[2.9rem] w-full resize-none overflow-hidden border-none bg-transparent px-3 py-0.5 text-[2rem] font-bold leading-[1.18] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-0 focus:placeholder:text-gray-500 md:min-h-[3.2rem] md:px-13 md:text-[2.5rem]"
     />
   );
 }

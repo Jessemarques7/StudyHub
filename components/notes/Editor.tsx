@@ -92,7 +92,7 @@ export default function Editor() {
       <div className="flex-1 overflow-y-auto relative scrollbar-hide">
         <NoteCover note={currentNote} />
 
-        <div className="w-full flex justify-center px-4 pb-8 pt-6 md:px-8 md:pb-12">
+        <div className="w-full flex justify-center px-0 pb-8 pt-6 md:px-8 md:pb-12">
           <div className="w-full min-h-[70vh] max-w-[828px]">
             <NoteHeader
               note={currentNote}

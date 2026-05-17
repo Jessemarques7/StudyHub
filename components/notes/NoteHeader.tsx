@@ -135,7 +135,7 @@ export function NoteHeader({
   );
 
   return (
-    <div className="px-8 mb-1">
+    <div className="mb-1 px-3 md:px-8">
       {hasIcon && (
         <div
           className={cn(

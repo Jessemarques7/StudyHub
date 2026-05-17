@@ -6,6 +6,7 @@ import "@blocknote/shadcn/style.css";
 import { useCallback, useMemo } from "react";
 import {
   DefaultReactSuggestionItem,
+  ExperimentalMobileFormattingToolbarController,
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
@@ -21,6 +22,7 @@ import {
 import { Mention } from "./Mention";
 import { Note } from "@/types/notes";
 import { debounce } from "lodash";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { uploadMedia } from "@/lib/storage";
 import { toast } from "sonner";
 
@@ -42,6 +44,8 @@ export default function Blocknote({
   currentNote,
   notes,
 }: BlocknoteProps) {
+  const isMobile = useIsMobile();
+
   // Configuração do Upload para Supabase
   const uploadFile = async (file: File): Promise<string> => {
     try {
@@ -89,14 +93,21 @@ export default function Blocknote({
     [onUpdateNote]
   );
 
-  const editor = useCreateBlockNote({
-    schema,
-    initialContent:
-      currentNote.content && currentNote.content.length > 0
-        ? (currentNote.content as PartialBlock[])
-        : undefined,
-    uploadFile,
-  });
+  const editor = useCreateBlockNote(
+    {
+      schema,
+      initialContent:
+        currentNote.content && currentNote.content.length > 0
+          ? (currentNote.content as PartialBlock[])
+          : undefined,
+      domAttributes: {
+        editor: {
+          class: "mx-0",
+        },
+      },
+      uploadFile,
+    }
+  );
 
   const handleChange = useCallback(() => {
     // FIX: Cast editor.document to 'unknown' then 'Block[]' to satisfy the strict type check.
@@ -110,6 +121,13 @@ export default function Blocknote({
       onChange={handleChange}
       editor={editor}
       theme="dark"
+      className={
+        isMobile
+          ? "studyhub-note-blocknote flex min-h-0 w-full flex-col-reverse"
+          : "studyhub-note-blocknote w-full"
+      }
+      sideMenu={!isMobile}
+      formattingToolbar={!isMobile}
       shadCNComponents={{}}
       style={
         {
@@ -124,6 +142,7 @@ export default function Blocknote({
           filterSuggestionItems(getMentionMenuItems(editor), query)
         }
       />
+      {isMobile && <ExperimentalMobileFormattingToolbarController />}
     </BlockNoteView>
   );
 }
