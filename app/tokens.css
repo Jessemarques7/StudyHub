@@ -7,7 +7,7 @@
   --theme-secondary: #242424;
   --theme-third: #2a2a2a;
   --theme-complement: #a882ff;
-  --theme-font: #f0efed;
+  --theme-font: #dcddde;
   --color-main: var(--theme-main);
   --color-secondary: var(--theme-secondary);
   --color-third: var(--theme-third);
@@ -170,11 +170,11 @@
 }
 
 .dark {
-  --theme-main: #191919;
-  --theme-secondary: #202020;
-  --theme-third: #0a0a0a;
-  --theme-complement: #2098d8;
-  --theme-font: #f0efed;
+  --theme-main: #1e1e1e;
+  --theme-secondary: #242424;
+  --theme-third: #2a2a2a;
+  --theme-complement: #a882ff;
+  --theme-font: #dcddde;
   --color-main: var(--theme-main);
   --color-secondary: var(--theme-secondary);
   --color-third: var(--theme-third);

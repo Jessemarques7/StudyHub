@@ -9,6 +9,7 @@ interface CoverPickerProps {
   currentCover: string | null;
   onSelect: (cover: string) => void;
   onRemove: () => void;
+  triggerClassName?: string;
 }
 
 const GRADIENT_PRESETS = [
@@ -88,6 +89,7 @@ export function CoverPicker({
   currentCover,
   onSelect,
   onRemove,
+  triggerClassName,
 }: CoverPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tab, setTab] = useState<TabType>("gallery");
@@ -149,7 +151,10 @@ export function CoverPicker({
         variant="ghost"
         size="xs"
         onClick={() => setIsOpen(!isOpen)}
-        className="h-7 px-2 text-font/60 hover:bg-third/60 hover:text-font"
+        className={cn(
+          "h-7 px-2 text-font/60 hover:bg-third/60 hover:text-font",
+          triggerClassName,
+        )}
       >
         <ImageIcon className="h-4 w-4" />
         <span>{currentCover ? "Change cover" : "Add cover"}</span>
