@@ -13,7 +13,7 @@ export const DEFAULT_THEME_COLORS: ThemeColors = {
   main: "#1e1e1e",
   secondary: "#242424",
   third: "#2a2a2a",
-  complement: "#a882ff",
+  complement: "#4299e1",
   font: "#dcddde",
 };
 
