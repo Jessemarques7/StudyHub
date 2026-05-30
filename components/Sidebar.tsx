@@ -6,14 +6,14 @@ import {
   IconCalendarFilled,
   IconCards,
   IconFile,
-  IconHome,
+  IconMessageChatbot,
   IconTargetArrow,
 } from "@tabler/icons-react";
 
 const links = [
   {
-    title: "Home",
-    icon: <IconHome className="h-full w-full" />,
+    title: "Study AI",
+    icon: <IconMessageChatbot className="h-full w-full" />,
     href: "/home",
   },
   {

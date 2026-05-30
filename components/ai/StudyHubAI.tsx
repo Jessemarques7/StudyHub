@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import {
   CalendarCheck,
@@ -62,6 +63,7 @@ function createMessage(role: ChatRole, content: string): ChatMessage {
 }
 
 export default function StudyHubAI() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -154,6 +156,10 @@ export default function StudyHubAI() {
     if (event.key === "Escape") {
       setIsOpen(false);
     }
+  }
+
+  if (pathname === "/home") {
+    return null;
   }
 
   return (
