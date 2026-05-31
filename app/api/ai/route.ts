@@ -13,7 +13,7 @@ type AIRequestBody = {
 const SYSTEM_MESSAGE =
   "You are StudyHub AI, an intelligent assistant inside a student productivity and note-taking app. Help the user study, organize notes, summarize content, create study plans, explain concepts clearly, generate flashcards, improve writing, and answer questions. Be concise, practical, and structured. When helpful, use headings, bullets, examples, and step-by-step explanations.";
 
-const MODEL = process.env.GROQ_MODEL?.trim() || "groq/compound";
+const MODEL = process.env.GROQ_MODEL?.trim() || "qwen/qwen3-32b";
 const MAX_CONTEXT_MESSAGES = 24;
 
 function isClientMessage(message: unknown): message is ClientMessage {
@@ -118,10 +118,7 @@ export async function POST(request: Request) {
 
     const completion = await groq.chat.completions.create({
       model: MODEL,
-      messages: [
-        { role: "system", content: SYSTEM_MESSAGE },
-        ...messages,
-      ],
+      messages: [{ role: "system", content: SYSTEM_MESSAGE }, ...messages],
     });
 
     const content = completion.choices[0]?.message?.content?.trim();

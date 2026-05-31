@@ -323,7 +323,8 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
   const [linkDistance, setLinkDistance] = useState(85);
   const directionalArrows = false;
 
-  const layoutKey = `${data.nodes.length}:${data.links.length}:${dimensions.width}:${dimensions.height}`;
+  const hasDimensions = dimensions.width > 0 && dimensions.height > 0;
+  const layoutKey = `${data.nodes.length}:${data.links.length}`;
 
   const highlightedNodeIds = useMemo(() => {
     const nodeIds = new Set<string>();
@@ -392,7 +393,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
   );
 
   useEffect(() => {
-    if (dimensions.width === 0 || dimensions.height === 0) {
+    if (!hasDimensions) {
       return;
     }
 
@@ -439,7 +440,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
         window.clearTimeout(retryTimeoutId);
       }
     };
-  }, [applyGraphForces, dimensions.height, dimensions.width, layoutKey]);
+  }, [applyGraphForces, hasDimensions, layoutKey]);
 
   useEffect(() => {
     return () => {
@@ -670,7 +671,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
         </div>
       )}
 
-      {dimensions.width > 0 && dimensions.height > 0 && (
+      {hasDimensions && (
         <ForceGraph2D
           ref={fgRef}
           graphData={data}

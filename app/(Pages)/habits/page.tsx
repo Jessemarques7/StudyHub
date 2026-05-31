@@ -714,7 +714,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen mt-16 bg-background pb-20 font-sans text-font selection:bg-complement/30">
+    <div className="min-h-screen bg-background pb-20 font-sans text-font selection:bg-complement/30">
       {/* Global override to style the React Emoji Picker */}
       <style>{`
         .custom-emoji-theme .EmojiPickerReact {

@@ -94,7 +94,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="relative min-h-full overflow-hidden bg-[#030811] px-4 pb-8 pt-16 text-font selection:bg-complement/25 sm:px-6">
+    <div className="relative min-h-full overflow-hidden bg-[#030811] px-4 pb-8 pt-8 text-font selection:bg-complement/25 sm:px-6">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(66,153,225,0.14),transparent_34%),radial-gradient(circle_at_80%_80%,rgba(70,80,190,0.12),transparent_35%),linear-gradient(180deg,#030811_0%,#050711_100%)]" />
       <div className="absolute inset-0 opacity-[0.055] [background-image:radial-gradient(circle,rgba(255,255,255,0.9)_1px,transparent_1px)] [background-size:42px_42px]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(3,8,17,0.1)_38%,rgba(3,8,17,0.88)_78%)]" />

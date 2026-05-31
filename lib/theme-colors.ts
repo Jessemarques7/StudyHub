@@ -10,9 +10,9 @@ export type ThemeColors = Record<ThemeColorKey, string>;
 export const THEME_STORAGE_KEY = "studyhub-theme-colors";
 
 export const DEFAULT_THEME_COLORS: ThemeColors = {
-  main: "#1e1e1e",
-  secondary: "#242424",
-  third: "#2a2a2a",
+  main: "#08090d",
+  secondary: "#12141c",
+  third: "#1c1e27",
   complement: "#4299e1",
   font: "#dcddde",
 };

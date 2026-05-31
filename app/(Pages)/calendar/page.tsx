@@ -148,8 +148,7 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(false);
   const calendarRef = useRef<FullCalendar>(null);
 
-  const [currentView, setCurrentView] =
-    useState<CalendarView>("timeGridWeek");
+  const [currentView, setCurrentView] = useState<CalendarView>("timeGridWeek");
   const [isMobile, setIsMobile] = useState(false);
   const [value, setValue] = useState([6, 22]);
 
@@ -227,21 +226,25 @@ export default function CalendarPage() {
 
       resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
-          if (entry.target === timeGridBody) setGridHeight(entry.contentRect.height);
-          if (entry.target === headerElement) setHeaderHeight(entry.contentRect.height);
+          if (entry.target === timeGridBody)
+            setGridHeight(entry.contentRect.height);
+          if (entry.target === headerElement)
+            setHeaderHeight(entry.contentRect.height);
         }
       });
       resizeObserver.observe(timeGridBody);
       if (headerElement) resizeObserver.observe(headerElement);
       setGridHeight(timeGridBody.getBoundingClientRect().height);
-      if (headerElement) setHeaderHeight(headerElement.getBoundingClientRect().height);
+      if (headerElement)
+        setHeaderHeight(headerElement.getBoundingClientRect().height);
     }, 100);
 
     return () => {
       mounted = false;
       clearTimeout(timer);
       if (resizeObserver) resizeObserver.disconnect();
-      if (scrollerEl && onScroll) scrollerEl.removeEventListener("scroll", onScroll);
+      if (scrollerEl && onScroll)
+        scrollerEl.removeEventListener("scroll", onScroll);
     };
   }, [currentView, value, events]);
 
@@ -421,7 +424,10 @@ export default function CalendarPage() {
     }
   };
 
-  const handleUpdateEvent = async (id: string, updates: CalendarEventUpdate) => {
+  const handleUpdateEvent = async (
+    id: string,
+    updates: CalendarEventUpdate,
+  ) => {
     try {
       setLoading(true);
       const token = await getProviderToken();
@@ -545,7 +551,7 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="relative mx-2 mt-2 flex h-[calc(100dvh-7rem)] flex-col overflow-hidden rounded-xl border border-border bg-background/30 text-foreground shadow-glow glass sm:mx-4 md:mx-32 md:mt-15 md:h-[calc(100vh-4rem)] md:rounded-2xl">
+    <div className="relative   flex h-[calc(100dvh-7rem)] flex-col overflow-hidden  border border-border bg-background/30 text-foreground shadow-glow glass   md:h-full ">
       <header className="flex shrink-0 flex-col items-stretch justify-between gap-3 border-b border-border bg-third/40 px-3 py-3 backdrop-blur-md sm:px-4 md:flex-row md:items-center md:px-6">
         <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
           <div className="flex min-w-0 items-center justify-between gap-3 md:justify-start">
@@ -712,11 +718,7 @@ export default function CalendarPage() {
         <div className="flex-1 min-w-0 relative h-full">
           <FullCalendar
             ref={calendarRef}
-            plugins={[
-              dayGridPlugin,
-              timeGridPlugin,
-              interactionPlugin,
-            ]}
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             dayHeaderContent={(args) => {
               const dayName = args.date.toLocaleDateString("pt-BR", {
                 weekday: "long",
@@ -1106,8 +1108,6 @@ export default function CalendarPage() {
           </div>
         </div>
       )}
-
-
     </div>
   );
 }

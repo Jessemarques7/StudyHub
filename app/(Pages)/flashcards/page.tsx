@@ -155,7 +155,7 @@ export default function Index() {
   };
 
   return (
-    <div className="relative mt-16 min-h-[calc(100vh-4rem)] bg-background">
+    <div className="relative min-h-screen bg-background">
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-8 px-4 py-8 md:px-8">
         <div className="flex items-center justify-between gap-4">
           <div>

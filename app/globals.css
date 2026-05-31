@@ -144,6 +144,9 @@
       "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    .excalidraw {
+      --color-primary: red;
+    }
   }
 }
 
@@ -342,37 +345,4 @@
   background-color: var(--blocknote-surface) !important;
   border: 1px solid var(--blocknote-hover-bg) !important;
   color: var(--blocknote-text) !important;
-}
-
-.dark .react-flow__node {
-  color: white;
-  border-radius: var(--radius-button);
-}
-
-.dark .react-flow__background {
-  background-color: var(--background);
-  --xy-background-pattern-dots-color-default: var(--blocknote-surface);
-}
-
-.dark .react-flow__controls {
-  --xy-controls-button-background-color-default: var(--blocknote-menu-bg);
-}
-
-.dark .react-flow__handle {
-  width: 8px;
-  height: 8px;
-  border: 0;
-  opacity: 0;
-}
-
-.dark .react-flow__handle:hover {
-  background-color: var(--brand-purple);
-  opacity: 1;
-}
-
-.dark .react-flow__controls button {
-  background-color: var(--blocknote-menu-bg);
-  color: white;
-  height: 3rem;
-  width: 3rem;
 }

@@ -3,9 +3,9 @@
 
   box-sizing: border-box;
 
-  --theme-main: #1e1e1e;
-  --theme-secondary: #242424;
-  --theme-third: #2a2a2a;
+  --theme-main: #08090d;
+  --theme-secondary: #12141c;
+  --theme-third: #1c1e27;
   --theme-complement: #4299e1;
   --theme-font: #dcddde;
   --color-main: var(--theme-main);

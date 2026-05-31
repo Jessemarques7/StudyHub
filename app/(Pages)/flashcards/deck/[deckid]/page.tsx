@@ -125,7 +125,7 @@ export default function DeckView() {
   }
 
   return (
-    <div className="bg-background p-4 mt-16">
+    <div className="bg-background p-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">

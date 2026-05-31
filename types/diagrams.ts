@@ -1,5 +1,5 @@
 // types/diagrams.ts
-import { Edge, Node } from "@xyflow/react";
+import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 import type {
   CreateFolderInput,
   Folder,
@@ -7,16 +7,12 @@ import type {
 } from "@/types/notes";
 
 export type DiagramFolder = Folder;
-
-export interface DiagramContent {
-  nodes: Node[];
-  edges: Edge[];
-}
+export type DiagramContent = ImportedDataState;
 
 export interface Diagram {
   id: string;
   title: string;
-  content: DiagramContent; // Armazena nodes e edges
+  content: DiagramContent;
   folderId?: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -37,6 +33,7 @@ export interface UpdateDiagramInput {
 export interface DiagramsContextValue {
   diagrams: Diagram[];
   folders: DiagramFolder[];
+  isLoading: boolean;
   addDiagram: (input?: CreateDiagramInput) => Promise<Diagram>;
   updateDiagram: (id: string, updates: UpdateDiagramInput) => Promise<void>;
   deleteDiagram: (id: string) => Promise<void>;

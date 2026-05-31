@@ -19,16 +19,30 @@ import {
   UpdateDiagramInput,
 } from "@/types/diagrams";
 import { useNotes } from "@/contexts/NotesContext";
+import { DEFAULT_THEME_COLORS } from "@/lib/theme-colors";
 import { toast } from "sonner";
 import type { DiagramRow } from "@/types/database";
 import type { Json } from "@/types/supabase";
 
 const DiagramsContext = createContext<DiagramsContextValue | null>(null);
 
+const createEmptyDiagramContent = (): DiagramContent => ({
+  type: "excalidraw",
+  version: 2,
+  source: "studyhub",
+  elements: [],
+  appState: {
+    currentItemStrokeColor: DEFAULT_THEME_COLORS.font,
+    gridModeEnabled: false,
+    viewBackgroundColor: DEFAULT_THEME_COLORS.main,
+  },
+  files: {},
+});
+
 const mapDiagramFromSupabase = (data: DiagramRow): Diagram => ({
   id: data.id,
   title: data.title,
-  content: (data.content as DiagramContent | null) || { nodes: [], edges: [] },
+  content: (data.content as DiagramContent | null) || createEmptyDiagramContent(),
   folderId: data.folder_id,
   createdAt: new Date(data.created_at),
   updatedAt: new Date(data.updated_at),
@@ -38,10 +52,13 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
   const supabase = useMemo(() => createClient(), []);
   const [diagrams, setDiagrams] = useState<Diagram[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { folders, addFolder, deleteFolder, updateFolder } = useNotes();
 
   useEffect(() => {
     async function fetchData() {
+      setIsLoading(true);
+
       try {
         const {
           data: { user },
@@ -68,6 +85,8 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         console.error("Erro ao carregar diagramas:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -82,7 +101,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
 
       const dbPayload = {
         title: input.title || "Untitled Diagram",
-        content: (input.content || { nodes: [], edges: [] }) as unknown as Json,
+        content: (input.content || createEmptyDiagramContent()) as unknown as Json,
         folder_id: input.folderId || null,
         user_id: userId,
       };
@@ -168,6 +187,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
     () => ({
       diagrams,
       folders,
+      isLoading,
       addDiagram,
       updateDiagram,
       deleteDiagram,
@@ -179,6 +199,7 @@ export function DiagramsProvider({ children }: { children: ReactNode }) {
     [
       diagrams,
       folders,
+      isLoading,
       addDiagram,
       updateDiagram,
       deleteDiagram,
