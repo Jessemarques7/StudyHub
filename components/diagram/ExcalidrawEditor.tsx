@@ -6,12 +6,13 @@ import {
   serializeAsJSON,
 } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ExcalidrawElementSkeleton } from "@excalidraw/excalidraw/data/transform";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import type {
   AppState,
   BinaryFiles,
+  ExcalidrawImperativeAPI,
   ExcalidrawInitialDataState,
 } from "@excalidraw/excalidraw/types";
 import type { DiagramContent } from "@/types/diagrams";
@@ -60,6 +61,9 @@ const DEFAULT_NODE_WIDTH = 220;
 const DEFAULT_NODE_HEIGHT = 96;
 const DEFAULT_NODE_STROKE = "#1e1e1e";
 const DEFAULT_IMAGE_NODE_BACKGROUND = "#a5d8ff";
+const DEFAULT_CANVAS_BACKGROUND = "#08090d";
+const EXCALIDRAW_BACKGROUND_CSS_VAR = "--color-main";
+const EXCALIDRAW_BACKGROUND_CSS_VALUE = "var(--color-main)";
 const SAVE_DEBOUNCE_MS = 900;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -83,6 +87,16 @@ function readNumber(value: unknown, fallback: number) {
 
 function readString(value: unknown) {
   return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+function getExcalidrawBackgroundColor() {
+  if (typeof window === "undefined") return DEFAULT_CANVAS_BACKGROUND;
+
+  return (
+    getComputedStyle(document.documentElement)
+      .getPropertyValue(EXCALIDRAW_BACKGROUND_CSS_VAR)
+      .trim() || DEFAULT_CANVAS_BACKGROUND
+  );
 }
 
 function isLegacyFlowContent(
@@ -114,6 +128,7 @@ function getLegacyNodeSize(node: LegacyFlowNode) {
 
 function convertLegacyFlowContent(
   content: LegacyFlowContent,
+  canvasBackgroundColor: string,
 ): ExcalidrawInitialDataState {
   const nodeBounds = new Map<
     string,
@@ -179,6 +194,9 @@ function convertLegacyFlowContent(
     elements: convertToExcalidrawElements(skeletons, {
       regenerateIds: false,
     }),
+    appState: {
+      viewBackgroundColor: canvasBackgroundColor,
+    },
     files: {},
     scrollToContent: true,
   };
@@ -186,9 +204,10 @@ function convertLegacyFlowContent(
 
 function toInitialData(
   content: DiagramContent | null | undefined,
+  canvasBackgroundColor: string,
 ): ExcalidrawInitialDataState {
   if (isLegacyFlowContent(content)) {
-    return convertLegacyFlowContent(content);
+    return convertLegacyFlowContent(content, canvasBackgroundColor);
   }
 
   return {
@@ -196,6 +215,10 @@ function toInitialData(
     version: content?.version ?? 2,
     source: content?.source ?? "studyhub",
     elements: content?.elements ?? [],
+    appState: {
+      ...(content?.appState ?? {}),
+      viewBackgroundColor: canvasBackgroundColor,
+    },
     files: content?.files ?? {},
     scrollToContent: content?.scrollToContent ?? true,
   };
@@ -216,15 +239,49 @@ export default function ExcalidrawEditor({
   name,
   onSave,
 }: ExcalidrawEditorProps) {
+  const excalidrawApiRef = useRef<ExcalidrawImperativeAPI | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingContentRef = useRef<DiagramContent | null>(null);
   const onSaveRef = useRef(onSave);
+  const [canvasBackgroundColor, setCanvasBackgroundColor] = useState(
+    DEFAULT_CANVAS_BACKGROUND,
+  );
 
-  const initialData = useMemo(() => toInitialData(content), [content]);
+  const initialData = useMemo(
+    () => toInitialData(content, canvasBackgroundColor),
+    [canvasBackgroundColor, content],
+  );
 
   useEffect(() => {
     onSaveRef.current = onSave;
   }, [onSave]);
+
+  useEffect(() => {
+    const syncCanvasBackground = () => {
+      const nextBackgroundColor = getExcalidrawBackgroundColor();
+
+      setCanvasBackgroundColor((currentBackgroundColor) =>
+        currentBackgroundColor === nextBackgroundColor
+          ? currentBackgroundColor
+          : nextBackgroundColor,
+      );
+
+      excalidrawApiRef.current?.updateScene({
+        appState: {
+          viewBackgroundColor: nextBackgroundColor,
+        },
+        captureUpdate: "NEVER",
+      });
+      excalidrawApiRef.current?.refresh();
+    };
+
+    syncCanvasBackground();
+    window.addEventListener("studyhub-theme-change", syncCanvasBackground);
+
+    return () => {
+      window.removeEventListener("studyhub-theme-change", syncCanvasBackground);
+    };
+  }, []);
 
   const flushPendingSave = useCallback(() => {
     if (saveTimeoutRef.current) {
@@ -260,9 +317,15 @@ export default function ExcalidrawEditor({
   );
 
   return (
-    <div className=" h-full w-full excalidraw">
+    <div
+      className="h-full w-full excalidraw"
+      style={{ backgroundColor: EXCALIDRAW_BACKGROUND_CSS_VALUE }}
+    >
       <Excalidraw
         autoFocus
+        excalidrawAPI={(api) => {
+          excalidrawApiRef.current = api;
+        }}
         initialData={initialData}
         name={name}
         onChange={handleChange}

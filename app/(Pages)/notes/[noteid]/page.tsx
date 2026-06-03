@@ -6,18 +6,12 @@ import Editor from "@/components/notes/Editor";
 import Graph from "@/components/notes/Graph";
 import { Button } from "@/components/ui/button";
 
-import {
-  IconChartDots3,
-  IconLayoutSidebarRight,
-} from "@tabler/icons-react";
+import { IconChartDots3, IconLayoutSidebarRight } from "@tabler/icons-react";
 import NotesList from "@/components/notes/NotesList";
 import { StarsBackground } from "@/components/ui/stars-background";
 import { ShootingStars } from "@/components/ui/shooting-stars";
 
-import {
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
+import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 
 export default function NotePage() {
   const [isGraphVisible, setIsGraphVisible] = useState(false);
@@ -29,7 +23,7 @@ export default function NotePage() {
 
       <ResizablePanelGroup
         orientation="horizontal"
-        className="relative flex h-[100dvh] flex-row pt-8 md:h-screen md:pt-12"
+        className="relative flex h-[100dvh] flex-row  md:h-screen md:pt-12"
       >
         <ResizablePanel>
           <Editor />
@@ -66,7 +60,7 @@ export default function NotePage() {
           }}
           variant="ghost"
           size="icon"
-          className="absolute right-4 top-24 z-50 hidden bg-secondary text-font hover:bg-complement/20 hover:text-font md:inline-flex"
+          className="absolute right-4 top-1.5 z-50 hidden bg-secondary text-font hover:bg-complement/20 hover:text-font md:inline-flex"
         >
           <IconLayoutSidebarRight className="h-8 w-8" />
         </Button>
@@ -88,7 +82,7 @@ export default function NotePage() {
           }}
           variant="ghost"
           size="icon"
-          className="absolute right-4 top-14 z-10 hidden bg-secondary text-font hover:bg-complement/20 hover:text-font md:inline-flex"
+          className="absolute right-15 top-1.5 z-10 hidden bg-secondary text-font hover:bg-complement/20 hover:text-font md:inline-flex"
         >
           {/* {isGraphVisible ? (
             <PanelRightClose className="h-5 w-5" />

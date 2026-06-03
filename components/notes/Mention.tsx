@@ -1,5 +1,6 @@
 import { createReactInlineContentSpec } from "@blocknote/react";
 import Link from "next/link";
+import { CanvasText } from "../ui/canvas-text";
 
 // Componente de menção inline
 export const Mention = createReactInlineContentSpec(
@@ -33,7 +34,7 @@ export const Mention = createReactInlineContentSpec(
             }}
             title="Invalid mention"
           >
-            @[Invalid]
+            {"->"}[Invalid]
           </span>
         );
       }
@@ -52,9 +53,26 @@ export const Mention = createReactInlineContentSpec(
           className="mention-link "
           title={`Go to: ${title}`}
         >
-          @{title || "Untitled"}
+          <CanvasText
+            text={`->${title || "Untitled"}`}
+            backgroundClassName="bg-blue-700"
+            colors={[
+              "rgba(0, 153, 255, 1)",
+              "rgba(0, 153, 255, 0.9)",
+              "rgba(0, 153, 255, 0.8)",
+              "rgba(0, 153, 255, 0.7)",
+              "rgba(0, 153, 255, 0.6)",
+              "rgba(0, 153, 255, 0.5)",
+              "rgba(0, 153, 255, 0.4)",
+              "rgba(0, 153, 255, 0.3)",
+              "rgba(0, 153, 255, 0.2)",
+              "rgba(0, 153, 255, 0.1)",
+            ]}
+            lineGap={4}
+            animationDuration={20}
+          />
         </Link>
       );
     },
-  }
+  },
 );

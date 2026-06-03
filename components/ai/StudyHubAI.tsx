@@ -168,7 +168,7 @@ export default function StudyHubAI() {
         type="button"
         aria-label="Open StudyHub AI"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 sm:bottom-24 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-complement/35 bg-main text-font shadow-2xl shadow-black/40 transition hover:-translate-y-0.5 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-complement/40 md:bottom-6 md:right-6"
+        className="fixed  right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-complement/35 bg-main text-font shadow-2xl shadow-black/40 transition hover:-translate-y-0.5 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-complement/40 bottom-6 md:right-6"
       >
         <span className="relative flex h-14 w-14 items-center justify-center rounded-full p-1.5 text-font">
           <Image

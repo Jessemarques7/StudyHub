@@ -146,6 +146,8 @@
     -moz-osx-font-smoothing: grayscale;
     .excalidraw {
       --color-primary: red;
+      --default-bg-color: var(--color-main);
+      background-color: var(--color-main);
     }
   }
 }
