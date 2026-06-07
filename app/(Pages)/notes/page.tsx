@@ -3,7 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { Search, Plus, FolderPlus, FilePlus } from "lucide-react";
+import { Search, FolderPlus, FilePlus } from "lucide-react";
 import { IconSitemap } from "@tabler/icons-react";
 
 import { useNotes } from "@/contexts/NotesContext";
@@ -21,6 +21,9 @@ const Graph = dynamic(() => import("@/components/notes/Graph"), {
 export default function WorkspacePage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeGraphNodeId, setActiveGraphNodeId] = useState<string | null>(
+    null,
+  );
 
   const { addNote, addFolder } = useNotes();
   const { addDiagram } = useDiagrams();
@@ -48,61 +51,39 @@ export default function WorkspacePage() {
   };
 
   return (
-    <div className="flex h-full bg-background text-foreground">
-      <div className="relative flex min-h-full flex-3 overflow-hidden  bg-main">
-        <div className="pointer-events-none absolute inset-0 z-0">
-          <StarsBackground />
-          <ShootingStars />
-        </div>
-        <div className="absolute inset-0 z-10">
-          <Graph classname="h-full w-full" />
-        </div>
+    <div className="relative h-full min-h-0 overflow-hidden bg-main text-foreground">
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <StarsBackground />
+        <ShootingStars />
       </div>
 
-      <div className="relative z-10 mt-10 flex flex-1 flex-col p-4 md:p-8">
-        <div className="mx-auto flex h-full w-full max-w-7xl flex-col gap-6">
-          <div className="flex w-full max-w-4xl flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative min-w-0 flex-1">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Buscar notas, diagramas e pastas..."
-                className="h-12 w-full rounded-xl border-secondary bg-third/50 pl-11 text-md focus-visible:ring-complement/40"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-              />
-            </div>
+      <div className="absolute inset-0 z-10">
+        <Graph classname="h-full w-full" activeNodeId={activeGraphNodeId} />
+      </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <Button
-                onClick={handleCreateFolder}
-                className="gap-2 bg-complement text-font shadow-lg shadow-complement/20 hover:bg-complement/90"
-              >
-                <FolderPlus className="h-4 w-4" />
-              </Button>
-              <Button
-                onClick={handleCreateNote}
-                className="gap-2 bg-complement text-font shadow-lg shadow-complement/20 hover:bg-complement/90"
-              >
-                <FilePlus className="h-4 w-4" />
-              </Button>
-              <Button
-                onClick={handleCreateDiagram}
-                className="gap-2 bg-complement text-font shadow-lg shadow-complement/20 hover:bg-complement/90"
-              >
-                <IconSitemap className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-            <NotesList
-              opensidebar
-              showActions={false}
-              searchQuery={searchQuery}
+      <div className="pointer-events-none absolute inset-x-3 top-3 z-20 md:inset-x-6 md:top-12">
+        <div className="pointer-events-auto flex w-full flex-col gap-2 rounded-lg  shadow-2xl shadow-black/25 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/35 sm:flex-row sm:items-center">
+          <div className="relative min-w-0 flex-1">
+            <Search className="absolute left-4 top-1/2  h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar notas, diagramas e pastas..."
+              className="h-11 w-full rounded-full border-white/10 bg-third/45 pl-11 text-sm shadow-sm shadow-black/10 backdrop-blur-xl placeholder:text-font/40 focus-visible:ring-complement/40"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
             />
           </div>
         </div>
       </div>
+
+      <aside className="absolute bottom-3 right-3 top-[8.5rem] z-20 w-[min(calc(100%-1.5rem),22rem)] overflow-hidden rounded-lg border border-white/10 bg-background/45 p-3 shadow-2xl shadow-black/30 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/35 sm:top-[5.75rem] md:bottom-6 md:right-6 md:top-24 md:w-[22rem]">
+        <div className="h-full min-h-0 overflow-y-auto pr-1">
+          <NotesList
+            opensidebar
+            searchQuery={searchQuery}
+            onGraphNodeActiveChange={setActiveGraphNodeId}
+          />
+        </div>
+      </aside>
     </div>
   );
 }

@@ -42,6 +42,7 @@ interface GraphRenderData {
 
 interface ForceGraphProps {
   data: GraphRenderData;
+  activeNodeId?: string | null;
 }
 
 interface D3Force {
@@ -84,6 +85,10 @@ interface ForceGraphInstance {
     padding?: number,
     nodeFilter?: (node: GraphRenderNode) => boolean,
   ): unknown;
+  centerAt(): { x: number; y: number };
+  centerAt(x: number, y: number, durationMs?: number): unknown;
+  zoom(): number;
+  zoom(scale: number, durationMs?: number): unknown;
 }
 
 interface ForceGraph2DProps {
@@ -305,7 +310,7 @@ function GraphSection({
   );
 }
 
-function ForceGraphComponent({ data }: ForceGraphProps) {
+function ForceGraphComponent({ data, activeNodeId = null }: ForceGraphProps) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<ForceGraphInstance | undefined>(undefined);
@@ -325,29 +330,30 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
 
   const hasDimensions = dimensions.width > 0 && dimensions.height > 0;
   const layoutKey = `${data.nodes.length}:${data.links.length}`;
+  const focusedNodeId = hoveredNodeId ?? activeNodeId;
 
   const highlightedNodeIds = useMemo(() => {
     const nodeIds = new Set<string>();
 
-    if (!hoveredNodeId) return nodeIds;
+    if (!focusedNodeId) return nodeIds;
 
-    nodeIds.add(hoveredNodeId);
+    nodeIds.add(focusedNodeId);
 
     data.links.forEach((link) => {
       const sourceId = getNodeId(link.source);
       const targetId = getNodeId(link.target);
 
-      if (sourceId === hoveredNodeId && targetId) {
+      if (sourceId === focusedNodeId && targetId) {
         nodeIds.add(targetId);
       }
 
-      if (targetId === hoveredNodeId && sourceId) {
+      if (targetId === focusedNodeId && sourceId) {
         nodeIds.add(sourceId);
       }
     });
 
     return nodeIds;
-  }, [data.links, hoveredNodeId]);
+  }, [data.links, focusedNodeId]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -450,12 +456,61 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!activeNodeId || fitTimeoutRef.current === null) return;
+
+    window.clearTimeout(fitTimeoutRef.current);
+    fitTimeoutRef.current = null;
+  }, [activeNodeId]);
+
+  useEffect(() => {
+    if (!activeNodeId || !hasDimensions) return;
+
+    let cancelled = false;
+    let retryTimeoutId: number | null = null;
+
+    const focusActiveNode = (attempt = 0) => {
+      if (cancelled) return;
+
+      const graph = fgRef.current;
+      const activeNode = data.nodes.find(
+        (node) => getNodeId(node) === activeNodeId,
+      );
+
+      if (
+        graph &&
+        activeNode &&
+        typeof activeNode.x === "number" &&
+        typeof activeNode.y === "number"
+      ) {
+        graph.centerAt(activeNode.x, activeNode.y, 450);
+        graph.zoom(Math.min(Math.max(graph.zoom(), 1.9), 4), 450);
+        return;
+      }
+
+      if (attempt < 30) {
+        retryTimeoutId = window.setTimeout(() => {
+          focusActiveNode(attempt + 1);
+        }, 50);
+      }
+    };
+
+    focusActiveNode();
+
+    return () => {
+      cancelled = true;
+      if (retryTimeoutId !== null) {
+        window.clearTimeout(retryTimeoutId);
+      }
+    };
+  }, [activeNodeId, data.nodes, hasDimensions]);
+
   function isLinkHighlighted(link: GraphRenderLink) {
-    if (!hoveredNodeId) return false;
+    if (!focusedNodeId) return false;
 
     return (
-      getNodeId(link.source) === hoveredNodeId ||
-      getNodeId(link.target) === hoveredNodeId
+      getNodeId(link.source) === focusedNodeId ||
+      getNodeId(link.target) === focusedNodeId
     );
   }
 
@@ -465,7 +520,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
   }
 
   function getLinkOpacity(link: GraphRenderLink) {
-    if (!hoveredNodeId) return 0.28;
+    if (!focusedNodeId) return 0.28;
     return isLinkHighlighted(link) ? 0.95 : 0.045;
   }
 
@@ -514,10 +569,10 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
     const x = node.x ?? 0;
     const y = node.y ?? 0;
     const nodeId = getNodeId(node);
-    const isHovered = nodeId === hoveredNodeId;
+    const isHovered = nodeId === focusedNodeId;
     const isHighlighted =
-      !hoveredNodeId || (nodeId !== null && highlightedNodeIds.has(nodeId));
-    const isNeighbor = Boolean(hoveredNodeId && isHighlighted && !isHovered);
+      !focusedNodeId || (nodeId !== null && highlightedNodeIds.has(nodeId));
+    const isNeighbor = Boolean(focusedNodeId && isHighlighted && !isHovered);
     const nodeRadius = getNodeRadius(node, isHovered);
     const complementColor = getThemeColor(
       "--color-complement",
@@ -712,7 +767,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
           onNodeHover={handleNodeHover}
           linkWidth={(link: GraphRenderLink) => {
             const baseWidth =
-              hoveredNodeId && !isLinkHighlighted(link) ? 0.35 : 0.85;
+              focusedNodeId && !isLinkHighlighted(link) ? 0.35 : 0.85;
             const highlightBoost = isLinkHighlighted(link) ? 1.35 : 1;
 
             return baseWidth * highlightBoost * linkThicknessMultiplier;
@@ -727,7 +782,7 @@ function ForceGraphComponent({ data }: ForceGraphProps) {
           linkDirectionalArrowColor={getLinkColor}
           linkDirectionalArrowRelPos={0.88}
           linkDirectionalParticles={(link: GraphRenderLink) => {
-            if (hoveredNodeId && !isLinkHighlighted(link)) return 0;
+            if (focusedNodeId && !isLinkHighlighted(link)) return 0;
             return isLinkHighlighted(link) ? 3 : 1;
           }}
           linkDirectionalParticleSpeed={0.006}

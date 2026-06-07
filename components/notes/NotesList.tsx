@@ -62,6 +62,7 @@ interface NotesListProps {
   opensidebar: boolean;
   showActions?: boolean;
   searchQuery?: string;
+  onGraphNodeActiveChange?: (nodeId: string | null) => void;
 }
 
 const ROOT_FOLDER_ID = "__root__";
@@ -71,6 +72,7 @@ export default function NotesList({
   opensidebar: _opensidebar,
   showActions = true,
   searchQuery = "",
+  onGraphNodeActiveChange,
 }: NotesListProps) {
   void _opensidebar;
 
@@ -111,6 +113,21 @@ export default function NotesList({
 
     return null;
   }, [pathname]);
+
+  const currentGraphNodeId = currentItem
+    ? `${currentItem.type}:${currentItem.id}`
+    : null;
+
+  useEffect(() => {
+    onGraphNodeActiveChange?.(currentGraphNodeId);
+  }, [currentGraphNodeId, onGraphNodeActiveChange]);
+
+  const handleGraphNodePreview = useCallback(
+    (nodeId: string | null) => {
+      onGraphNodeActiveChange?.(nodeId ?? currentGraphNodeId);
+    },
+    [currentGraphNodeId, onGraphNodeActiveChange],
+  );
 
   const folderIds = useMemo(
     () => new Set(folders.map((folder) => folder.id)),
@@ -370,11 +387,7 @@ export default function NotesList({
   );
 
   const handleDeleteItem = useCallback(
-    async (
-      id: string,
-      type: EditingType,
-      parentId?: string | null,
-    ) => {
+    async (id: string, type: EditingType, parentId?: string | null) => {
       if (type === "note") {
         await deleteNote(id);
         if (currentItem?.type === "note" && currentItem.id === id) {
@@ -488,12 +501,12 @@ export default function NotesList({
         <img
           src={folder.icon}
           alt=""
-          className="h-5 w-5 rounded-sm object-cover"
+          className="h-4 w-4 rounded-sm object-cover"
         />
       );
     }
 
-    return <span className="text-base leading-none">{folder.icon}</span>;
+    return <span className="text-sm leading-none">{folder.icon}</span>;
   };
 
   const renderNoteIcon = (note: Note) => {
@@ -503,11 +516,11 @@ export default function NotesList({
 
     if (note.icon.startsWith("data:") || note.icon.startsWith("http")) {
       return (
-        <img src={note.icon} alt="" className="h-5 w-5 rounded object-cover" />
+        <img src={note.icon} alt="" className="h-4 w-4 rounded object-cover" />
       );
     }
 
-    return <span className="text-base leading-none">{note.icon}</span>;
+    return <span className="text-sm leading-none">{note.icon}</span>;
   };
 
   const renderRenameInput = () => (
@@ -520,7 +533,7 @@ export default function NotesList({
         if (event.key === "Escape") handleCancelEditing();
       }}
       autoFocus
-      className="w-full border-b border-complement bg-transparent px-2 py-2 text-sm text-font focus:outline-none"
+      className="w-full border-b border-complement bg-transparent px-2 py-1 text-sm text-font focus:outline-none"
       onClick={(event) => event.stopPropagation()}
     />
   );
@@ -542,27 +555,31 @@ export default function NotesList({
           handleDragStart(event, { type: item.type, id: item.id })
         }
         onDragEnd={handleDragEnd}
+        onMouseEnter={() => handleGraphNodePreview(itemKey)}
+        onMouseLeave={() => handleGraphNodePreview(null)}
+        onFocus={() => handleGraphNodePreview(itemKey)}
+        onBlur={() => handleGraphNodePreview(null)}
         className={cn(
-          "group relative rounded-2xl   px-4 py-1  transition-all hover:border-complement/30 hover:bg-secondary hover:shadow-xl hover:shadow-complement/10",
-          isActive && "border-complement/40 bg-complement/10",
+          "group relative rounded-md border border-transparent px-2 py-1 transition-colors hover:bg-font/5",
+          isActive && "bg-complement/10 text-complement",
           isDragging && "opacity-50",
         )}
-        style={{ marginLeft: `${depth * 18}px` }}
+        style={{ marginLeft: `${depth * 14}px` }}
       >
         {isEditing ? (
           renderRenameInput()
         ) : (
-          <Link href={itemHref} className="flex h-full gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/50 p-2 text-font/80">
+          <Link href={itemHref} className="flex min-h-8 items-center gap-2">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-font/65 transition-colors group-hover:bg-complement/10 group-hover:text-font">
               {item.type === "note" ? (
                 renderNoteIcon(item.note)
               ) : (
-                <IconSitemap className="h-4 w-4" />
+                <IconSitemap className="h-3.5 w-3.5" />
               )}
             </div>
 
-            <div className="min-w-0 flex flex-1 items-center  ">
-              <h3 className=" line-clamp-1 font-semibold text-font/90 transition-colors group-hover:text-font">
+            <div className="min-w-0 flex flex-1 items-center">
+              <h3 className="line-clamp-1 text-sm font-medium text-font/85 transition-colors group-hover:text-font">
                 {item.title || "Untitled"}
               </h3>
             </div>
@@ -628,19 +645,19 @@ export default function NotesList({
               onDragLeave={() => setDropTargetId(null)}
               onDrop={(event) => void handleDrop(event, folder.id)}
               className={cn(
-                "group relative rounded-2xl   px-4 py-1  transition-all hover:border-complement/30 hover:bg-secondary",
+                "group relative rounded-md border border-transparent px-2 py-1 transition-colors hover:bg-font/5",
                 isDropTarget && "border-complement bg-complement/10",
                 isDragging && "opacity-50",
               )}
-              style={{ marginLeft: `${depth * 18}px` }}
+              style={{ marginLeft: `${depth * 14}px` }}
             >
               {isEditing ? (
                 renderRenameInput()
               ) : (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   <CollapsibleTrigger asChild>
-                    <button className="group flex min-w-0 flex-1 items-center gap-4 text-left">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/50 p-2 text-font/80">
+                    <button className="group flex min-h-8 min-w-0 flex-1 items-center gap-2 text-left">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-font/65 transition-colors group-hover:bg-complement/10 group-hover:text-font">
                         <div className="block group-hover:hidden">
                           {renderFolderIcon(folder)}
                         </div>
@@ -648,7 +665,7 @@ export default function NotesList({
                         <div className="hidden group-hover:block">
                           <IconChevronDown
                             className={cn(
-                              "h-4 w-4 shrink-0 transition-transform duration-200",
+                              "h-3.5 w-3.5 shrink-0 transition-transform duration-200",
                               !isFolderOpen && "-rotate-90",
                             )}
                           />
@@ -657,7 +674,7 @@ export default function NotesList({
 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="truncate font-semibold text-font/90">
+                          <h3 className="truncate text-sm font-medium text-font/85 transition-colors group-hover:text-font">
                             {folder.name}
                           </h3>
                         </div>
@@ -715,11 +732,11 @@ export default function NotesList({
           </ContextMenuContent>
         </ContextMenu>
 
-        <CollapsibleContent className="mt-2 space-y-2 overflow-hidden">
+        <CollapsibleContent className="mt-1 space-y-1 overflow-hidden">
           {isEmpty ? (
             <div
-              className="rounded-xl border border-dashed border-secondary px-4 py-3 text-xs italic text-neutral-500"
-              style={{ marginLeft: `${(depth + 1) * 18}px` }}
+              className="rounded-md border border-dashed border-white/10 px-3 py-2 text-xs italic text-neutral-500"
+              style={{ marginLeft: `${(depth + 1) * 14}px` }}
             >
               Empty
             </div>
@@ -747,27 +764,27 @@ export default function NotesList({
     <div className="flex-1">
       {showActions && (
         <div className="mb-3 flex w-full items-center justify-between rounded-md px-2 py-2 text-neutral-700 transition-colors dark:text-neutral-200">
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <motion.button
               onClick={() => void handleCreateFolder(null)}
               className="rounded p-1 text-font/60 hover:bg-complement/10 hover:text-font"
               title="New folder"
             >
-              <IconFolderPlus className="h-6 w-6" />
+              <IconFolderPlus className="h-4 w-4" />
             </motion.button>
             <motion.button
               onClick={() => void handleCreateNewNote(null)}
               className="rounded p-1 text-font/60 hover:bg-complement/10 hover:text-font"
               title="New note"
             >
-              <IconPlus className="h-6 w-6" />
+              <IconPlus className="h-4 w-4" />
             </motion.button>
             <motion.button
               onClick={() => void handleCreateNewDiagram(null)}
               className="rounded p-1 text-font/60 hover:bg-complement/10 hover:text-font"
               title="New diagram"
             >
-              <IconSitemap className="h-6 w-6" />
+              <IconSitemap className="h-4 w-4" />
             </motion.button>
           </div>
         </div>
@@ -778,7 +795,7 @@ export default function NotesList({
         onDragLeave={() => setDropTargetId(null)}
         onDrop={(event) => void handleDrop(event, null)}
         className={cn(
-          "space-y-1 rounded-2xl transition-colors",
+          "space-y-0.5 rounded-md transition-colors",
           isRootDropTarget && "bg-complement/10 ring-1 ring-complement",
         )}
       >
@@ -786,7 +803,7 @@ export default function NotesList({
         {rootItems.map((item) => renderWorkspaceItem(item, 0))}
 
         {isWorkspaceEmpty && (
-          <div className="rounded-2xl border-2 border-dashed border-secondary bg-third/30 px-4 py-16 text-center text-sm text-neutral-500 backdrop-blur-sm">
+          <div className="rounded-md border border-dashed border-white/10 bg-third/20 px-4 py-10 text-center text-sm text-neutral-500 backdrop-blur-sm">
             No notes, diagrams or folders
           </div>
         )}

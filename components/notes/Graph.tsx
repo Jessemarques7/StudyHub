@@ -35,7 +35,12 @@ function getNodeValue(connectionCount: number): number {
   return connectionCount + 1;
 }
 
-export default function Graph({ classname }: { classname?: string }) {
+interface GraphProps {
+  classname?: string;
+  activeNodeId?: string | null;
+}
+
+export default function Graph({ classname, activeNodeId = null }: GraphProps) {
   const { notes } = useNotes();
   const { diagrams } = useDiagrams();
 
@@ -131,7 +136,7 @@ export default function Graph({ classname }: { classname?: string }) {
   return (
     <div className={`relative overflow-hidden ${classname || ""}`}>
       <ErrorBoundary>
-        <ForceGraphComponent data={graphData} />
+        <ForceGraphComponent data={graphData} activeNodeId={activeNodeId} />
       </ErrorBoundary>
     </div>
   );

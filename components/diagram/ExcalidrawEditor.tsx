@@ -22,7 +22,6 @@ type LegacyFlowNode = {
   type?: string;
   position?: {
     x?: number;
-    y?: number;
   };
   data?: {
     label?: unknown;
@@ -63,7 +62,6 @@ const DEFAULT_NODE_STROKE = "#1e1e1e";
 const DEFAULT_IMAGE_NODE_BACKGROUND = "#a5d8ff";
 const DEFAULT_CANVAS_BACKGROUND = "#08090d";
 const EXCALIDRAW_BACKGROUND_CSS_VAR = "--color-main";
-const EXCALIDRAW_BACKGROUND_CSS_VALUE = "var(--color-main)";
 const SAVE_DEBOUNCE_MS = 900;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -92,11 +90,13 @@ function readString(value: unknown) {
 function getExcalidrawBackgroundColor() {
   if (typeof window === "undefined") return DEFAULT_CANVAS_BACKGROUND;
 
-  return (
-    getComputedStyle(document.documentElement)
-      .getPropertyValue(EXCALIDRAW_BACKGROUND_CSS_VAR)
-      .trim() || DEFAULT_CANVAS_BACKGROUND
-  );
+  const color = getComputedStyle(document.documentElement)
+    .getPropertyValue(EXCALIDRAW_BACKGROUND_CSS_VAR)
+    .trim();
+
+  return color && color !== "#ffffff" && color !== "white"
+    ? color
+    : DEFAULT_CANVAS_BACKGROUND;
 }
 
 function isLegacyFlowContent(
@@ -243,8 +243,9 @@ export default function ExcalidrawEditor({
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingContentRef = useRef<DiagramContent | null>(null);
   const onSaveRef = useRef(onSave);
-  const [canvasBackgroundColor, setCanvasBackgroundColor] = useState(
-    DEFAULT_CANVAS_BACKGROUND,
+
+  const [canvasBackgroundColor, setCanvasBackgroundColor] = useState(() =>
+    getExcalidrawBackgroundColor(),
   );
 
   const initialData = useMemo(
@@ -259,26 +260,24 @@ export default function ExcalidrawEditor({
   useEffect(() => {
     const syncCanvasBackground = () => {
       const nextBackgroundColor = getExcalidrawBackgroundColor();
+      setCanvasBackgroundColor(nextBackgroundColor);
 
-      setCanvasBackgroundColor((currentBackgroundColor) =>
-        currentBackgroundColor === nextBackgroundColor
-          ? currentBackgroundColor
-          : nextBackgroundColor,
-      );
-
-      excalidrawApiRef.current?.updateScene({
-        appState: {
-          viewBackgroundColor: nextBackgroundColor,
-        },
-        captureUpdate: "NEVER",
-      });
-      excalidrawApiRef.current?.refresh();
+      if (excalidrawApiRef.current) {
+        excalidrawApiRef.current.updateScene({
+          appState: {
+            viewBackgroundColor: nextBackgroundColor,
+          },
+          captureUpdate: "NEVER",
+        });
+        excalidrawApiRef.current.refresh();
+      }
     };
 
-    syncCanvasBackground();
+    const timeoutId = setTimeout(syncCanvasBackground, 50);
     window.addEventListener("studyhub-theme-change", syncCanvasBackground);
 
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener("studyhub-theme-change", syncCanvasBackground);
     };
   }, []);
@@ -318,9 +317,22 @@ export default function ExcalidrawEditor({
 
   return (
     <div
-      className="h-full w-full excalidraw"
-      style={{ backgroundColor: EXCALIDRAW_BACKGROUND_CSS_VALUE }}
+      className="h-full w-full custom-excalidraw-container"
+      style={{ backgroundColor: canvasBackgroundColor }}
     >
+      {/* Injeção de CSS para forçar a visibilidade das linhas do Grid e das bordas no tema escuro */}
+      <style>{`
+        .custom-excalidraw-container .excalidraw.theme--dark canvas {
+          filter: none !important;
+        }
+        /* Força a cor cinza visível para as linhas do grid do canvas */
+        .custom-excalidraw-container .excalidraw.theme--dark {
+          --grid-color: rgba(255, 255, 255, 0.08) !important;
+          --stroke-color: #ffffff !important;
+          --theme-filter: none !important;
+        }
+      `}</style>
+
       <Excalidraw
         autoFocus
         excalidrawAPI={(api) => {
