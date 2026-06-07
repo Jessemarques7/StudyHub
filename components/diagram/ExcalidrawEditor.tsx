@@ -22,6 +22,7 @@ type LegacyFlowNode = {
   type?: string;
   position?: {
     x?: number;
+    y?: number; // <--- Adicione esta linha para corrigir o erro de compilação
   };
   data?: {
     label?: unknown;
